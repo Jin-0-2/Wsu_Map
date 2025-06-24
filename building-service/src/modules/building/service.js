@@ -1,4 +1,4 @@
-// src/modules/user/service.js
+// src/modules/building/service.js
 
 const con = require("../../core/db")
 
@@ -93,10 +93,10 @@ exports.update = (building_name, desc, file) => {
 };
 
 // 건물 삭제
-exports.delete = (id) => {
-  const deleteQuery = 'DELETE FROM "User" WHERE "Id" = $1'
+exports.delete = (building_name) => {
+  const deleteQuery = 'DELETE FROM "Building" WHERE "Building_Name" = $1'
 
-  const values = [id]
+  const values = [building_name]
 
   return new Promise((resolve, reject) => {
     con.query(deleteQuery, values, (err, result) => {
