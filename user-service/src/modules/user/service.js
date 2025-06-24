@@ -18,8 +18,7 @@ exports.getAll = () => {
 exports.register = (id, pw, name, stu_number, phone, email) => {
   const insertQuery = `
     INSERT INTO "User" ("Id", "Pw", "Name", "Stu_Num", "Phone", "Email")
-    VALUES ($1, $2, $3, $4, $5, $6) 
-    RETURNING "User_Id"
+    VALUES ($1, $2, $3, $4, $5, $6)
   `
   const values = [id, pw, name, stu_number, phone, email]
 

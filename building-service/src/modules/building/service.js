@@ -53,7 +53,7 @@ exports.getBuilding_3d = (building_name) => {
 // 건물 추가
 exports.create = (building_name, x, y, desc, file) => {
   const insertQuery = `
-    INSERT INTO "User" ("Building_Name", "Location", "Description", "File")
+    INSERT INTO "Building" ("Building_Name", "Location", "Description", "File")
     VALUES ($1, point($2, $3), $4,  $5) 
   `
   const values = [building_name, x, y, desc, file ?? null]
