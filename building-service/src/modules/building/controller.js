@@ -102,7 +102,7 @@ exports.update = [
     if (!building_name) {
       return res.status(400).send("building_name는 필수입니다.")
     }
-    if (!desc  && !file) {
+    if (!decs  && !file) {
       return res.status(400).send("수정할 항목이 없습니다.")
     }
 
