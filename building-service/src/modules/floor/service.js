@@ -30,7 +30,7 @@ exports.getFloors = (building_name) => {
 
 // 층 조회 (2d), 하나만
 exports.getFloorNumber = (floor, building_name) => {
-  const query = 'SELECT "File" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Num" = $2'
+  const query = 'SELECT "File" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2'
 
   const values = [building_name, floor]
 
@@ -63,7 +63,7 @@ exports.updateFloorFile = (building_name, floor_number, file) => {
   const sql = `
     UPDATE "Floor"
     SET "File" = $1
-    WHERE "Building_Name" = $2 AND "Floor" = $3
+    WHERE "Building_Name" = $2 AND "Floor_Number" = $3
   `;
   const values = [file, building_name, floor_number];
 
@@ -77,7 +77,7 @@ exports.updateFloorFile = (building_name, floor_number, file) => {
 
 // 층 삭제
 exports.delete = (building_name, floor_number) => {
-  const deleteQuery = 'DELETE FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Num" = $2'
+  const deleteQuery = 'DELETE FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2'
 
   const values = [building_name, floor_number]
 
