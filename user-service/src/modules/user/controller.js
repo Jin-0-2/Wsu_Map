@@ -1,9 +1,6 @@
-// Eun
-// userController.js
+// src/modules/user/controller.js
+
 const userService = require("./service")
-const generateApiKey = require("../apikey/service").createApiKey
-const saveLog = require("../../core/savelogService");
-const validateApiKey = require("../../core/validateApikey")
 
 exports.getAll = async (req, res) => {
   try {

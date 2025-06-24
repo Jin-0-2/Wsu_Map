@@ -1,6 +1,6 @@
-// Eun **************
-// User.js
-const con = require("../../core/dbConnect")
+// src/modules/user/service.js
+
+const con = require("../../core/db")
 
 // 회원 전체 조회
 exports.getAll = () => {
