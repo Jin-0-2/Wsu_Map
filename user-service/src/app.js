@@ -4,10 +4,12 @@ const express = require('express');
 const app = express();
 const userRouter = require('./routes/index');
 
+const AWS_IP = `http://13.55.76.216:`
+
 app.use(express.json());
 app.use("/", userRouter);
 
-const PORT = 3000;
+const PORT = 3001;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on ${AWS_IP}${PORT}`);
 });
