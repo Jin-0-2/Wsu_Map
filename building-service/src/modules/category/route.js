@@ -7,7 +7,7 @@ const controller = require("./controller")
 // 카테고리 검색(건물 이름 > 건물 위치)
 router.get("/:name", controller.getAll)
 
-// 
+// 건물_층 2d도면에 카테고리 필터 클릭시 띄우기
 router.get("/:building", controller.getFloors)
 
 // 층 조회 (2D)
