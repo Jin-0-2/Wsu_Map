@@ -19,4 +19,7 @@ router.post("/logout", controller.logout)
 // 회원정보 수정
 router.put("/update", controller.update)
 
+// 회원정보 삭제
+router.delete("/delete", controller.delete)
+
 module.exports = router

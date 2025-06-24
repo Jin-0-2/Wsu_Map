@@ -15,21 +15,26 @@ exports.getAll = () => {
 }
 
 // 회원가입
-exports.register = (id, pw, name, stu_number, phone, email, type_id) => {
+exports.register = (id, pw, name, stu_number, phone, email) => {
   const insertQuery = `
-    INSERT INTO "User" ("Id", "Pw", "Name", "Stu_Number", "Phone", "Email", "Type_Id")
-    VALUES ($1, $2, $3, $4, $5, $6, $7) 
+    INSERT INTO "User" ("Id", "Pw", "Name", "Stu_Num", "Phone", "Email")
+    VALUES ($1, $2, $3, $4, $5, $6) 
     RETURNING "User_Id"
   `
-  const values = [id, pw, name, stu_number, phone, email, type_id]
+  const values = [id, pw, name, stu_number, phone, email]
 
   return new Promise((resolve, reject) => {
     con.query(
       insertQuery, values, (err, result) => {
         if (err) {
-          // 중복(유니크 제약 위반) 에러코드: 23505
+          // 중복(PK 제약 위반) 에러코드: 23505
           if (err.code === '23505') {
-            return resolve({ duplicate: true });
+            // 어떤 제약조건 위반인지 구분
+            return resolve({ 
+              duplicate: true,
+              constraint: err.constraint, // 예: user_pkey, user_email_key 등
+              detail: err.detail // 예: Key (id)=(test) already exists.
+            });
           }
           return reject(err);
         }
@@ -41,9 +46,8 @@ exports.register = (id, pw, name, stu_number, phone, email, type_id) => {
 
 // 로그인
 exports.login = (id, pw) => {
-  const selectQuery    = `SELECT "User_Id", "Name", "Type_Id" FROM "User" WHERE "Id" = $1 AND "Pw" = $2`
-  const updateQuery    = 'UPDATE "User" SET "IsLogin" = true WHERE "Id" = $1'
-  const getApiKeyQuery = 'SELECT "APIkey" FROM "APIkey" WHERE "User_Id" = $1'
+  const selectQuery    = `SELECT * FROM "User" WHERE "Id" = $1 AND "Pw" = $2`
+  const updateQuery    = 'UPDATE "User" SET "Is_Login" = true WHERE "Id" = $1'
 
   const values = [id, pw]
   const values2 = [id]
@@ -56,24 +60,17 @@ exports.login = (id, pw) => {
 
       console.log(result.rows[0]); // 실제 반환되는 키 확인!
 
-      const { User_Id, Name, Type_Id } = result.rows[0];
-      console.log(User_Id, Name, Type_Id)
+      const { Id, Name } = result.rows[0];
 
       // 2. 로그인 상태 업데이트 (비동기, 실패해도 로그인은 진행)
       con.query(updateQuery, values2, (err) => {
         if (err) console.error("IsLogin 업데이트 실패:", err);
-        // 3. API키 가져오기
-        con.query(getApiKeyQuery, [User_Id], (err, result) => {
-          if (err) return reject(err);
-          console.log(result)
-          if (result.rows.length === 0) return resolve({ notfound: true });
-          return resolve({
-            apikey: result.rows[0].apikey || result.rows[0].APIkey,
-            user_id: User_Id,
-            name: Name,
-            type_id: Type_Id
-          });
-        });
+
+        return resolve({
+          id: Id,
+          name: Name,
+          message: "로그인 성공!"
+        })
       });
     });
   });
@@ -81,7 +78,7 @@ exports.login = (id, pw) => {
 
 // 로그아웃
 exports.logout = (id) => {
-  const updateQuery = 'UPDATE "User" SET "IsLogin" = false WHERE "Id" = $1'
+  const updateQuery = 'UPDATE "User" SET "Is_Login" = false WHERE "Id" = $1'
 
   const values = [id]
 
@@ -117,6 +114,20 @@ exports.update = (id, pw, phone, email) => {
 
   return new Promise((resolve, reject) => {
     con.query(sql, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+// 회원정보 삭제
+exports.delete = (id) => {
+  const deleteQuery = 'DELETE FROM "User" WHERE "Id" = $1'
+
+  const values = [id]
+
+  return new Promise((resolve, reject) => {
+    con.query(deleteQuery, values, (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });
