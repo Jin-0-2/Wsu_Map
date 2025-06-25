@@ -87,7 +87,7 @@ exports.create = [
       return res.status(400).send("모든 항목을 입력하세요.")
     }
 
-    const result = await Service.register(building_name, x, y, desc, file);
+    const result = await Service.create(building_name, x, y, desc, file);
 
     res.status(201).json({
       message: "건물추가가 완료되었습니다",
