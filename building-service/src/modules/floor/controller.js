@@ -3,10 +3,13 @@
 const Service = require("./service")
 const multer = require('multer');
 const upload = multer();
+const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
 
 // 전체 조회
 exports.getAll = async (req, res) => {
   try {
+    logRequestInfo(req);
+
     const result = await Service.getAll();
     
     res.status(200).json(result.rows);
@@ -20,6 +23,8 @@ exports.getAll = async (req, res) => {
 // 건물 별 층 조회 (2d)
 exports.getFloors = async (req, res) => {
   try {
+    logRequestInfo(req);
+
     const building_name = req.params.building;
 
     const result = await Service.getFloors(building_name);
@@ -54,6 +59,8 @@ exports.getFloors = async (req, res) => {
 // 층 조회 (2d), 하나만
 exports.getFloorNumber = async (req, res) => {
   try {
+    logRequestInfo(req);
+
     const floor = req.params.floor;
     const building_name = req.params.building;
 
@@ -86,6 +93,8 @@ exports.create = [
   upload.single('file'),
   async (req, res) => {
   try {
+    logRequestInfo(req);
+
     const { building_name, floor_number } = req.body
     const file = req.file ? req.file.buffer : null; //파일이 없으면 null
     console.log(`${building_name}, ${floor_number}`)
@@ -111,6 +120,8 @@ exports.update = [
   upload.single('file'),
   async (req, res) => {
   try {
+    logRequestInfo(req);
+
     const floor_number = req.params.floor;
     const building_name = req.params.building;
     const file = req.file ? req.file.buffer : undefined;
@@ -136,6 +147,8 @@ exports.update = [
 // 층 삭제
 exports.delete = async (req, res) => {
   try {
+    logRequestInfo(req);
+    
     const floor_number = req.params.floor;
     const building_name  = req.params.building;
 

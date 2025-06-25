@@ -71,13 +71,13 @@ exports.create = async (req, res) => {
     const result = await Service.create(building_name, floor_number, category, x, y);
 
     res.status(201).json({
-        message: "층 추가가 완료되었습니다",
-      });
-    } catch (err) {
-      console.error("층 추가 처리 중 오류:", err);
-      res.status(500).send("층 추가 처리 중 오류");
-    }
+      message: "층 추가가 완료되었습니다",
+    });
+  } catch (err) {
+    console.error("층 추가 처리 중 오류:", err);
+    res.status(500).send("층 추가 처리 중 오류");
   }
+}
 
 
 // 카테고리 삭제: 이건 관리 페이지에서.. 목록을 보고 삭제를..

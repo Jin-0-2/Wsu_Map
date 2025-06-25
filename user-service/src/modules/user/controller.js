@@ -1,10 +1,13 @@
 // src/modules/user/controller.js
 
 const userService = require("./service")
+const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
 
 // 회원 전체 조회
 exports.getAll = async (req, res) => {
   try {
+    logRequestInfo(req);
+    
     const result = await userService.getAll();
     
     res.status(200).json(result.rows);
@@ -18,6 +21,8 @@ exports.getAll = async (req, res) => {
 // 회원 가입
 exports.register = async (req, res) => {
   try {
+    logRequestInfo(req);
+
     const { id, pw, name, stu_number, phone, email } = req.body
     if (!id || !pw || !name || !phone) {
       return res.status(400).send("모든 항목을 입력하세요.")
@@ -41,6 +46,8 @@ exports.register = async (req, res) => {
 // 로그인
 exports.login = async (req, res) => {
   try {
+    logRequestInfo(req);
+
     const { id, pw } = req.body
     if (!id || !pw) {
       return res.status(400).send("아이디와 비밀번호를 입력하세요.")
@@ -63,6 +70,8 @@ exports.login = async (req, res) => {
 // 로그아웃
 exports.logout = async (req, res) => {
   try {
+    logRequestInfo(req);
+
     const { id } = req.body;
 
     const result = await userService.logout(id);
@@ -82,6 +91,8 @@ exports.logout = async (req, res) => {
 // 회원 수정
 exports.update = async (req, res) => {
   try {
+    logRequestInfo(req);
+
     const { id, pw, phone, email } = req.body
 
     if (!id) {
@@ -108,6 +119,8 @@ exports.update = async (req, res) => {
 // 회원 삭제
 exports.delete = async (req, res) => {
   try {
+    logRequestInfo(req);
+
     const { id } = req.body;
 
     const result = await userService.delete(id);

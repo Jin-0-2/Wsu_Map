@@ -59,9 +59,8 @@ exports.parsePoint = (pointStr) => {
 // 카테고리 추가
 exports.create = (building_name, floor_number, category, x, y) => {
   const insertQuery = `
-    INSERT INTO "Floor" ("Floor_Number", "Building_Name", "File")
-    VALUES ($1, $2, $3)
-  `;
+  INSERT INTO "Categories" ("Category_Name", "Building_Name") VALUES ($1, $2);
+  INSERT INTO "Floor_C" (")`;
   const values = [floor_number, building_name, file ?? null]
 
   return new Promise((resolve, reject) => {
