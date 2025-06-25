@@ -25,7 +25,7 @@ exports.getBuilding_Location = async (req, res) => {
   try {
     logRequestInfo(req);
 
-    const building_name = req.params.id;
+    const building_name = req.params.name;
 
     const result = await Service.getBuilding_Location(building_name);
 
@@ -106,12 +106,10 @@ exports.update = [
   try {
     logRequestInfo(req);
 
-    const { building_name, decs } = req.body;
+    const building_name = req.params.name;
+    const decs  = req.body;
     const file = req.file ? req.file.buffer : undefined;
 
-    if (!building_name) {
-      return res.status(400).send("building_name는 필수입니다.")
-    }
     if (!decs  && !file) {
       return res.status(400).send("수정할 항목이 없습니다.")
     }

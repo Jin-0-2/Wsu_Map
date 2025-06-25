@@ -16,7 +16,7 @@ router.get("/:name/3d", controller.getBuilding_3d)
 // 빌딩 추가
 router.post("/", controller.create)
 
-// 회원정보 수정
+// 빌딩 수정
 router.put("/:name", controller.update)
 
 module.exports = router
