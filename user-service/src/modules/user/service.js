@@ -68,7 +68,7 @@ exports.login = (id, pw) => {
         return resolve({
           id: Id,
           name: Name,
-          IsLogin: result.rows[0]
+          islogin: result.rows[0]
         })
       });
     });

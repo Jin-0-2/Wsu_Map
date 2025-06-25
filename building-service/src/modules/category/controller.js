@@ -71,11 +71,11 @@ exports.create = async (req, res) => {
     const result = await Service.create(building_name, floor_number, category, x, y);
 
     res.status(201).json({
-      message: "층 추가가 완료되었습니다",
+      message: "카테고리 추가가 완료되었습니다",
     });
   } catch (err) {
-    console.error("층 추가 처리 중 오류:", err);
-    res.status(500).send("층 추가 처리 중 오류");
+    console.error("카테고리 추가 처리 중 오류:", err);
+    res.status(500).send("카테고리 추가 처리 중 오류");
   }
 }
 
@@ -83,19 +83,20 @@ exports.create = async (req, res) => {
 // 카테고리 삭제: 이건 관리 페이지에서.. 목록을 보고 삭제를..
 exports.delete = async (req, res) => {
   try {
+    const building_name = req.params.building;
     const floor_number = req.params.floor;
-    const building_name  = req.params.building;
+    const category = req.body.category;
 
-    const result = await Service.delete(building_name, floor_number);
+    const result = await Service.delete(building_name, floor_number, category);
     if (result.rowCount === 0) {
       // 삭제된 행이 없음 → 잘못된 id
-      return res.status(404).send("존재하지 않는 층입니다.");
+      return res.status(404).send("존재하지 않는 건물/층입니다.");
     }
 
-    res.status(200).send("층 삭제 성공");
+    res.status(200).send("카테고리 삭제 성공");
   } catch (err) {
-    console.error("층 삭제 처리 중 오류:", err);
+    console.error("카테고리 삭제 처리 중 오류:", err);
 
-    res.status(500).send("층 삭제 처리 중 오류");
+    res.status(500).send("카테고리 삭제 처리 중 오류");
   }
 };

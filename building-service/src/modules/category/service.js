@@ -58,46 +58,51 @@ exports.parsePoint = (pointStr) => {
 
 // 카테고리 추가
 exports.create = (building_name, floor_number, category, x, y) => {
-  const insertQuery = `
-  INSERT INTO "Categories" ("Category_Name", "Building_Name") VALUES ($1, $2);
-  INSERT INTO "Floor_C" (")`;
-  const values = [floor_number, building_name, file ?? null]
+  const f_idQuery = `SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2;`
+  const insert_Categories_Query = `INSERT INTO "Categories" ("Category_Name", "Building_Name") VALUES ($1, $2);`;
+  const insert_Floor_C_Query = `INSERT INTO "Floor_C" ("Floor_Id", "Category_Name", "Category_Location") VALUES ($1, $2, point($3, $4));`;
+  const values1 = [building_name, floor_number]
+  const values2 = [category, building_name]
 
   return new Promise((resolve, reject) => {
-    con.query(insertQuery, values, (err, result) => {
+    con.query(f_idQuery, values1, (err, result) => {
         if (err)  return reject(err);
-        resolve(result);
+
+        const floor_id = result.rows[0];
+        const values3 = [floor_id, category, x, y];
+
+        con.query(insert_Categories_Query, values2, (err) => {
+          if(err) return reject(err);
+        })
+        con.query(insert_Floor_C_Query, values3, (err, result) => {
+          if(err) return reject(err);
+
+          return resolve(result);
+        })
     });
   });
 };
 
-// 층 정보 수정
-exports.updateFloorFile = (building_name, floor_number, file) => {
-  const sql = `
-    UPDATE "Floor"
-    SET "File" = $1
-    WHERE "Building_Name" = $2 AND "Floor" = $3
-  `;
-  const values = [file, building_name, floor_number];
+// 카테고리 삭제: 이건 관리 페이지에서.. 목록을 보고 삭제를..
+exports.delete = (building_name, floor_number, category) => {
+  const delete_Floor_id_Query = `DELETE FROM "Floor_C" WHERE "Floor_Id" = (
+      SELECT "Floor_Id"
+      FROM "Floor"
+      WHERE "Building_Name" = $1 AND "Floor_Number" = $2)
+      AND "Category_Name" = $3;
+      `
+  const delete_Categories_Query = `DELETE FROM "Categories" WHERE "Building_Name" = $4 AND "Category_Name" = $5;`;
+
+  const values1 = [building_name, floor_number, category];
+  const values2 = [building_name, category]
 
   return new Promise((resolve, reject) => {
-    con.query(sql, values, (err, result) => {
+    con.query(delete_Floor_id_Query, values1, (err, result) => {
       if (err) return reject(err);
-      resolve(result);
     });
-  });
-};
-
-// 층 삭제
-exports.delete = (building_name, floor_number) => {
-  const deleteQuery = 'DELETE FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Num" = $2'
-
-  const values = [building_name, floor_number]
-
-  return new Promise((resolve, reject) => {
-    con.query(deleteQuery, values, (err, result) => {
+    con.query(delete_Categories_Query, values2, (err, result) => {
       if (err) return reject(err);
-      resolve(result);
+      return resolve(result);
     });
   });
 };
