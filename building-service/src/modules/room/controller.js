@@ -25,18 +25,13 @@ exports.getAll = async (req, res) => {
 exports.getRoomDescByName = async (req, res) => {
   try {
     logRequestInfo(req);
-    const building = req.params.building;
-    const floor = req.params.floor;
-    const room = req.body;
+    const building_name = req.params.building;
+    const floor_number = req.params.floor;
+    const room_name = req.body;
     
-    const result = await Service.getRoomDescByName(category_name);
+    const result = await Service.getRoomDescByName(building_name, floor_number, room_name);
 
-    const rows = result.rows.map(row => ({
-      ...row,
-      Location: Service.parsePoint(row.Category_Location)
-    }));
-
-    res.status(200).json(rows);
+    res.status(200).json(result.rows[0]);
   } catch (err) {
     console.error("DB 오류:", err);
 
@@ -125,10 +120,10 @@ exports.delete = async (req, res) => {
       return res.status(404).send("존재하지 않는 건물/층/방입니다.");
     }
 
-    res.status(200).send("카테고리 삭제 성공");
+    res.status(200).send("방 삭제 성공");
   } catch (err) {
-    console.error("카테고리 삭제 처리 중 오류:", err);
+    console.error("방 삭제 처리 중 오류:", err);
 
-    res.status(500).send("카테고리 삭제 처리 중 오류");
+    res.status(500).send("방 삭제 처리 중 오류");
   }
 };

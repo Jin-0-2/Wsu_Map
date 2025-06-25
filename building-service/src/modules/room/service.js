@@ -4,7 +4,7 @@ const con = require("../../core/db")
 
 // 전체 조회
 exports.getAll = () => {
-  const query = 'SELECT * FROM "Categories" ORDER BY "Building_Name", "Category_Name"'
+  const query = 'SELECT * FROM "Floor_R" ORDER BY "Floor_Id"'
 
   return new Promise((resolve, reject) => {
     con.query(query, (err, result) => {
@@ -15,10 +15,10 @@ exports.getAll = () => {
 }
 
 // 2D도면에서 방 클릭 시 보여줄 방 이름 및 설명
-exports.getRoomDescByName = (category_name) => {
-  const query = 'SELECT c."Building_Name", b."Location" FROM "Categories" c JOIN "Building" b ON c."Building_Name" = b."Building_Name" WHERE c."Category_Name" = $1';
+exports.getRoomDescByName = (building_name, floor_number, room_name) => {
+  const query = 'SELECT r."Room_Description" FROM "Floor_R" r JOIN "Floor" f ON r."Floor_Id" = f."Floor_Id" WHERE f."Building_Name" = $1 AND f."Floor_Number" = $2 AND r."Room_Name" = $3';
   
-  const values = [category_name]
+  const values = [building_name, floor_number, room_name];
 
   return new Promise((resolve, reject) => {
     con.query(query, values, (err, result) => {
@@ -28,7 +28,7 @@ exports.getRoomDescByName = (category_name) => {
   });
 }
 
-// 길찾기용 포인트 얻기
+// 길찾기용 포인트 얻기 (이건.. 다시 생각해봐야 할듯..)  > 승헌이형꺼 붙이기
 exports.getCategoryLocationsAt2D = (building_name, floor_number, category) => {
   const query = `
   SELECT fc."Category_Location"
@@ -71,7 +71,7 @@ exports.create = (building_name, floor_number, room_name, room_desc, x, y) => {
     con.query(insertQuery, values, (err, result) => {
         if (err)  return reject(err);
 
-        return resolve(result);
+        resolve(result);
         })
     });
 };
@@ -92,7 +92,7 @@ exports.update = (building_name, floor_number, room_name, room_desc) => {
     con.query(updateQuery, values, (err, result) => {
         if (err)  return reject(err);
 
-        return resolve(result);
+        resolve(result);
         })
     });
 };
@@ -112,7 +112,7 @@ exports.delete = (building_name, floor_number, room_name) => {
     con.query(deleteQuery, values, (err, result) => {
       if (err) return reject(err);
     });
-    
-    return resolve(result);
+
+    resolve(result);
     });
 };
