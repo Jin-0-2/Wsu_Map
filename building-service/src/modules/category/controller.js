@@ -17,8 +17,22 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// 건물 별 층 조회 (2d)
-exports.getFloors = async (req, res) => {
+// 카테고리 검색(카테고리 이름 > 건물 위치) 메인화면에서 상단부분 필터 클릭 시
+exports.getBuildingLocationsByCategory = async (req, res) => {
+  try {
+    const category_name = req.params.category;
+    const result = await Service.getAll();
+    
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("DB 오류:", err);
+    
+    res.status(500).send("DB 오류");
+  }
+};
+
+// 건물_층 2d도면에 카테고리 필터 클릭시 띄우기
+exports.getCategoryLocationsAt2D = async (req, res) => {
   try {
     const building_name = req.params.building;
 
@@ -51,37 +65,7 @@ exports.getFloors = async (req, res) => {
   }
 };
 
-// 층 조회 (2d), 하나만
-exports.getFloorNumber = async (req, res) => {
-  try {
-    const floor = req.params.floor;
-    const building_name = req.params.building;
-
-    const result = await Service.getFloorNumber(floor, building_name);
-
-    if (!result.rows.length) {
-      return res.status(404).send("해당 층 도면이 없습니다.");
-    }
-    
-    const fileBuffer = result.rows[0].File; // bytea 컬럼
-    if (!fileBuffer) {
-      return res.status(404).send("도면 파일이 없습니다.");
-    }
-
-    // Content-Type: PNG
-    res.setHeader('Content-Type', 'image/png');
-    // 파일명 예시: W15_2층.png
-    res.setHeader('Content-Disposition', `inline; filename="${building_name}_${floor}.png"`);
-
-    res.status(200).send(fileBuffer);
-  } catch (err) {
-    console.error("DB 오류:", err);
-
-    res.status(500).send("DB 오류");
-  }
-};
-
-// 층 추가
+// 카테고리 추가(2d도면에서 좌표 지정, 이름 지정을 하면, 카테고리스, floor_c에 들거가게끔)
 exports.create = [
   upload.single('file'),
   async (req, res) => {
@@ -105,34 +89,7 @@ exports.create = [
   }
 ];
 
-// 층 수정
-exports.update = [
-  upload.single('file'),
-  async (req, res) => {
-  try {
-    const floor_number = req.params.floor;
-    const building_name = req.params.building;
-    const file = req.file ? req.file.buffer : undefined;
-
-    if (!floor_number || !building_name) {
-        return res.status(400).send("floor_number와 building_name은 필수입니다.");
-      }
-
-    const result = await Service.update(building_name, floor_number, file);
-
-    if (result.rowCount === 0) {
-      return res.status(404).send("해당 이름의 건물이 없습니다.");
-    }
-
-    res.status(200).send("건물정보가 수정되었습니다.");
-  } catch (err) {
-    console.error("건물정보 수정 중 오류:", err);
-
-    res.status(500).send("건물정보 수정 중 오류");
-  }
-}]; 
-
-// 층 삭제
+// 카테고리 삭제: 이건 관리 페이지에서.. 목록을 보고 삭제를..
 exports.delete = async (req, res) => {
   try {
     const floor_number = req.params.floor;

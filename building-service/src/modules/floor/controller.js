@@ -88,7 +88,7 @@ exports.create = [
   try {
     const { building_name, floor_number } = req.body
     const file = req.file ? req.file.buffer : null; //파일이 없으면 null
-    console.log(`${building_name}, ${floor_number}`);
+    console.log(`${building_name}, ${floor_number}`)
 
     if (!floor_number || !building_name) {
         return res.status(400).send("floor_number와 building_name을 모두 입력하세요.");
