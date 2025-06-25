@@ -46,7 +46,7 @@ exports.register = (id, pw, name, stu_number, phone, email) => {
 // 로그인
 exports.login = (id, pw) => {
   const selectQuery    = `SELECT * FROM "User" WHERE "Id" = $1 AND "Pw" = $2`
-  const updateQuery    = 'UPDATE "User" SET "Is_Login" = true WHERE "Id" = $1'
+  const updateQuery    = 'UPDATE "User" SET "Is_Login" = true WHERE "Id" = $1 RETURNING "Is_Login";'
 
   const values = [id, pw]
   const values2 = [id]
@@ -62,13 +62,13 @@ exports.login = (id, pw) => {
       const { Id, Name } = result.rows[0];
 
       // 2. 로그인 상태 업데이트 (비동기, 실패해도 로그인은 진행)
-      con.query(updateQuery, values2, (err) => {
+      con.query(updateQuery, values2, (err, result) => {
         if (err) console.error("IsLogin 업데이트 실패:", err);
 
         return resolve({
           id: Id,
           name: Name,
-          message: "로그인 성공!"
+          IsLogin: result.rows[0]
         })
       });
     });
