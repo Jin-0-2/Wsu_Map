@@ -14,6 +14,19 @@ exports.getAll = () => {
   });
 }
 
+exports.getRoombyBuildingFloor = (building_name, floor_number) => {
+  const query = 'SELECT r."Romm"Name", r."Romm_Description", r."Room_Location" FROM "Floor_R" r JOIN "Floor" f ON r."Floor_Id" = f."Floor_Id" WHERE f."Building_Name" = $1 AND f."Floor_Number" = $2'
+
+  const values = [building_name, floor_number];
+
+  return new Promise((resolve, reject) => {
+    con.query(query, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 // 2D도면에서 방 클릭 시 보여줄 방 이름 및 설명
 exports.getRoomDescByName = (building_name, floor_number, room_name) => {
   const query = 'SELECT r."Room_Description" FROM "Floor_R" r JOIN "Floor" f ON r."Floor_Id" = f."Floor_Id" WHERE f."Building_Name" = $1 AND f."Floor_Number" = $2 AND r."Room_Name" = $3';

@@ -13,7 +13,7 @@ exports.getAll = () => {
     });
   });
 }
-
+  
 // 건물 조회
 exports.getBuilding_Location = (building_name) => {
   const query = 'SELECT "Building_Name", "Location", "Description" FROM "Building" WHERE "Building_Name" = $1'

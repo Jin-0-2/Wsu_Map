@@ -11,8 +11,14 @@ exports.getAll = async (req, res) => {
     logRequestInfo(req);
 
     const result = await Service.getAll();
+
+     // file(Buffer) → Base64로 변환
+    const floors = result.rows.map(row => ({
+      ...row,
+      file: row.File ? row.File.toString('base64') : null
+    }));
     
-    res.status(200).json(result.rows);
+    res.status(200).json(floors);
   } catch (err) {
     console.error("DB 오류:", err);
     
@@ -32,7 +38,7 @@ exports.getFloors = async (req, res) => {
      // file(Buffer) → Base64로 변환
     const floors = result.rows.map(row => ({
       ...row,
-      file: row.file ? row.file.toString('base64') : null
+      file: row.File ? row.File.toString('base64') : null
     }));
     /*
     [
@@ -48,6 +54,7 @@ exports.getFloors = async (req, res) => {
       }
     ]
     */
+    console.log(floors);
     res.status(200).json(floors);
   } catch (err) {
     console.error("DB 오류:", err);

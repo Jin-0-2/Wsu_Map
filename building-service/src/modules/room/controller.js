@@ -21,13 +21,29 @@ exports.getAll = async (req, res) => {
   }
 };
 
+// 건물_층의 방 목록 조회 : 관리자
+exports.getRoombyBuildingFloor = async (req, res) => {
+  try {
+    const building_name = req.params.building;
+    const floor_number = req.params.floor;
+
+    const result = await Service.getRoombyBuildingFloor(building_name, floor_number);
+    
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류");
+  }
+}
+
 // 2D도면에서 방 클릭 시 보여줄 방 이름 및 설명
 exports.getRoomDescByName = async (req, res) => {
   try {
     logRequestInfo(req);
     const building_name = req.params.building;
     const floor_number = req.params.floor;
-    const room_name = req.body;
+    const room_name = req.body.room_name;
     
     const result = await Service.getRoomDescByName(building_name, floor_number, room_name);
 
@@ -45,7 +61,7 @@ exports.getRoomPointByName = async (req, res) => {
     logRequestInfo(req);
     const building = req.params.building;
     const floor = req.params.floor;
-    const room = req.body;
+    const room_ = req.body;
     
     const result = await Service.getBuildingLocationsByCategory(category_name);
 
@@ -112,7 +128,7 @@ exports.delete = async (req, res) => {
     
     const building_name = req.params.building;
     const floor_number = req.params.floor;
-    const room_name = req.body.category;
+    const room_name = req.body.room_name;
 
     const result = await Service.delete(building_name, floor_number, room_name);
     if (result.rowCount === 0) {

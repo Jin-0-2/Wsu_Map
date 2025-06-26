@@ -72,7 +72,6 @@ exports.getCategoryLocationsAt2D = async (req, res) => {
     
     // Location 컬럼 파싱
     const rows = result.rows.map(row => ({
-      ...row,
       Location: Service.parsePoint(row.Category_Location)
     }));
 
@@ -93,10 +92,10 @@ exports.getAllCategoryLocationsAt2D = async (req, res) => {
     const floor_number = req.params.floor;
 
     const result = await Service.getAllCategoryLocationsAt2D(building_name, floor_number);
-    
+
     // Location 컬럼 파싱
     const rows = result.rows.map(row => ({
-      ...row,
+      Category_Name: row.Category_Name,
       Location: Service.parsePoint(row.Category_Location)
     }));
 
