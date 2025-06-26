@@ -42,6 +42,23 @@ exports.getBuildingLocationsByCategory = async (req, res) => {
   }
 };
 
+// 2D도면에서 필터를 선택하려면 카테고리 목록이 필요하겠지? 주는거 만들어야겠지?
+exports.getCategoryListAt2D = async (req, res) => {
+  try{
+    logRequestInfo(req);
+
+    const building_name = req.params.building;
+    const floor_number = req.params.floor;
+
+    const result = await Service.getCategoryListAt2D(building_name, floor_number);
+
+  } catch (err){
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류");
+  }
+}
+
 // 건물_층 2d도면에 카테고리 필터 클릭시 띄우기
 exports.getCategoryLocationsAt2D = async (req, res) => {
   try {
@@ -52,6 +69,30 @@ exports.getCategoryLocationsAt2D = async (req, res) => {
     const category = req.body.category;
 
     const result = await Service.getCategoryLocationsAt2D(building_name, floor_number, category);
+    
+    // Location 컬럼 파싱
+    const rows = result.rows.map(row => ({
+      ...row,
+      Location: Service.parsePoint(row.Category_Location)
+    }));
+
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류");
+  }
+};
+
+// 건물_층 2d도면에 카테고리 전부 띄우기(관리자용)
+exports.getAllCategoryLocationsAt2D = async (req, res) => {
+  try {
+    logRequestInfo(req);
+
+    const building_name = req.params.building;
+    const floor_number = req.params.floor;
+
+    const result = await Service.getAllCategoryLocationsAt2D(building_name, floor_number);
     
     // Location 컬럼 파싱
     const rows = result.rows.map(row => ({

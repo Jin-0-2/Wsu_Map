@@ -28,6 +28,21 @@ exports.getBuildingLocationsByCategory = (category_name) => {
   });
 }
 
+// 2D도면에서 필터를 선택하려면 카테고리 목록이 필요하겠지? 주는거 만들어야겠지?
+exports.getCategoryListAt2D = (building_name, floor_number) => {
+  const query = ``;
+  
+  const values = [building_name, floor_number]
+
+  return new Promise((resolve, reject) => {
+    con.query(query, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
+
 // 건물_층 2d도면에 카테고리 필터 클릭시 띄우기
 exports.getCategoryLocationsAt2D = (building_name, floor_number, category) => {
   const query = `
@@ -39,6 +54,25 @@ exports.getCategoryLocationsAt2D = (building_name, floor_number, category) => {
     AND fc."Category_Name" = $3
 `;
   const values = [building_name, floor_number, category]
+
+  return new Promise((resolve, reject) => {
+    con.query(query, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
+// 건물_층 2d도면에 카테고리 전부 띄우기(관리자용)
+exports.getAllCategoryLocationsAt2D = (building_name, floor_number) => {
+  const query = `
+  SELECT fc."Category_Name", fc."Category_Location"
+  FROM "Floor" f
+  JOIN "Floor_C" fc ON f."Floor_Id" = fc."Floor_Id"
+  WHERE f."Building_Name" = $1
+    AND f."Floor_Number" = $2
+`;
+  const values = [building_name, floor_number]
 
   return new Promise((resolve, reject) => {
     con.query(query, values, (err, result) => {
@@ -68,7 +102,7 @@ exports.create = (building_name, floor_number, category, x, y) => {
     con.query(f_idQuery, values1, (err, result) => {
         if (err)  return reject(err);
 
-        const floor_id = result.rows[0];
+        const floor_id = result.rows[0].Floor_Id;
         const values3 = [floor_id, category, x, y];
 
         con.query(insert_Categories_Query, values2, (err) => {
