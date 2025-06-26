@@ -110,7 +110,7 @@ exports.update = [
     const desc  = req.body.desc;
     const file = req.file ? req.file.buffer : undefined;
 
-    if (!decs  && !file) {
+    if (!desc  && !file) {
       return res.status(400).send("수정할 항목이 없습니다.")
     }
 
