@@ -114,7 +114,7 @@ exports.update = [
       return res.status(400).send("수정할 항목이 없습니다.")
     }
 
-    const result = await userService.update(building_name, decs, file);
+    const result = await Service.update(building_name, decs, file);
 
     if (result.rowCount === 0) {
       return res.status(404).send("해당 이름의 건물이 없습니다.");

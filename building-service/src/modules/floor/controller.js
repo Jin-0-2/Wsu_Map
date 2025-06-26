@@ -124,7 +124,7 @@ exports.update = [
         return res.status(400).send("floor_number와 building_name은 필수입니다.");
       }
 
-    const result = await Service.update(building_name, floor_number, file);
+    const result = await Service.updateFloorFile(building_name, floor_number, file);
 
     if (result.rowCount === 0) {
       return res.status(404).send("해당 이름의 건물이 없습니다.");
