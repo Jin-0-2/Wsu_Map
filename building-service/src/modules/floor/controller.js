@@ -40,21 +40,8 @@ exports.getFloors = async (req, res) => {
       ...row,
       file: row.File ? row.File.toString('base64') : null
     }));
-    /*
-    [
-      {
-        floor: 1,
-        building: "w15",
-        file: "iVBORw0KGgoAAAANSUhEUgAA..." // Base64 인코딩된 PNG 데이터
-      },
-      {
-        floor: 2,
-        building: "w15",
-        file: "iVBORw0KGgoAAAANSUhEUgAA..." // Base64 인코딩된 PNG 데이터
-      }
-    ]
-    */
-    console.log(floors);
+    
+
     res.status(200).json(floors);
   } catch (err) {
     console.error("DB 오류:", err);
