@@ -107,14 +107,14 @@ exports.update = [
     logRequestInfo(req);
 
     const building_name = req.params.name;
-    const decs  = req.body;
+    const desc  = req.body.desc;
     const file = req.file ? req.file.buffer : undefined;
 
     if (!decs  && !file) {
       return res.status(400).send("수정할 항목이 없습니다.")
     }
 
-    const result = await Service.update(building_name, decs, file);
+    const result = await Service.update(building_name, desc, file);
 
     if (result.rowCount === 0) {
       return res.status(404).send("해당 이름의 건물이 없습니다.");
