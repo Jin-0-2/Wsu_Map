@@ -93,10 +93,7 @@ exports.create = (building_name, floor_number, room_name, room_desc, x, y) => {
 exports.update = (building_name, floor_number, old_room_name, room_name, room_desc) => {
   const updateQuery = `UPDATE "Floor_R"
   SET "Room_Name" = $1, "Room_Description" = $2
-  WHERE "Floor_Id" = (
-  SELECT "Floor_Id"
-  FROM "Floor"
-  WHERE "Building_Name" = $3 AND "Floor_Number" = $4)
+  WHERE "Floor_Id" = (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $3 AND "Floor_Number" = $4)
   AND "Room_Name" = $5;`;
 
   const values = [room_name, room_desc, building_name, floor_number, old_room_name];
