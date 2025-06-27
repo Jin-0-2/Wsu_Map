@@ -5,9 +5,8 @@ const con = require("../../core/db")
 let outdoorGraph = null;
 let outdoorLocations = null;
 
-// 전체 조회
-exports.getPath = () => {
-  const query = 'select f."Building_Name", f."Floor_Number", r."Room_Name", r."Room_Description" from "Floor_R" r JOIN "Floor" f ON r."Floor_Id" = f."Floor_Id"'
+// 건물 ↔ 건물
+exports.handleBuildingToBuilding = (from_building, to_building) => {
 
   return new Promise((resolve, reject) => {
     con.query(query, (err, result) => {
@@ -16,6 +15,40 @@ exports.getPath = () => {
     });
   });
 }
+
+// 호실 ↔ 건물
+exports.handleRoomToBuilding = (from_building, from_floor, from_room, to_building) => {
+
+  return new Promise((resolve, reject) => {
+    con.query(query, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
+// 건물 ↔ 호실
+exports.handleBuildingToRoom = (from_building, to_building, to_floor, to_room) => {
+
+  return new Promise((resolve, reject) => {
+    con.query(query, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
+// 호실 ↔ 호실
+exports.handleRoomToRoom = (from_building, from_floor, from_room, to_building, to_floor, to_room) => {
+
+  return new Promise((resolve, reject) => {
+    con.query(query, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 
 // ✅ DB에서 그래프 구성
 async function buildOutdoorGraph() {
