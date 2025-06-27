@@ -1,8 +1,7 @@
 // src/modules/room/controller.js
 
 const Service = require("./service")
-const multer = require('multer');
-const upload = multer();
+const { dijkstra, outdoorGraph, outdoorLocations } = require('./service');
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
 
 
@@ -11,7 +10,7 @@ exports.getPath = async (req, res) => {
   try {
     logRequestInfo(req);
 
-    const result = await Service.getAll();
+    const result = await Service.getPath();
     
     res.status(200).json(result.rows);
   } catch (err) {

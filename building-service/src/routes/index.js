@@ -8,12 +8,14 @@ const buildingRouter = require("../modules/building/route");
 const floorRouter = require("../modules/floor/route");
 const categoryRouter = require("../modules/category/route");
 const roomRouter = require("../modules/room/route");
+const pathRouter = require("../modules/path/route");
 
 // 도메인별 엔드포인트 등록
 router.use("/building", buildingRouter);
 router.use("/floor", floorRouter);
 router.use("/category", categoryRouter);
 router.use("/room", roomRouter);
+router.use("/path", pathRouter)
 
 // 필요하다면 메인 페이지 라우트도 추가
 router.get("/", (req, res) => {

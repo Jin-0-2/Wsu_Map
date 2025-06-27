@@ -3,6 +3,7 @@
 const express = require('express');
 const app = express();
 const Router = require('./routes/index');
+const { initOutdoorGraph } = require('./modules/path/service');
 
 const AWS_IP = `http://13.55.76.216:`
 
