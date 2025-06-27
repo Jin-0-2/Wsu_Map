@@ -35,7 +35,7 @@ exports.getFloors = async (req, res) => {
 
     const result = await Service.getFloors(building_name);
 
-     // file(Buffer) → Base64로 변환
+    // file(Buffer) → Base64로 변환
     const floors = result.rows.map(row => ({
       ...row,
       file: row.File ? row.File.toString('base64') : null
