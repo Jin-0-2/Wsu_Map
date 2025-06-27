@@ -11,8 +11,15 @@ exports.getAll = async (req, res) => {
     logRequestInfo(req);
     
     const result = await Service.getAll();
+
+        // file(Buffer) → Base64로 변환
+    const buildings = result.rows.map(row => ({
+      Building_Name: row.Building_Name,
+      Description: row.Description,
+      File: row.File ? row.File.toString('base64') : null
+    }));
     
-    res.status(200).json(result.rows);
+    res.status(200).json(buildings);
   } catch (err) {
     console.error("DB 오류:", err);
     
