@@ -111,7 +111,11 @@ exports.update = async (req, res) => {
     const room_name = req.body.room_name;
     const room_desc = req.body.room_desc;
 
+    console.log(building_name, floor_number, room_name, room_desc);
+
     const result = await Service.update(building_name, floor_number, room_name, room_desc);
+
+    console.log(result);
 
     res.status(200).send("방 수정 성공");
   } catch (err) {
