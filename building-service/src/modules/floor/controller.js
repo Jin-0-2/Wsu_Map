@@ -72,7 +72,8 @@ exports.getFloorNumber = async (req, res) => {
     // Content-Type: PNG
     res.setHeader('Content-Type', 'image/png');
     // 파일명 예시: W15_2층.png
-    res.setHeader('Content-Disposition', `inline; filename="${building_name}_${floor}.png"`);
+    const fileName = `${building_name}_${floor}.png`;
+    res.setHeader('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(fileName)}`);
 
     res.status(200).send(fileBuffer);
   } catch (err) {
