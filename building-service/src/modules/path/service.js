@@ -6,7 +6,7 @@ let outdoorGraph = null;
 let outdoorLocations = null;
 
 
-// 건물 ↔ 건물
+// 건물 ↔ 건물 (외부만 사용)
 exports.handleBuildingToBuilding = (from_building, to_building) => {
 
   return new Promise((resolve, reject) => {
@@ -17,7 +17,7 @@ exports.handleBuildingToBuilding = (from_building, to_building) => {
   });
 }
 
-// 호실 ↔ 건물
+// 호실 ↔ 건물 (내부 -> 외부)
 exports.handleRoomToBuilding = (from_building, from_floor, from_room, to_building) => {
 
   return new Promise((resolve, reject) => {
@@ -28,7 +28,7 @@ exports.handleRoomToBuilding = (from_building, from_floor, from_room, to_buildin
   });
 }
 
-// 건물 ↔ 호실
+// 건물 ↔ 호실 (외부 -> 내부)
 exports.handleBuildingToRoom = (from_building, to_building, to_floor, to_room) => {
 
   return new Promise((resolve, reject) => {
@@ -39,7 +39,59 @@ exports.handleBuildingToRoom = (from_building, to_building, to_floor, to_room) =
   });
 }
 
-// // 호실 ↔ 호실 indoorService.js에서 불러올거임 (한승헌)
+/*
+// 호실 ↔ 호실 경로 탐색
+exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_building, to_floor, to_room) => {
+  try {
+    if (from_building === to_building) {
+      // 같은 건물 내부 이동: 실내 경로만 탐색
+      // 예: 실내 그래프에서 from_room → to_room 경로 탐색
+      const query = `
+        -- 여기서 같은 건물 내부의 실내 경로만 계산하는 쿼리 또는 함수 호출
+        -- 예시: SELECT ... FROM IndoorEdges WHERE ...
+      `;
+      // 또는 실내 그래프/서비스 함수 호출
+      // const path = await indoorService.findIndoorPath(from_building, from_floor, from_room, to_floor, to_room);
+      // return path;
+
+      return new Promise((resolve, reject) => {
+        con.query(query, (err, result) => {
+          if (err) return reject(err);
+          resolve(result);
+        });
+      });
+    } else {
+      // 다른 건물 간 이동: 실내 → 실외 → 실내 경로
+      // 1. 출발 호실 → 출발 건물 출입구(실내)
+      // 2. 출발 건물 출입구 → 도착 건물 출입구(실외)
+      // 3. 도착 건물 출입구 → 도착 호실(실내)
+
+      // 1. 출발 호실 → 출발 건물 출입구(실내)
+      // (예: indoorService.findIndoorPath(from_building, from_floor, from_room, 출입구))
+      // 2. 출발 출입구 ↔ 도착 출입구(실외)
+      // (예: outdoorService.findOutdoorPath(출발출입구, 도착출입구))
+      // 3. 도착 출입구 → 도착 호실(실내)
+      // (예: indoorService.findIndoorPath(to_building, 출입구, to_floor, to_room))
+
+      // 아래는 각 단계별로 함수 호출하는 예시입니다.
+      const fromEntrance = await indoorService.findEntrance(from_building, from_floor, from_room);
+      const toEntrance = await indoorService.findEntrance(to_building, to_floor, to_room);
+
+      const indoorPath1 = await indoorService.findIndoorPath(from_building, from_floor, from_room, fromEntrance.floor, fromEntrance.room);
+      const outdoorPath = await outdoorService.findOutdoorPath(fromEntrance.entranceNode, toEntrance.entranceNode);
+      const indoorPath2 = await indoorService.findIndoorPath(to_building, toEntrance.floor, toEntrance.room, to_floor, to_room);
+
+      // 경로 합치기
+      const fullPath = [...indoorPath1, ...outdoorPath, ...indoorPath2];
+
+      return fullPath;
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+*/
+// // 호실 ↔ 호실 indoorService.js에서 불러올거임 (한승헌) (1. 내부 -> 외부 -> 내부  2. 같은 건물 내부 -> 내부)
 // exports.handleRoomToRoom = (from_building, from_floor, from_room, to_building, to_floor, to_room) => {
 
 //   return new Promise((resolve, reject) => {
