@@ -38,16 +38,16 @@ exports.handleBuildingToRoom = (from_building, to_building, to_floor, to_room) =
   });
 }
 
-// 호실 ↔ 호실
-exports.handleRoomToRoom = (from_building, from_floor, from_room, to_building, to_floor, to_room) => {
+// // 호실 ↔ 호실 indoorService.js에서 불러올거임 (한승헌)
+// exports.handleRoomToRoom = (from_building, from_floor, from_room, to_building, to_floor, to_room) => {
 
-  return new Promise((resolve, reject) => {
-    con.query(query, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
-}
+//   return new Promise((resolve, reject) => {
+//     con.query(query, (err, result) => {
+//       if (err) return reject(err);
+//       resolve(result);
+//     });
+//   });
+// }
 
 
 // ✅ DB에서 그래프 구성
@@ -120,7 +120,7 @@ async function initOutdoorGraph() {
 
 module.exports = {
   buildOutdoorGraph,
-  dijkstra,
+  //dijkstra, <-이거 정의 안되어 있어서 일단 주석(한승헌)
   outdoorGraph: () => outdoorGraph,
   outdoorLocations: () => outdoorLocations,
   initOutdoorGraph
