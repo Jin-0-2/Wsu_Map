@@ -4,12 +4,14 @@ const Service = require("./service")
 const { dijkstra, outdoorGraph, outdoorLocations } = require('./service');
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
 
+//실내 경로 부분(한승헌)
+const IndoorService = require("./indoorService")
 
 // 전체 조회
 exports.getPath = async (req, res) => {
   try {
     logRequestInfo(req);
-    
+
     // body에서 출발/도착 정보 추출
     const {
       from_building,
@@ -21,8 +23,8 @@ exports.getPath = async (req, res) => {
     } = req.body;
 
     const fromType = from_room ? "room" : "building";
-    const toType   = to_room   ? "room" : "building";
-    
+    const toType = to_room ? "room" : "building";
+
     const result = null;
 
     // 분기 처리
@@ -36,8 +38,8 @@ exports.getPath = async (req, res) => {
       // 건물 ↔ 호실
       result = await handleBuildingToRoom(from_building, to_building, to_floor, to_room);
     } else if (fromType === "room" && toType === "room") {
-      // 호실 ↔ 호실
-      result = await handleRoomToRoom(from_building, from_floor, from_room, to_building, to_floor, to_room);
+      // 호실 ↔ 호실(실내 전용 indoorService.js에서 불러올거임 한승헌)
+      result = await IndoorService.handleRoomToRoom(from_building, from_floor, from_room, to_building, to_floor, to_room);
     } else {
       return res.status(400).json({ error: "입력값이 올바르지 않습니다." });
     }
@@ -45,7 +47,7 @@ exports.getPath = async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     console.error("DB 오류:", err);
-    
+
     res.status(500).send("DB 오류");
   }
 };
