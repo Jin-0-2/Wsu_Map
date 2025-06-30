@@ -4,7 +4,7 @@ const con = require("../../core/db")
 
 // 회원 전체 조회
 exports.getAll = () => {
-  const query = 'SELECT * FROM "User"'
+  const query = 'SELECT * FROM "User" ORDER BY "Created_At"'
 
   return new Promise((resolve, reject) => {
     con.query(query, (err, result) => {
