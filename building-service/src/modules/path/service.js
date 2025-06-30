@@ -260,6 +260,7 @@ function dijkstra(graph, locations, startNode, endNode) {
     pathKeys.unshift(current);
     current = previous[current];
   }
+  console.log(pathKeys);
 
   const path = pathKeys.map(key => locations[key]).filter(Boolean);
   /*
