@@ -42,7 +42,6 @@ exports.handleBuildingToRoom = (from_building, to_building, to_floor, to_room) =
   });
 }
 
-/*
 // 호실 ↔ 호실 경로 탐색
 exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_building, to_floor, to_room) => {
   try {
@@ -93,17 +92,6 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
     throw err;
   }
 };
-// 호실 ↔ 호실 indoorService.js에서 불러올거임 (한승헌) (1. 내부 -> 외부 -> 내부  2. 같은 건물 내부 -> 내부)
-exports.handleRoomToRoom = (from_building, from_floor, from_room, to_building, to_floor, to_room) => {
-
-  return new Promise((resolve, reject) => {
-    con.query(query, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
-}
-*/
 
 
 // 내부
