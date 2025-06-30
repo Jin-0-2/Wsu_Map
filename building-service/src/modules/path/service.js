@@ -17,12 +17,6 @@ exports.handleBuildingToBuilding = (from_building, to_building) => {
 // 호실 ↔ 건물 (내부 -> 외부)
 exports.handleRoomToBuilding = (from_building, from_floor, from_room, to_building) => {
 
-  return new Promise((resolve, reject) => {
-    con.query(query, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
 }
 
 // 건물 ↔ 호실 (외부 -> 내부)
@@ -265,7 +259,7 @@ function dijkstra(graph, locations, startNode, endNode) {
   const pathKeys = [];
   let current = endNode;
   while (current) {
-    path.unshift(current);
+    pathKeys.unshift(current);
     current = previous[current];
   }
 
