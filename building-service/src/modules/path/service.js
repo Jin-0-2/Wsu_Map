@@ -61,7 +61,7 @@ exports.handleRoomToBuilding = async (from_building, from_floor, from_room, to_b
   const outdoorPath = dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);
 
   return {
-    exit_indoor: {
+    departure_indoor: {
       start_floorImage: start_floorBase64, // 실내 사진(base64)
       end_floorImage: end_floorBase64,
       path: indoorPath                // 실내 경로
@@ -107,17 +107,12 @@ exports.handleBuildingToRoom = async (from_building, to_building, to_floor, to_r
   }
 
   return {
-    departure_indoor: {
-      start_floorImage: start_floorBase64, // 실내 사진(base64)
-      end_floorImage: first_floorBase64,
-      path: indoorPath                // 실내 경로
-    },
     outdoor: {
       path: outdoorPath               // 실외 경로
     },
     arrival_indoor: {
-      start_floorImage: entry_end_floorBase64,
-      end_floorImage: entry_first_floorBase64,
+      start_floorImage: entry_first_floorBase64,
+      end_floorImage: entry_end_floorBase64,
       path: indoorPath
     }
   };
@@ -227,15 +222,15 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
       return {
         departure_indoor: {
           start_floorImage: exit_start_floorImage,   // 출발 층 도면 (출발 건물)
-          first_floorImage: exit_first_floorImage,   // 1층 도면 (출발 건물)
+          end_floorImage: exit_first_floorImage,   // 1층 도면 (출발 건물)
           path: exit_indoor_path                     // 출발 건물 실내 경로
         },
         outdoor: {
           path: outdoorPath                          // 실외 경로
         },
         arrival_indoor: {
-          start_floorImage: entry_start_floorImage,  // 도착 층 도면 (도착 건물)
-          first_floorImage: entry_first_floorImage,  // 1층 도면 (도착 건물)
+          start_floorImage:  entry_first_floorImage,  // 도착 층 도면 (도착 건물)
+          end_floorImage: entry_start_floorImage,  // 1층 도면 (도착 건물)
           path: entry_indoor_path                    // 도착 건물 실내 경로
         }
       };
