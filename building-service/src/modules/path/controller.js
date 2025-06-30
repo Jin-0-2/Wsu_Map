@@ -1,4 +1,4 @@
-// src/modules/room/controller.js
+// src/modules/path/controller.js
 
 const Service = require("./service")
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게

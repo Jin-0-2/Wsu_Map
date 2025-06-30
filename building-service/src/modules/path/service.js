@@ -175,7 +175,7 @@ function haversineDistance(a, b) {
 // ✅ DB에서 그래프 구성
 async function buildOutdoorGraph() {
   // 1. 노드 정보: 이름, 위도/경도(point 타입)
-  const roomRes = await con.query(`
+  const nodeRes = await con.query(`
     SELECT "Node_Name", "Location" FROM "OutSideNode"
   `);
 
