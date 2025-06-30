@@ -11,13 +11,7 @@ let indoorLocations = {};
 
 // 건물 ↔ 건물 (외부만 사용)
 exports.handleBuildingToBuilding = (from_building, to_building) => {
-
-  return new Promise((resolve, reject) => {
-    con.query(query, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  return dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);
 }
 
 // 호실 ↔ 건물 (내부 -> 외부)
