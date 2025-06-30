@@ -40,13 +40,13 @@ exports.getPath = (req, res) => {
     } else if (fromType === "building" && toType === "room") {
       // 건물 ↔ 호실
       finaly_result = {
-        type : "room-building",
+        type : "building-room",
         result : Service.handleBuildingToRoom(from_building, to_building, to_floor, to_room)
       }
     } else if (fromType === "room" && toType === "room") {
       // 호실 ↔ 호실(실내 전용 indoorService.js에서 불러올거임 한승헌)
       finaly_result = finaly_result = {
-        type : "room-building",
+        type : "room-room",
         result : Service.handleRoomToRoom(from_building, from_floor, from_room, to_building, to_floor, to_room)
       }
     } else {
