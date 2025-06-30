@@ -2,8 +2,11 @@
 
 const con = require("../../core/db")
 
-let outdoorGraph = null;
-let outdoorLocations = null;
+// ✅ 전역 변수: 그래프, 좌표 캐싱
+let outdoorGraph = {};
+let outdoorLocations = {};
+let indoorGraph = {};
+let indoorLocations = {};
 
 
 // 건물 ↔ 건물 (외부만 사용)
@@ -90,17 +93,17 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
     throw err;
   }
 };
-*/
-// // 호실 ↔ 호실 indoorService.js에서 불러올거임 (한승헌) (1. 내부 -> 외부 -> 내부  2. 같은 건물 내부 -> 내부)
-// exports.handleRoomToRoom = (from_building, from_floor, from_room, to_building, to_floor, to_room) => {
+// 호실 ↔ 호실 indoorService.js에서 불러올거임 (한승헌) (1. 내부 -> 외부 -> 내부  2. 같은 건물 내부 -> 내부)
+exports.handleRoomToRoom = (from_building, from_floor, from_room, to_building, to_floor, to_room) => {
 
-//   return new Promise((resolve, reject) => {
-//     con.query(query, (err, result) => {
-//       if (err) return reject(err);
-//       resolve(result);
-//     });
-//   });
-// }
+  return new Promise((resolve, reject) => {
+    con.query(query, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+*/
 
 
 // 내부
@@ -108,9 +111,66 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
 const euclideanDistance = (a, b) =>
   Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 
-// ✅ 내부 DB에서 그래프 구성
-async function buildIndoorGraph() {}
+// ✅ DB에서 그래프 구성
+async function buildIndoorGraph() {
+  // 방 위치 정보 가져오기
+  const roomRes = await con.query(`
+    SELECT "Building_Name", "Floor_Number", "Room_Name", "Room_Location"
+    FROM "Floor_R" JOIN "Floor" ON "Floor_R"."Floor_Id" = "Floor"."Floor_Id"
+  `);
 
+  // 방 간 연결 정보 가져오기
+  const edgeRes = await con.query(`
+    SELECT
+     f_from."Building_Name" AS "From_Building_Name",
+     f_from."Floor_Number" AS "From_Floor_Number",
+     e."From_Room_Name",
+     f_to."Building_Name" AS "To_Building_Name",
+     f_to."Floor_Number" AS "To_Floor_Number",
+     e."To_Room_Name"
+    FROM "Edge" e
+    JOIN "Floor" f_from ON e."From_Floor_Id" = f_from."Floor_Id"
+    JOIN "Floor" f_to   ON e."To_Floor_Id"   = f_to."Floor_Id"
+  `);
+
+  // 방 좌표를 저장할 객체: key = Building@Floor@Room
+  const locations = {};
+  roomRes.rows.forEach(({Building_Name, Floor_Number, Room_Name, Room_Location }) => {
+    const key = `${Building_Name}@${Floor_Number}@${Room_Name}`;
+    const { x, y } = Room_Location;
+    locations[key] = { x: Number(x), y: Number(y) };
+  });
+
+  // 그래프 객체 초기화
+  const graph = {};
+  Object.keys(locations).forEach(key => {
+    graph[key] = [];
+  });
+
+  // 간선 정보로 그래프 연결 구성
+  edgeRes.rows.forEach(
+    ({
+      From_Building_Name, From_Floor_Number, From_Room_Name,
+      To_Building_Name, To_Floor_Number, To_Room_Name }) => {
+    const fromKey = `${From_Building_Name}@${From_Floor_Number}@${From_Room_Name}`;
+    const toKey   = `${To_Building_Name}@${To_Floor_Number}@${To_Room_Name}`;
+
+    // 연결 노드 모두 존재할 때만 처리
+    if (locations[fromKey] && locations[toKey]) {
+      const distance = euclideanDistance(locations[fromKey], locations[toKey]);
+      graph[fromKey].push({ node: toKey, weight: distance });
+    }
+  });
+
+  return { graph, locations }; // 그래프와 위치 정보 반환
+}
+
+async function initIndoorGraph() {
+  const { graph, locations } = await buildIndoorGraph();
+  indoorGraph = graph;
+  indoorLocations = locations;
+  console.log('실내 그래프 캐싱 완료!');
+}
 
 // 외부
 // ✅ 위도 경도 거리계산 하버사인 함수
@@ -130,15 +190,15 @@ function haversineDistance(a, b) {
   return R * c;
 }
 
-// ✅ 외부 DB에서 그래프 구성
+// ✅ DB에서 그래프 구성
 async function buildOutdoorGraph() {
   // 1. 노드 정보: 이름, 위도/경도(point 타입)
-  const roomRes = await pool.query(`
+  const roomRes = await con.query(`
     SELECT "Node_Name", "Location" FROM "OutSideNode"
   `);
 
   // 2. Edge 테이블에서 방 간 연결 정보 가져오기
-  const edgeRes = await pool.query(`
+  const edgeRes = await con.query(`
     SELECT "From_Node", "To_Node" FROM "OutSideEdge"
   `);
 
@@ -168,7 +228,6 @@ async function buildOutdoorGraph() {
   return { graph, locations }; // 그래프와 위치 정보 반환
 }
 
-// 외부 그래프 초기화
 async function initOutdoorGraph() {
   const { graph, locations } = await buildOutdoorGraph();
   outdoorGraph = graph;
@@ -176,56 +235,74 @@ async function initOutdoorGraph() {
   console.log('실외 그래프 캐싱 완료!');
 }
 
+// 최단경로 탐색
+function dijkstra(graph, locations, startNode, endNode) {
+  const distances = {};
+  const visited = {};
+  const previous = {};
 
-// ✅ Dijkstra 알고리즘: 최단 경로 계산
-function dijkstra(graph, start, end) {
-  const dist = {};        // 시작 노드로부터 거리
-  const prev = {};        // 이전 노드 정보 (경로 추적용)
-  const visited = new Set(); // 방문 여부 확인용
+  // 각 노드별 초기값 설정
+  Object.keys(graph).forEach(node => {
+    distances[node] = Infinity;
+    visited[node] = false;
+    previous[node] = null;
+  });
 
-  // 모든 노드까지 거리 초기화 → 무한대, 시작 노드는 0
-  Object.keys(graph).forEach(k => dist[k] = Infinity);
-  dist[start] = 0;
+  distances[startNode] = 0; // 시작 노드는 0으로
 
-  while (visited.size < Object.keys(graph).length) {
-    // 아직 방문하지 않은 노드 중 가장 거리가 짧은 노드 선택
-    const current = Object.keys(dist)
-      .filter(k => !visited.has(k))
-      .sort((a, b) => dist[a] - dist[b])[0];
+  // 반복문으로 모든 노드 탐색
+  while (true) {
+    let closestNode = null;
+    let smallestDistance = Infinity;
 
-    // 더 이상 진행할 수 없으면 종료
-    if (!current || dist[current] === Infinity) break;
-
-    visited.add(current); // 현재 노드 방문 처리
-    if (current === end) break; // 목적지 도달 시 종료
-
-    // 이웃 노드들 검사
-    for (const { node, weight } of graph[current] || []) {
-      if (!visited.has(node)) {
-        const newDist = dist[current] + weight;
-        if (newDist < dist[node]) {
-          dist[node] = newDist;   // 더 짧은 거리로 갱신
-          prev[node] = current;   // 이전 노드 기록
-        }
+    // 아직 방문하지 않은 노드 중 가장 가까운 노드 선택
+    for (const node in distances) {
+      if (!visited[node] && distances[node] < smallestDistance) {
+        smallestDistance = distances[node];
+        closestNode = node;
       }
     }
+
+    // 더 이상 진행할 노드가 없거나 목표 노드 도달 시 종료
+    if (closestNode === null) break;
+    if (closestNode === endNode) break;
+
+    visited[closestNode] = true;
+
+    // 이웃 노드 확인하며 거리 갱신
+    graph[closestNode].forEach(neighbor => {
+      const alt = distances[closestNode] + neighbor.weight;
+      if (alt < distances[neighbor.node]) {
+        distances[neighbor.node] = alt;
+        previous[neighbor.node] = closestNode;
+      }
+    });
   }
 
-  // ✅ 최단 경로 역추적 (end → start)
-  const path = [];
-  let curr = end;
-  while (curr) {
-    path.unshift(curr);   // 앞에 삽입 (start → ... → end)
-    curr = prev[curr];
+  // 경로 역추적
+  const pathKeys = [];
+  let current = endNode;
+  while (current) {
+    path.unshift(current);
+    current = previous[current];
   }
 
-  return path; // 예: ['O1', 'W11', 'O2', 'O3', ...]
+  const path = pathKeys.map(key => locations[key]).filter(Boolean);
+  /*
+  {
+    distance: 46.21, // (예시 값)
+    path: [
+      { x: 10, y: 20 },
+      { x: 30, y: 40 },
+      { x: 50, y: 60 },
+      { x: 100, y: 200 },
+      { x: 120, y: 220 }
+    ]
+  }
+  */
+
+  return { distance: distances[endNode], path };
 }
 
-module.exports = {
-  buildOutdoorGraph,
-  //dijkstra, <-이거 정의 안되어 있어서 일단 주석(한승헌)
-  outdoorGraph: () => outdoorGraph,
-  outdoorLocations: () => outdoorLocations,
-  initOutdoorGraph
-};
+exports.initIndoorGraph = initIndoorGraph;
+exports.initOutdoorGraph = initOutdoorGraph;
