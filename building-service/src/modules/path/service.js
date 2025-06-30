@@ -13,9 +13,6 @@ let indoorLocations = {};
 
 // 건물 ↔ 건물 (외부만 사용)
 exports.handleBuildingToBuilding = (from_building, to_building) => {
-  console.log(outdoorGraph);
-  console.log(outdoorLocations);
-  
   return dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);
 }
 
