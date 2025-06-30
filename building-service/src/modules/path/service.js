@@ -110,7 +110,7 @@ async function buildIndoorGraph() {
      f_to."Building_Name" AS "To_Building_Name",
      f_to."Floor_Number" AS "To_Floor_Number",
      e."To_Room_Name"
-    FROM "Edge" e
+    FROM "InSideEdge" e
     JOIN "Floor" f_from ON e."From_Floor_Id" = f_from."Floor_Id"
     JOIN "Floor" f_to   ON e."To_Floor_Id"   = f_to."Floor_Id"
   `);
