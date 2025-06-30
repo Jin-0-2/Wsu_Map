@@ -15,6 +15,7 @@ let indoorLocations = {};
 exports.handleBuildingToBuilding = (from_building, to_building) => {
   console.log(outdoorGraph);
   console.log(outdoorLocations);
+  
   return dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);
 }
 
@@ -72,12 +73,6 @@ exports.handleRoomToBuilding = async (from_building, from_floor, from_room, to_b
 // 건물 ↔ 호실 (외부 -> 내부)
 exports.handleBuildingToRoom = (from_building, to_building, to_floor, to_room) => {
 
-  return new Promise((resolve, reject) => {
-    con.query(query, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
 }
 
 // 호실 ↔ 호실 경로 탐색
