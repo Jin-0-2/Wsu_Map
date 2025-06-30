@@ -172,7 +172,10 @@ function haversineDistance(a, b) {
 async function buildOutdoorGraph() {
   // 1. 노드 정보: 이름, 위도/경도(point 타입)
   const nodeRes = await con.query(`
-    SELECT "Node_Name", "Location" FROM "OutSideNode"
+    SELECT Node_Name,
+    split_part(trim(Location::text, '()'), ',', 1)::float AS lat,
+    split_part(trim(Location::text, '()'), ',', 2)::float AS lng
+    FROM your_table;
   `);
 
   // 2. Edge 테이블에서 방 간 연결 정보 가져오기
