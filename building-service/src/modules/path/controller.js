@@ -1,11 +1,7 @@
 // src/modules/room/controller.js
 
 const Service = require("./service")
-const { dijkstra, outdoorGraph, outdoorLocations } = require('./service');
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
-
-//실내 경로 부분(한승헌)
-const IndoorService = require("./indoorService")
 
 // 전체 조회
 exports.getPath = (req, res) => {
@@ -30,16 +26,16 @@ exports.getPath = (req, res) => {
     // 분기 처리
     if (fromType === "building" && toType === "building") {
       // 건물 ↔ 건물
-      result = handleBuildingToBuilding(from_building, to_building);
+      result = Service.handleBuildingToBuilding(from_building, to_building);
     } else if (fromType === "room" && toType === "building") {
       // 호실 ↔ 건물
-      result = handleRoomToBuilding(from_building, from_floor, from_room, to_building);
+      result = Service.handleRoomToBuilding(from_building, from_floor, from_room, to_building);
     } else if (fromType === "building" && toType === "room") {
       // 건물 ↔ 호실
-      result = handleBuildingToRoom(from_building, to_building, to_floor, to_room);
+      result = Service.handleBuildingToRoom(from_building, to_building, to_floor, to_room);
     } else if (fromType === "room" && toType === "room") {
       // 호실 ↔ 호실(실내 전용 indoorService.js에서 불러올거임 한승헌)
-      result = IndoorService.handleRoomToRoom(from_building, from_floor, from_room, to_building, to_floor, to_room);
+      result = Service.handleRoomToRoom(from_building, from_floor, from_room, to_building, to_floor, to_room);
     } else {
       return res.status(400).json({ error: "입력값이 올바르지 않습니다." });
     }
