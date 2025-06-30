@@ -21,7 +21,7 @@ exports.getPath = (req, res) => {
     const fromType = from_room ? "room" : "building";
     const toType = to_room ? "room" : "building";
 
-    const result = null;
+    let result = null;
 
     // 분기 처리
     if (fromType === "building" && toType === "building") {
