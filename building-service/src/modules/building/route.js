@@ -24,4 +24,7 @@ router.post("/", controller.create)
 // 빌딩 수정 (설명만 고치는 걸로)
 router.put("/:name", controller.update)
 
+// 삭제
+router.delete("/:name", controller.delete)
+
 module.exports = router

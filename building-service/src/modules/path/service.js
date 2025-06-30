@@ -2,6 +2,8 @@
 
 const con = require("../../core/db")
 
+const floor = require("../floor/service")
+
 // ✅ 전역 변수: 그래프, 좌표 캐싱
 let outdoorGraph = {};
 let outdoorLocations = {};
@@ -17,8 +19,54 @@ exports.handleBuildingToBuilding = (from_building, to_building) => {
 }
 
 // 호실 ↔ 건물 (내부 -> 외부)
-exports.handleRoomToBuilding = (from_building, from_floor, from_room, to_building) => {
+exports.handleRoomToBuilding = async (from_building, from_floor, from_room, to_building) => {
+  console.log(outdoorGraph);
+  console.log(outdoorLocations);
+  console.log(indoorGraph);
+  console.log(indoorLocations);
 
+  const start_room = `${from_building}@${from_floor}@${from_room}`;
+  const start_enterance = `${from_building}@1@입구`;
+
+
+  // 건물 내부 탈출 (1층 입구까지 가는건 동일)
+  const indoorPath = dijkstra(indoorGraph, indoorLocations, start_room, start_enterance);
+
+  let start_floorBase64 = null;
+  if (from_floor != 1) {
+    // 건물 내부 이동 도면 (시작 층)
+    const startfloorResult = await floor.getFloorNumber(from_floor, from_building);
+    if (startfloorResult && startfloorResult.rows && startfloorResult.rows.length > 0) {
+      const fileBuffer = startfloorResult.rows[0].File; // File 컬럼 (Buffer 타입)
+      if (fileBuffer) {
+        floorBase64 = fileBuffer.toString('base64'); // base64로 변환
+      }
+    }
+  }
+
+  // 건물 내부 이동 도면 (시작 1층)
+  const firstfloorResult = await floor.getFloorNumber(1, from_building);
+  let first_floorBase64 = null;
+  if (firstfloorResult && firstfloorResult.rows && firstfloorResult.rows.length > 0) {
+    const fileBuffer = firstfloorResult.rows[0].File; // File 컬럼 (Buffer 타입)
+    if (fileBuffer) {
+      floorBase64 = fileBuffer.toString('base64'); // base64로 변환
+    }
+  }
+
+  // 건물 -> 건물
+  const outdoorPath = dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);
+
+  return {
+    indoor: {
+      start_floorImage: start_floorBase64, // 실내 사진(base64)
+      first_floorImage: first_floorBase64,
+      path: indoorPath                // 실내 경로
+    },
+    outdoor: {
+      path: outdoorPath               // 실외 경로
+    }
+  };
 }
 
 // 건물 ↔ 호실 (외부 -> 내부)
