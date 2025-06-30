@@ -92,7 +92,7 @@ exports.update = (building_name, desc, file) => {
   });
 };
 
-// 건물 삭제
+// 건물 삭제  걸린거 다 지워야하는데 ㅈㄴ 애매해! ㄹㅇ 개 애매해!
 exports.delete = (building_name) => {
   const deleteQuery = 'DELETE FROM "Building" WHERE "Building_Name" = $1'
 

@@ -135,7 +135,7 @@ exports.update = [
   }
 }]; 
 
-// 건물 삭제
+// 건물 삭제  애매해! ㅈㄴ 애매해! 다 지워야해 ! ㅈㄴ 애매해!
 exports.delete = async (req, res) => {
   try {
     logRequestInfo(req);

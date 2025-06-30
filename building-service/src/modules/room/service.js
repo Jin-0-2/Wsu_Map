@@ -121,8 +121,10 @@ exports.delete = (building_name, floor_number, room_name) => {
   return new Promise((resolve, reject) => {
     con.query(deleteQuery, values, (err, result) => {
       if (err) return reject(err);
+      
+      resolve(result);
     });
 
-    resolve(result);
+
     });
 };
