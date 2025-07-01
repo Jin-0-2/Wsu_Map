@@ -130,7 +130,8 @@ exports.delete = (building_name, floor_number, x, y) => {
       SELECT "Floor_Id"
       FROM "Floor"
       WHERE "Building_Name" = $1 AND "Floor_Number" = $2)
-      AND "Category_Location" = POINT($3, $4);
+      AND "Category_Location"[0] = $3
+      AND "Category_Location"[1] = $4;
       `
   // const delete_Categories_Query = `DELETE FROM "Categories" WHERE "Building_Name" = $1 AND "Category_Name" = $2;`;
 
