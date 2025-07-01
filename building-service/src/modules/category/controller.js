@@ -93,14 +93,9 @@ exports.getCategoryForManager = async (req, res) => {
     const floor_number = req.params.floor;
 
     const result = await Service.getCategoryForManager(building_name, floor_number);
-    
-    // Location 컬럼 파싱
-    const rows = result.rows.map(row => ({
-      Category_Name : row.Category_Name,
-      Location: Service.parsePoint(row.Category_Location)
-    }));
+  
 
-    res.status(200).json(rows);
+    res.status(200).json(result.rows);
   } catch (err) {
     console.error("DB 오류:", err);
 
