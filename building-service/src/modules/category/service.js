@@ -152,8 +152,12 @@ exports.delete = (building_name, floor_number, category, x, y) => {
       if (err) return reject(err);
       // 첫 번째 쿼리가 끝난 뒤 두 번째 쿼리 실행
       con.query(delete_Categories_Query, values2, (err2, result2) => {
-        if (err2) return reject(err2);
-        return resolve(result2);
+        if (err2) return reject(err2)
+
+        if (result2.rowCount === 0)
+          return resolve( {type : 'floor_c', result});
+        else
+          return resolve({ type: 'categories', result2});
       });
     });
   });

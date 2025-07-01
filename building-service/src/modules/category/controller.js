@@ -132,17 +132,21 @@ exports.create = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     logRequestInfo(req);
-    
+
     const building_name = req.params.building;
     const floor_number = req.params.floor;
+    const category_name = req.body.category_name;
     const x = req.body.x;
     const y = req.body.y;
 
-    const result = await Service.delete(building_name, floor_number, x, y);
-    if (result.rowCount === 0) {
-      // 삭제된 행이 없음 → 잘못된 id
-      return res.status(404).send("존재하지 않는 건물/층입니다.");
+    const { floorC, categories } = await Service.delete(building_name, floor_number, category_name, x, y);
+    if (floorC.rowCount === 0) {
+      return res.status(404).send("해당 카테고리가 없습니다.");
     }
+    if (categories.rowCount === 0) {
+      return res.status(200).send("카테고리 위치만 삭제, 카테고리 자체는 남아있음");
+    }
+    return res.status(200).send("카테고리와 위치 모두 삭제 성공");
 
     res.status(200).send("카테고리 삭제 성공");
   } catch (err) {
