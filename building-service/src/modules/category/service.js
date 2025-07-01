@@ -132,18 +132,18 @@ exports.delete = (building_name, floor_number, x, y) => {
       WHERE "Building_Name" = $1 AND "Floor_Number" = $2)
       AND "Category_Location" = $3::point);
       `
-  const delete_Categories_Query = `DELETE FROM "Categories" WHERE "Building_Name" = $1 AND "Category_Name" = $2;`;
+  // const delete_Categories_Query = `DELETE FROM "Categories" WHERE "Building_Name" = $1 AND "Category_Name" = $2;`;
 
   const values1 = [building_name, floor_number,`(${x},${y})`];
-  const values2 = [building_name, category]
+  // const values2 = [building_name, category]
 
   return new Promise((resolve, reject) => {
     con.query(delete_Floor_id_Query, values1, (err, result) => {
       if (err) return reject(err);
     });
-    con.query(delete_Categories_Query, values2, (err, result) => {
-      if (err) return reject(err);
-      return resolve(result);
-    });
+    // con.query(delete_Categories_Query, values2, (err, result) => {
+    //   if (err) return reject(err);
+    //   return resolve(result);
+    // });
   });
 };
