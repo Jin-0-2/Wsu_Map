@@ -28,6 +28,19 @@ exports.getFloors = (building_name) => {
   });
 }
 
+exports.getFloorNames = (building_name) => {
+  const query = 'SELECT "Floor_Number" FROM "Floor" WHERE "Building_Name" = $1'
+
+  const values = [building_name]
+
+  return new Promise((resolve, reject) => {
+    con.query(query, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 // 층 조회 (2d), 하나만
 exports.getFloorNumber = (floor, building_name) => {
   const query = 'SELECT "File" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2'

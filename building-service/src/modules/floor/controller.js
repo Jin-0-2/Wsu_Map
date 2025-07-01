@@ -26,6 +26,8 @@ exports.getAll = async (req, res) => {
   }
 };
 
+
+
 // 건물 별 층 조회 (2d)
 exports.getFloors = async (req, res) => {
   try {
@@ -49,6 +51,23 @@ exports.getFloors = async (req, res) => {
     res.status(500).send("DB 오류");
   }
 };
+
+
+exports.getFloorNames = async (req, res) => {
+  try {
+    logRequestInfo(req);
+
+    const building_name = req.params.building;
+
+    const result = await Service.getFloorNames(building_name);   
+
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류");
+  }
+}
 
 // 층 조회 (2d), 하나만
 exports.getFloorNumber = async (req, res) => {
