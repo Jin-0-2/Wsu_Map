@@ -110,7 +110,12 @@ exports.update = async (req, res) => {
   try {
     logRequestInfo(req);
 
-    const { id, pw, phone, email } = req.body
+    const {
+      id = null,
+      pw = null,
+      phone = null,
+      email = null
+    } = req.body;
 
     if (!id) {
       return res.status(400).send("id는 필수입니다.")

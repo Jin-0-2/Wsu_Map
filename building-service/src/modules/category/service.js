@@ -125,7 +125,7 @@ exports.create = (building_name, floor_number, category, x, y) => {
 };
 
 // 카테고리 삭제: 이건 관리 페이지에서.. 목록을 보고 삭제를..
-exports.delete = (building_name, floor_number, x, y) => {
+exports.delete = (building_name, floor_number, category, x, y) => {
   const delete_Floor_id_Query = `DELETE FROM "Floor_C" WHERE "Floor_Id" = (
       SELECT "Floor_Id"
       FROM "Floor"
@@ -133,19 +133,28 @@ exports.delete = (building_name, floor_number, x, y) => {
       AND "Category_Location"[0] = $3
       AND "Category_Location"[1] = $4;
       `
-  // const delete_Categories_Query = `DELETE FROM "Categories" WHERE "Building_Name" = $1 AND "Category_Name" = $2;`;
+
+  const delete_Categories_Query = `DELETE FROM "Categories"
+      WHERE "Building_Name" = $1
+      AND "Category_Name" = $2
+      AND NOT EXISTS (
+        SELECT 1
+        FROM "Floor_C" fc
+        JOIN "Floor" f ON fc."Floor_Id" = f."Floor_Id"
+        WHERE fc."Category_Name" = $2 AND f."Building_Name" = $1);
+        `
 
   const values1 = [building_name, floor_number, x, y];
-  // const values2 = [building_name, category]
+  const values2 = [building_name, category]
 
   return new Promise((resolve, reject) => {
     con.query(delete_Floor_id_Query, values1, (err, result) => {
       if (err) return reject(err);
-      return resolve(result)
+      // 첫 번째 쿼리가 끝난 뒤 두 번째 쿼리 실행
+      con.query(delete_Categories_Query, values2, (err2, result2) => {
+        if (err2) return reject(err2);
+        return resolve(result2);
+      });
     });
-    // con.query(delete_Categories_Query, values2, (err, result) => {
-    //   if (err) return reject(err);
-    //   return resolve(result);
-    // });
   });
 };
