@@ -125,7 +125,7 @@ exports.create = (building_name, floor_number, category, x, y) => {
 };
 
 // 카테고리 삭제: 이건 관리 페이지에서.. 목록을 보고 삭제를..
-exports.delete = (building_name, floor_number, category, x, y) => {
+exports.delete = (building_name, floor_number, category_name, x, y) => {
   const delete_Floor_id_Query = `DELETE FROM "Floor_C" WHERE "Floor_Id" = (
       SELECT "Floor_Id"
       FROM "Floor"
@@ -145,19 +145,16 @@ exports.delete = (building_name, floor_number, category, x, y) => {
         `
 
   const values1 = [building_name, floor_number, x, y];
-  const values2 = [building_name, category]
+  const values2 = [building_name, category_name]
 
   return new Promise((resolve, reject) => {
-    con.query(delete_Floor_id_Query, values1, (err, result) => {
+    con.query(delete_Floor_id_Query, values1, (err, result1) => {
       if (err) return reject(err);
       // 첫 번째 쿼리가 끝난 뒤 두 번째 쿼리 실행
       con.query(delete_Categories_Query, values2, (err2, result2) => {
-        if (err2) return reject(err2)
+        if (err2) return reject(err2);
 
-        if (result2.rowCount === 0)
-          return resolve( {type : 'floor_c', result});
-        else
-          return resolve({ type: 'categories', result2});
+        return resolve({ floorC: result1, categories: result2 });
       });
     });
   });

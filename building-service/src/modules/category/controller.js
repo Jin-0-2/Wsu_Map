@@ -147,8 +147,6 @@ exports.delete = async (req, res) => {
       return res.status(200).send("카테고리 위치만 삭제, 카테고리 자체는 남아있음");
     }
     return res.status(200).send("카테고리와 위치 모두 삭제 성공");
-
-    res.status(200).send("카테고리 삭제 성공");
   } catch (err) {
     console.error("카테고리 삭제 처리 중 오류:", err);
 
