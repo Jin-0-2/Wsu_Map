@@ -52,6 +52,7 @@ exports.getCategoryListAt2D = async (req, res) => {
 
     const result = await Service.getCategoryListAt2D(building_name, floor_number);
 
+    res.status(200).json(result.rows);
   } catch (err){
     console.error("DB 오류:", err);
 
@@ -72,6 +73,30 @@ exports.getCategoryLocationsAt2D = async (req, res) => {
     
     // Location 컬럼 파싱
     const rows = result.rows.map(row => ({
+      Location: Service.parsePoint(row.Category_Location)
+    }));
+
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류");
+  }
+};
+
+// 건물/층을 입력받아 그 층에 있는 모든 카테고리의 이름과 좌표 반환
+exports.getCategoryForManager = async (req, res) => {
+  try {
+    logRequestInfo(req);
+
+    const building_name = req.params.building;
+    const floor_number = req.params.floor;
+
+    const result = await Service.getCategoryForManager(building_name, floor_number);
+    
+    // Location 컬럼 파싱
+    const rows = result.rows.map(row => ({
+      Category_Name : row.Category_Name,
       Location: Service.parsePoint(row.Category_Location)
     }));
 

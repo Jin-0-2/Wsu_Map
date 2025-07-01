@@ -30,8 +30,14 @@ exports.getBuildingLocationsByCategory = (category_name) => {
 
 // 2D도면에서 필터를 선택하려면 카테고리 목록이 필요하겠지? 주는거 만들어야겠지?
 exports.getCategoryListAt2D = (building_name, floor_number) => {
-  const query = ``;
-  
+  const query = `
+    SELECT fc."Category_Name"
+    FROM "Floor" f
+    JOIN "Floor_C" fc ON f."Floor_Id" = fc."Floor_Id"
+    WHERE f."Building_Name" = $1
+    AND f."Floor_Number" = $2
+  `;
+
   const values = [building_name, floor_number]
 
   return new Promise((resolve, reject) => {
@@ -54,6 +60,25 @@ exports.getCategoryLocationsAt2D = (building_name, floor_number, category) => {
     AND fc."Category_Name" = $3
 `;
   const values = [building_name, floor_number, category]
+
+  return new Promise((resolve, reject) => {
+    con.query(query, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
+// 건물/층을 입력받아 그 층에 있는 모든 카테고리의 이름과 좌표 반환
+exports.getCategoryForManager = (building_name, floor_number) => {
+  const query = `
+  SELECT fc."Category_Name", fc."Category_Location"
+  FROM "Floor" f
+  JOIN "Floor_C" fc ON f."Floor_Id" = fc."Floor_Id"
+  WHERE f."Building_Name" = $1
+    AND f."Floor_Number" = $2
+`;
+  const values = [building_name, floor_number]
 
   return new Promise((resolve, reject) => {
     con.query(query, values, (err, result) => {

@@ -19,6 +19,10 @@ router.get("/:category", controller.getBuildingLocationsByCategory)
 // 건물_층 2d도면에 카테고리 필터 클릭시 띄우기
 router.get("/:building/:floor", controller.getCategoryLocationsAt2D)
 
+// 관리자용 카테고리 관리에 사용
+// 건물/층을 입력받아 그 층에 있는 모든 카테고리의 이름과 좌표 반환
+router.get("/manager/:building/:floor", controller.getCategoryForManager)
+
 // 성공!
 // 카테고리 추가(2d도면에서 좌표 지정, 이름 지정을 하면, categories, floor_c에 들거가게끔)
 router.post("/:building/:floor", controller.create)
