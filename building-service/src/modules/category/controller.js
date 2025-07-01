@@ -135,9 +135,10 @@ exports.delete = async (req, res) => {
     
     const building_name = req.params.building;
     const floor_number = req.params.floor;
-    const category = req.body.category;
+    const x = req.body.x;
+    const y = req.body.y;
 
-    const result = await Service.delete(building_name, floor_number, category);
+    const result = await Service.delete(building_name, floor_number, x, y);
     if (result.rowCount === 0) {
       // 삭제된 행이 없음 → 잘못된 id
       return res.status(404).send("존재하지 않는 건물/층입니다.");
