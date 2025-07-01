@@ -428,7 +428,7 @@ function dijkstra(graph, locations, startNode, endNode) {
       }
       return null
     })
-    .fillter(Boolean);
+    .filter(Boolean);
   /*
   {
     distance: 46.21, // (예시 값)
