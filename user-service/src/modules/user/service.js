@@ -109,20 +109,20 @@ exports.update = (id, pw, phone, email) => {
   let idx = 1
 
   if (pw) {
-    fields.push(`Pw = $${idx++}`)
+    fields.push(`"Pw" = $${idx++}`)
     values.push(pw)
   }
   if (phone) {
-    fields.push(`Phone = $${idx++}`)
+    fields.push(`"Phone" = $${idx++}`)
     values.push(phone)
   }
   if (email) {
-    fields.push(`Email = $${idx++}`)
+    fields.push(`"Email" = $${idx++}`)
     values.push(email)
   }
   values.push(id)
 
-  const sql = `UPDATE "User" SET ${fields.join(", ")} WHERE Id = $${idx}`
+  const sql = `UPDATE "User" SET ${fields.join(", ")} WHERE "Id" = $${idx}`
 
   return new Promise((resolve, reject) => {
     con.query(sql, values, (err, result) => {
