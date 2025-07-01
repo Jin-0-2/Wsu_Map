@@ -105,3 +105,11 @@ exports.delete = (building_name) => {
     });
   });
 };
+
+// point형식 x, y로 파싱
+exports.parsePoint = (pointStr) => {
+  // "(37.123,128.456)" → { x: 37.123, y: 128.456 }
+  const match = pointStr.match(/\((.*),(.*)\)/);
+  if (!match) return null;
+  return { x: parseFloat(match[1]), y: parseFloat(match[2]) };
+};

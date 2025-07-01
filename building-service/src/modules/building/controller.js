@@ -16,7 +16,7 @@ exports.getAll = async (req, res) => {
     const buildings = result.rows.map(row => ({
       Building_Name: row.Building_Name,
       Description: row.Description,
-      File: row.File ? row.File.toString('base64') : null
+      Location: Service.parsePoint(row.Location)
     }));
     
     res.status(200).json(buildings);
