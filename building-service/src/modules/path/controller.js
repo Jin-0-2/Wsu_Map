@@ -4,7 +4,7 @@ const Service = require("./service")
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
 
 // 전체 조회
-exports.getPath = (req, res) => {
+exports.getPath = async (req, res) => {
   try {
     logRequestInfo(req);
 
@@ -28,26 +28,26 @@ exports.getPath = (req, res) => {
       // 건물 ↔ 건물
       finaly_result = {
         type : "building-building",
-        result : Service.handleBuildingToBuilding(from_building, to_building)
+        result : await Service.handleBuildingToBuilding(from_building, to_building)
       }
       
     } else if (fromType === "room" && toType === "building") {
       // 호실 ↔ 건물
       finaly_result = {
         type : "room-building",
-        result : Service.handleRoomToBuilding(from_building, from_floor, from_room, to_building)
+        result : await Service.handleRoomToBuilding(from_building, from_floor, from_room, to_building)
       }
     } else if (fromType === "building" && toType === "room") {
       // 건물 ↔ 호실
       finaly_result = {
         type : "building-room",
-        result : Service.handleBuildingToRoom(from_building, to_building, to_floor, to_room)
+        result : await Service.handleBuildingToRoom(from_building, to_building, to_floor, to_room)
       }
     } else if (fromType === "room" && toType === "room") {
       // 호실 ↔ 호실(실내 전용 indoorService.js에서 불러올거임 한승헌)
       finaly_result = finaly_result = {
         type : "room-room",
-        result : Service.handleRoomToRoom(from_building, from_floor, from_room, to_building, to_floor, to_room)
+        result : await Service.handleRoomToRoom(from_building, from_floor, from_room, to_building, to_floor, to_room)
       }
     } else {
       return res.status(400).json({ error: "입력값이 올바르지 않습니다." });
