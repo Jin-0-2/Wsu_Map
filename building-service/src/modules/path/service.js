@@ -420,7 +420,15 @@ function dijkstra(graph, locations, startNode, endNode) {
   }
   console.log(pathKeys);
 
-  const path = pathKeys.map(key => locations[key]).filter(Boolean);
+  const path = pathKeys
+    .map(key => {
+      const loc = locations[key];
+      if (loc) {
+        return { name: key, x: loc.x, y: loc.y };
+      }
+      return null
+    })
+    .fillter(Boolean);
   /*
   {
     distance: 46.21, // (예시 값)
