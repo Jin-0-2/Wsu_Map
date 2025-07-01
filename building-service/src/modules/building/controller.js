@@ -12,16 +12,10 @@ exports.getAll = async (req, res) => {
     
     const result = await Service.getAll();
 
-    console.log(result.rows[0].Location, typeof(result.rows[0].Location))
+    console.log(result.rows[0].Location, typeof(result.rows[0].Location)) // { x: 36.339589, y: 127.447295 }
 
-        // file(Buffer) → Base64로 변환
-    const buildings = result.rows.map(row => ({
-      Building_Name: row.Building_Name,
-      Description: row.Description,
-      Location: Service.parsePoint(row.Location)
-    }));
     
-    res.status(200).json(buildings);
+    res.status(200).json(result.rows);
   } catch (err) {
     console.error("DB 오류:", err);
     
