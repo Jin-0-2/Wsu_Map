@@ -15,7 +15,7 @@ router.get("/names", controller.getNames);
 // 빌딩 위치 조회
 router.get("/:name", controller.getBuilding_Location)
 
-// 아직.?
+// 아직.?   필요 없음.
 // 빌딩 3D 도면 출력
 router.get("/:name/3d", controller.getBuilding_3d)
 
