@@ -12,6 +12,8 @@ exports.getAll = async (req, res) => {
     
     const result = await Service.getAll();
 
+    console.log(result.rows[0].Location, typeof(result.rows[0].Location))
+
         // file(Buffer) → Base64로 변환
     const buildings = result.rows.map(row => ({
       Building_Name: row.Building_Name,
