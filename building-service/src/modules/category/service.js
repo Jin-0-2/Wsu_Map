@@ -88,24 +88,6 @@ exports.getCategoryForManager = (building_name, floor_number) => {
   });
 }
 
-// 건물_층 2d도면에 카테고리 전부 띄우기(관리자용)
-exports.getAllCategoryLocationsAt2D = (building_name, floor_number) => {
-  const query = `
-  SELECT fc."Category_Name", fc."Category_Location"
-  FROM "Floor" f
-  JOIN "Floor_C" fc ON f."Floor_Id" = fc."Floor_Id"
-  WHERE f."Building_Name" = $1
-    AND f."Floor_Number" = $2
-`;
-  const values = [building_name, floor_number]
-
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
-}
 
 // point형식 x, y로 파싱
 exports.parsePoint = (pointStr) => {

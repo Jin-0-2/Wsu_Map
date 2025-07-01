@@ -18,6 +18,23 @@ exports.getAll = async (req, res) => {
   }
 };
 
+
+// 회원 한명 조회 마이페이지
+exports.getUser = async (req, res) => {
+  try{
+    logRequestInfo(req);
+
+    const id = req.params.id;
+
+    const result = await userService.getUser(id);
+
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("DB 오류:", err);
+    
+    res.status(500).send("DB 오류");
+  }
+}
 // 회원 가입
 exports.register = async (req, res) => {
   try {

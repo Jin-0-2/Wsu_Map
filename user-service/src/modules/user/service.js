@@ -14,6 +14,19 @@ exports.getAll = () => {
   });
 }
 
+exports.getUser = (id) => {
+  const query = `SELECT "Id", "Pw", "Name", "Stu_Num", "Phone", "Email" FROM "User" WHERE "Id" = $1`;
+
+  const values = [id];
+
+  return new Promise((resolve, reject) => {
+    con.query(query, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 // 회원가입
 exports.register = (id, pw, name, stu_number, phone, email) => {
   const insertQuery = `
