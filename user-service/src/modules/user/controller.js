@@ -18,7 +18,6 @@ exports.getAll = async (req, res) => {
   }
 };
 
-
 // 회원 한명 조회 마이페이지
 exports.getUser = async (req, res) => {
   try{

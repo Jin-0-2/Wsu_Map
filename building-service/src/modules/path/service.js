@@ -147,6 +147,7 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
           end_floorBase64 = fileBuffer.toString('base64');
         }
       }
+      console.log(indoorPath);
 
       return {
         arrival_indoor: {
