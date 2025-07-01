@@ -124,6 +124,8 @@ exports.update = (id, pw, phone, email) => {
 
   const sql = `UPDATE "User" SET ${fields.join(", ")} WHERE "Id" = $${idx}`
 
+  console.log(sql, values);
+
   return new Promise((resolve, reject) => {
     con.query(sql, values, (err, result) => {
       if (err) return reject(err);
