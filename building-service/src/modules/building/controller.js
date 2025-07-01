@@ -11,9 +11,6 @@ exports.getAll = async (req, res) => {
     logRequestInfo(req);
     
     const result = await Service.getAll();
-
-    console.log(result.rows[0].Location, typeof(result.rows[0].Location)) // { x: 36.339589, y: 127.447295 }
-
     
     res.status(200).json(result.rows);
   } catch (err) {
@@ -22,6 +19,21 @@ exports.getAll = async (req, res) => {
     res.status(500).send("DB 오류");
   }
 };
+
+// 건물 전체 이름만 조회
+exports.getNames = async (req, res) => {
+  try {
+    logRequestInfo(req);
+    
+    const result = await Service.getNames();
+    
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("DB 오류:", err);
+    
+    res.status(500).send("DB 오류");
+  }
+}
 
 // 건물 조회
 exports.getBuilding_Location = async (req, res) => {

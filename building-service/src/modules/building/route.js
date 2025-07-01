@@ -8,7 +8,10 @@ const controller = require("./controller")
 // 빌딩 전체 조회(메인화면)
 router.get("/", controller.getAll)
 
-// 
+// 빌딩 이름만 조회
+router.get("/names", controller.getNames);
+
+
 // 빌딩 위치 조회
 router.get("/:name", controller.getBuilding_Location)
 
