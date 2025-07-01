@@ -124,7 +124,7 @@ exports.update = async (req, res) => {
       return res.status(400).send("수정할 항목이 없습니다.")
     }
 
-    const result = await userService.update({ id, pw, phone, email });
+    const result = await userService.update(id, pw, phone, email);
 
     if (result.rowCount === 0) {
       return res.status(404).send("해당 id의 사용자가 없습니다.");

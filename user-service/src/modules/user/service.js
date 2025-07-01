@@ -122,6 +122,7 @@ exports.update = (id, pw, phone, email) => {
   }
   values.push(id)
 
+  
   const sql = `UPDATE "User" SET ${fields.join(", ")} WHERE "Id" = $${idx}`
 
   console.log(sql, values);
