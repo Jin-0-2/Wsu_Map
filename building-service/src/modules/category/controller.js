@@ -93,7 +93,8 @@ exports.getCategoryForManager = async (req, res) => {
     const floor_number = req.params.floor;
 
     const result = await Service.getCategoryForManager(building_name, floor_number);
-  
+
+    console.log(result.rows);
 
     res.status(200).json(result.rows);
   } catch (err) {
