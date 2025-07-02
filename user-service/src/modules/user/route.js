@@ -28,6 +28,9 @@ router.post("/logout", controller.logout)
 // 회원정보 수정
 router.put("/update", controller.update)
 
+// 현재 위치 전송
+router.put("/update_location", controller.update_location);
+
 // 성공!
 // 회원정보 삭제
 router.delete("/delete", controller.delete)

@@ -2,6 +2,7 @@
 
 const Service = require("./service")
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
+const { ConnectionPool } = require("mssql");
 
 // 전체 조회
 exports.getPath = async (req, res) => {
@@ -67,10 +68,16 @@ exports.getNodes = async (req, res) => {
 
     const result = await Service.getNodes();
 
-    console.log(result);
+    // 객체 → 배열 변환 로직 추가
+    const nodesArray = Object.entries(result).map(([nodeId, coord]) => ({
+      id: nodeId,      // 키를 id 필드로 (예: "W1")
+      lat: coord.lat,
+      lng: coord.lng
+    }));
 
-    res.status(200).json(result);
-
+    console.log(nodesArray);
+    
+    res.status(200).json(nodesArray);
   } catch (err) {
     console.error("DB 오류:", err);
 

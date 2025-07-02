@@ -137,6 +137,33 @@ exports.update = async (req, res) => {
   }
 };
 
+// 현재 위치 전송
+exports.update_location = async (req, res) => {
+try {
+    logRequestInfo(req);
+
+    const id = req.body.id;
+    const x = req.body.x;
+    const y = req.body.y;
+
+    if (!id && !x && !y) {
+      return res.status(400).send("필수 항목 누락입니다.")
+    }
+
+    const result = await userService.update_location(id, x, y);
+
+    if (result.rowCount === 0) {
+      return res.status(404).send("해당 id의 사용자가 없습니다.");
+    }
+
+    res.status(200).send("현재 위치 업데이트 완료");
+  } catch (err) {
+    console.error("현재 위치 업데이트 오류:", err);
+
+    res.status(500).send("현재 위치 업데이트 오류");
+  } 
+};
+
 // 회원 삭제
 exports.delete = async (req, res) => {
   try {
