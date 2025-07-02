@@ -163,7 +163,11 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
       // 다른 건물 간 이동: 실내 → 실외 → 실내 경로
       // 1. 출발 호실 → 출발 건물 출입구(실내)
       const start_room = `${from_building}@${from_floor}@${from_room}`;
-      const start_enterance = `${from_building}@1@입구`;
+      let start_enterance = ``;
+      if (to_building === "W15")
+        start_enterance = `${from_building}@2@입구`
+      else
+        start_enterance = `${from_building}@1@입구`;
 
       const exit_indoor_path = dijkstra(indoorGraph, indoorLocations, start_room, start_enterance)
 
