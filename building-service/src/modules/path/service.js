@@ -10,6 +10,9 @@ let outdoorLocations = {};
 let indoorGraph = {};
 let indoorLocations = {};
 
+exports.getNodes = () => {
+  return outdoorLocations;
+}
 
 // 건물 ↔ 건물 (외부만 사용)
 exports.handleBuildingToBuilding = (from_building, to_building) => {

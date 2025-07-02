@@ -60,3 +60,20 @@ exports.getPath = async (req, res) => {
     res.status(500).send("DB 오류");
   }
 };
+
+exports.getNodes = async (req, res) => {
+  try {
+    logRequestInfo(req);
+
+    const result = await Service.getNodes();
+
+    console.log(result);
+
+    res.status(200).json(result);
+
+  } catch (err) {
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류");
+  }
+}
