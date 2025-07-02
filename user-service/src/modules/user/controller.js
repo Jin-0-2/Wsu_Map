@@ -35,6 +35,8 @@ exports.getUser = async (req, res) => {
     res.status(500).send("DB 오류");
   }
 }
+
+
 // 회원 가입
 exports.register = async (req, res) => {
   try {
