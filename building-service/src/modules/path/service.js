@@ -68,6 +68,7 @@ exports.delete = async (node_name) => {
   });
 }
 
+// 노드끼리 잇기
 exports.connect = async (from_node, to_node) => {
   const insert_OutSideEdge = `INSERT INTO "OutSideEdge" ("From_Node", "To_Node") 
   VALUES ($1, $2), ($2, $1)`;
@@ -76,6 +77,20 @@ exports.connect = async (from_node, to_node) => {
 
   return new Promise((resolve, reject) => {
     con.query(insert_OutSideEdge, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
+// 노드 연결 해제
+exports.disconnect = async (from_node, to_node) => {
+  const delete_OutSideEdge = `DELETE FROM "OutSideEdge" WHERE "From_Node" = $1 OR "To_Node" = $1`;
+
+  const values = [from_node, to_node];
+
+  return new Promise((resolve, reject) => {
+    con.query(delete_OutSideEdge, values, (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });
