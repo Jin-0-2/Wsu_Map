@@ -194,6 +194,7 @@ exports.delete = async (req, res) => {
   }
 }
 
+// 노드끼리 잇기
 exports.connect = async (req, res) => {
   try {
     logRequestInfo(req);
@@ -202,6 +203,26 @@ exports.connect = async (req, res) => {
     const to_node = req.body.to_node;
 
     const result = await Service.connect(from_node, to_node);
+
+    Service.initOutdoorGraph();
+
+    res.status(200).json("연결 완료!");
+  } catch (err) {
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류: 연결 중 오류");
+  }
+}
+
+// 노드 연결 해제
+exports.disconnect = async (req, res) => {
+  try {
+    logRequestInfo(req);
+
+    const from_node = req.body.from_node;
+    const to_node = req.body.to_node;
+
+    const result = await Service.disconnect(from_node, to_node);
 
     Service.initOutdoorGraph();
 
