@@ -70,10 +70,10 @@ exports.getNodes = async (req, res) => {
     const result = await Service.getNodes();
 
     // 객체 → 배열 변환 로직 추가
-    const nodesArray = Object.entries(result).map(([nodeId, coord]) => ({
-      id: nodeId,      // 키를 id 필드로 (예: "W1")
-      lat: coord.lat,
-      lng: coord.lng
+    const nodesArray = Object.entries(result).map(([key, value]) => ({
+      id: key,
+      lat: value.lat,
+      lng: value.lng
     }));
 
     console.log(nodesArray);
