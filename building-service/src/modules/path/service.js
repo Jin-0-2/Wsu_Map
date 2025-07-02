@@ -18,6 +18,7 @@ exports.getEdges = () => {
   return outdoorGraph;
 }
 
+// 건물/노드 생성
 exports.create = async (node_name, x, y) => {
   const sql = `INSERT INTO "OutSideNode" ("Node_Name", "Location") VALUES ($1, POINT($2, $3));`
 
@@ -31,6 +32,7 @@ exports.create = async (node_name, x, y) => {
   });
 }
 
+// 노드 위치 수정
 exports.update_node_location = (node_name, x, y) => {
   const sql = `UPDATE "OutSideNode" SET "Location" = POINT($1, $2) WHERE "Node_Name" = $3`;
 
@@ -43,6 +45,29 @@ exports.update_node_location = (node_name, x, y) => {
     });
   });
 }
+
+// 건물/노드 삭제
+exports.delete = async (node_name) => {
+  const delete_OutSideEdge = `DELETE FROM "OutSideEdge" WHERE "From_Node" = $1 OR "To_Node" = $1`;
+  const delete_OutSideNode = `DELETE FROM "OutSideNode" WHERE "Node_Name" = $1`;
+
+  const values = [node_name];
+
+  return new Promise((resolve, reject) => {
+    // 1. OutSideEdge 먼저 삭제
+    con.query(delete_OutSideEdge, values, (err, result) => {
+      if (err) return reject(err);
+      
+      // 2. OutSideNode 삭제
+      con.query(delete_OutSideNode, values, (err2, result2) => {
+        if (err2) return reject(err2);
+
+        resolve({ edgeResult: result, nodeResult: result2 });
+      });
+    });
+  });
+}
+
 // 건물 ↔ 건물 (외부만 사용)
 exports.handleBuildingToBuilding = (from_building, to_building) => {
   console.log(outdoorLocations);

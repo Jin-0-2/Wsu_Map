@@ -16,4 +16,7 @@ router.put("/", controller.update_node_location)
 // 건물/경로 추가
 router.post("/create", controller.create)
 
+// 노드/건물 삭제
+router.delete("/", controller.delete);
+
 module.exports = router

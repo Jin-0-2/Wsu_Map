@@ -127,6 +127,7 @@ exports.update_node_location = async (req, res) => {
   }
 }
 
+// 건물/노드 생성
 exports.create = async (req, res) => {
   try {
     logRequestInfo(req);
@@ -151,6 +152,35 @@ exports.create = async (req, res) => {
     } else if (type == "node") {
       result = await Service.create(node_name, x, y);
       console.log("노드에 추가완료")
+
+    }
+    
+    Service.initOutdoorGraph();
+
+    res.status(200).json("추가 완료!");
+  } catch (err) {
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류");
+  }
+}
+
+// 건물/ 노드 삭제
+exports.delete = async (req, res) => {
+  try {
+    logRequestInfo(req);
+
+    const type = req.body.type;
+    const node_name = req.body.node_name;
+
+    if (type === "building") {
+      const building_create_result = await buildingService.delete(node_name);
+      console.log("빌딩에 삭제완료")
+      result = await Service.delete(node_name);
+      console.log("노드에 삭제완료")
+    } else if (type == "node") {
+      result = await Service.delete(node_name);
+      console.log("노드에 삭제완료")
 
     }
     
