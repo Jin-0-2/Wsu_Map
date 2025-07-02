@@ -96,10 +96,6 @@ exports.getEdges = async (req, res) => {
       nodes: value
     }));
 
-    console.log(nodesArray[0].nodes);
-
-    console.log(JSON.stringify(nodesArray, null, 2));
-
     res.status(200).json(nodesArray);
   } catch (err) {
     console.error("DB 오류:", err);

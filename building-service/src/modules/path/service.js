@@ -53,7 +53,7 @@ exports.handleRoomToBuilding = async (from_building, from_floor, from_room, to_b
 
   const start_room = `${from_building}@${from_floor}@${from_room}`;
   let start_enterance = ``;
-  if (to_building === "W15") {
+  if (from_building === "W15") {
     start_enterance = `${from_building}@2@입구`
   } else {
     start_enterance = `${from_building}@1@입구`;
@@ -64,6 +64,11 @@ exports.handleRoomToBuilding = async (from_building, from_floor, from_room, to_b
   const indoorPath = dijkstra(indoorGraph, indoorLocations, start_room, start_enterance);
 
   let start_floorBase64 = null;
+  if(from_building === "W15") {
+
+  }
+
+  
   if (from_floor != 1) {
     // 건물 내부 이동 도면 (시작 층)
     const startfloorResult = await floor.getFloorNumber(from_floor, from_building);
