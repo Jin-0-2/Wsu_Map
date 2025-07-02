@@ -36,7 +36,12 @@ exports.handleRoomToBuilding = async (from_building, from_floor, from_room, to_b
   console.log(indoorLocations);
 
   const start_room = `${from_building}@${from_floor}@${from_room}`;
-  const start_enterance = `${from_building}@1@입구`;
+  let start_enterance = ``;
+  if (to_building === "W15") {
+    start_enterance = `${from_building}@2@입구`
+  } else {
+    start_enterance = `${from_building}@1@입구`;
+  }
 
 
   // 건물 내부 탈출 (1층 입구까지 가는건 동일)
@@ -85,8 +90,13 @@ exports.handleBuildingToRoom = async (from_building, to_building, to_floor, to_r
   const outdoorPath = dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);
 
   // 건물 도착 후 실내 경로
-  const entry_room = `${to_building}@${to_floor}@${to_room}`;
-  const entery_enterance = `${to_building}@1@입구`;
+  let entery_enterance = ``;
+      if (to_building === "W15") {
+        entery_enterance = `${to_building}@2@입구`
+      } else {
+        entery_enterance = `${to_building}@1@입구`;
+      }
+      const entry_room = `${to_building}@${to_floor}@${to_room}`;
 
   // 건물 내부 이동 (1층 입구부터  가는건 동일)
   const indoorPath = dijkstra(indoorGraph, indoorLocations, entery_enterance, entry_room);
@@ -211,9 +221,6 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
         entery_enterance = `${to_building}@1@입구`;
       }
       const entry_room = `${to_building}@${to_floor}@${to_room}`;
-      console.log(entery_enterance);
-      console.log(entry_room);
-
 
       // 건물 내부 이동 (입구 -> 방)
       const entry_indoor_path = dijkstra(indoorGraph, indoorLocations, entery_enterance, entry_room);
