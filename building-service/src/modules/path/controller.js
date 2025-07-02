@@ -85,3 +85,29 @@ exports.getNodes = async (req, res) => {
     res.status(500).send("DB 오류");
   }
 }
+
+exports.getEdges = async (req, res) => {
+  try {
+    logRequestInfo(req);
+
+    const result = await Service.getEdges();
+
+    console.log(result);
+
+    // 객체 → 배열 변환 로직 추가
+    const nodesArray = Object.entries(result).map(([key, value]) => ({
+      id: key,
+      lat: value.lat,
+      lng: value.lng
+    }));
+
+    console.log(nodesArray);
+
+    res.status(200).json(nodesArray);
+  } catch (err) {
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류");
+  }
+}
+

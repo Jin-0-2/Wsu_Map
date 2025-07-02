@@ -9,4 +9,6 @@ router.post("/", controller.getPath)
 
 router.get("/", controller.getNodes)
 
+router.get("/edges", controller.getEdges)
+
 module.exports = router

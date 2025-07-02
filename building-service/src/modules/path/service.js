@@ -14,6 +14,10 @@ exports.getNodes = () => {
   return outdoorLocations;
 }
 
+exports.getEdges = () => {
+  return outdoorGraph;
+}
+
 // 건물 ↔ 건물 (외부만 사용)
 exports.handleBuildingToBuilding = (from_building, to_building) => {
   const outdoorPath = dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);
