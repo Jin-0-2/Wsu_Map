@@ -19,7 +19,7 @@ exports.getEdges = () => {
 }
 
 exports.create = async (node_name, x, y) => {
-  const sql = `INSERT INTO "OutSideEdge" ("Node_Name", "Location") VALUES ($1, POINT($2, $3));`
+  const sql = `INSERT INTO "OutSideNode" ("Node_Name", "Location") VALUES ($1, POINT($2, $3));`
 
   values = [node_name, x, y]
 
