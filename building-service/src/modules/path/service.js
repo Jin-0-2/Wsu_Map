@@ -32,6 +32,8 @@ exports.update_node_location = (node_name, x, y) => {
 }
 // 건물 ↔ 건물 (외부만 사용)
 exports.handleBuildingToBuilding = (from_building, to_building) => {
+  console.log(outdoorLocations);
+
   const outdoorPath = dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);
 
   console.log(outdoorPath);
