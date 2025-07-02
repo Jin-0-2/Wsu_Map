@@ -57,13 +57,27 @@ exports.delete = async (node_name) => {
     // 1. OutSideEdge 먼저 삭제
     con.query(delete_OutSideEdge, values, (err, result) => {
       if (err) return reject(err);
-      
+
       // 2. OutSideNode 삭제
       con.query(delete_OutSideNode, values, (err2, result2) => {
         if (err2) return reject(err2);
 
         resolve({ edgeResult: result, nodeResult: result2 });
       });
+    });
+  });
+}
+
+exports.connect = async (from_node, to_node) => {
+  const insert_OutSideEdge = `INSERT INTO "OutSideEdge" ("From_Node", "To_Node")
+   FROM "OutSideNode" VALUES ($1, $2), ($2, $1)`;
+
+  const values = [from_node, to_node];
+
+  return new Promise((resolve, reject) => {
+    con.query(insert_OutSideEdge, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
     });
   });
 }

@@ -19,4 +19,7 @@ router.post("/create", controller.create)
 // 노드/건물 삭제
 router.delete("/", controller.delete);
 
+// 노드끼리 잇기
+router.post("/connect", controller.connect)
+
 module.exports = router

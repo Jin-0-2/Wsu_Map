@@ -193,3 +193,22 @@ exports.delete = async (req, res) => {
     res.status(500).send("DB 오류");
   }
 }
+
+exports.connect = async (req, res) => {
+  try {
+    logRequestInfo(req);
+
+    const from_node = req.body.from_node;
+    const to_node = req.body.to_node;
+
+    const result = await Service.connect(from_node, to_node);
+
+    Service.initOutdoorGraph();
+
+    res.status(200).json("연결 완료!");
+  } catch (err) {
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류: 연결 중 오류");
+  }
+}
