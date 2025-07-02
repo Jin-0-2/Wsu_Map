@@ -98,7 +98,7 @@ exports.getEdges = async (req, res) => {
 
     console.log(nodesArray[0].nodes);
 
-    console.log(nodesArray);
+    console.log(JSON.stringify(nodesArray, null, 2));
 
     res.status(200).json(nodesArray);
   } catch (err) {
