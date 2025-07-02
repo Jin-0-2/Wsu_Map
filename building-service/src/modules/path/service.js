@@ -69,8 +69,8 @@ exports.delete = async (node_name) => {
 }
 
 exports.connect = async (from_node, to_node) => {
-  const insert_OutSideEdge = `INSERT INTO "OutSideEdge" ("From_Node", "To_Node")
-   FROM "OutSideNode" VALUES ($1, $2), ($2, $1)`;
+  const insert_OutSideEdge = `INSERT INTO "OutSideEdge" ("From_Node", "To_Node") 
+  VALUES ($1, $2), ($2, $1)`;
 
   const values = [from_node, to_node];
 
