@@ -468,7 +468,9 @@ function dijkstra(graph, locations, startNode, endNode) {
     .map(key => {
       const loc = locations[key];
       if (loc) {
-        return { name: key, x: loc.x, y: loc.y };
+        const x = loc.x !== undefined ? loc.x : loc.lat;
+        const y = loc.x !== undefined ? loc.y : loc.lng;
+        return { name : key, x, y}
       }
       return null
     })
