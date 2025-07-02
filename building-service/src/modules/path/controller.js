@@ -90,16 +90,15 @@ exports.getEdges = async (req, res) => {
 
     console.log(result);
 
-    // // 객체 → 배열 변환 로직 추가
-    // const nodesArray = Object.entries(result).map(([key, value]) => ({
-    //   id: key,
-    //   lat: value.lat,
-    //   lng: value.lng
-    // }));
+    // 객체 → 배열 변환 로직 추가
+    const nodesArray = Object.entries(result).map(([key, value]) => ({
+      key,
+      value
+    }));
 
-    // console.log(nodesArray);
+    console.log(nodesArray);
 
-    res.status(200).json(result);
+    res.status(200).json(nodesArray);
   } catch (err) {
     console.error("DB 오류:", err);
 
