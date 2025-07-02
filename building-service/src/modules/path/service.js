@@ -206,11 +206,14 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
       // 건물 도착 후 실내 경로
       let entery_enterance = ``;
       if (to_building === "W15") {
-        entery_enterance = `${from_building}@2@입구`
+        entery_enterance = `${to_building}@2@입구`
       } else {
-        entery_enterance = `${from_building}@1@입구`;
+        entery_enterance = `${to_building}@1@입구`;
       }
       const entry_room = `${to_building}@${to_floor}@${to_room}`;
+      console.log(entery_enterance);
+      console.log(entry_room);
+
 
       // 건물 내부 이동 (입구 -> 방)
       const entry_indoor_path = dijkstra(indoorGraph, indoorLocations, entery_enterance, entry_room);
