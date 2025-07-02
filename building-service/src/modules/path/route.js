@@ -11,4 +11,6 @@ router.get("/", controller.getNodes)
 
 router.get("/edges", controller.getEdges)
 
+router.put("/", controller.update_node_location)
+
 module.exports = router

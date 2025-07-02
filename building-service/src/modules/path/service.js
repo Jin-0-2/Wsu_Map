@@ -18,6 +18,18 @@ exports.getEdges = () => {
   return outdoorGraph;
 }
 
+exports.update_node_location = (node_name, x, y) => {
+  const sql = `UPDATE "OutSideNode" SET "Location" = POINT($1, $2) WHERE "Node_Name" = $3`;
+
+  const values = [x, y, node_name];
+
+  return new Promise((resolve, reject) => {
+    con.query(sql, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
 // 건물 ↔ 건물 (외부만 사용)
 exports.handleBuildingToBuilding = (from_building, to_building) => {
   const outdoorPath = dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);

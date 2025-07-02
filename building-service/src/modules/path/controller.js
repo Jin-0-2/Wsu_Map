@@ -106,3 +106,30 @@ exports.getEdges = async (req, res) => {
   }
 }
 
+exports.update_node_location = async (req, res) => {
+  try {
+    logRequestInfo(req);
+
+    const node_name = req.body.node_name;
+    const x = req.body.x;
+    const y = req.body.y;
+
+    const result = await Service.update_node_location(node_name, x, y);
+
+    console.log(result);
+
+    // 객체 → 배열 변환 로직 추가
+    const nodesArray = Object.entries(result).map(([key, value]) => ({
+      id: key,
+      nodes: value
+    }));
+
+    console.log(nodesArray);
+
+    res.status(200).json(nodesArray);
+  } catch (err) {
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류");
+  }
+}
