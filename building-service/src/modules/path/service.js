@@ -46,15 +46,14 @@ exports.handleBuildingToBuilding = (from_building, to_building) => {
 
 // 호실 ↔ 건물 (내부 -> 외부)
 exports.handleRoomToBuilding = async (from_building, from_floor, from_room, to_building) => {
-  console.log(outdoorGraph);
-  console.log(outdoorLocations);
-  console.log(indoorGraph);
-  console.log(indoorLocations);
-
   const start_room = `${from_building}@${from_floor}@${from_room}`;
+
   let start_enterance = ``;
+  let entrance_floor = 1;
+
   if (from_building === "W15") {
-    start_enterance = `${from_building}@2@입구`
+    entrance_floor = 2;
+    start_enterance = `${from_building}@2@입구`;
   } else {
     start_enterance = `${from_building}@1@입구`;
   }
@@ -63,30 +62,25 @@ exports.handleRoomToBuilding = async (from_building, from_floor, from_room, to_b
   // 건물 내부 탈출 (1층 입구까지 가는건 동일)
   const indoorPath = dijkstra(indoorGraph, indoorLocations, start_room, start_enterance);
 
+
+
+  // 출발 층 도면
   let start_floorBase64 = null;
-  if(from_building === "W15") {
-
-  }
-
-  
-  if (from_floor != 1) {
-    // 건물 내부 이동 도면 (시작 층)
-    const startfloorResult = await floor.getFloorNumber(from_floor, from_building);
-    if (startfloorResult && startfloorResult.rows && startfloorResult.rows.length > 0) {
-      const fileBuffer = startfloorResult.rows[0].File; // File 컬럼 (Buffer 타입)
-      if (fileBuffer) {
-        floorBase64 = fileBuffer.toString('base64'); // base64로 변환
-      }
+  const startfloorResult = await floor.getFloorNumber(from_floor, from_building)
+  if (startfloorResult && startfloorResult.rows && startfloorResult.rows.length > 0) {
+    const fileBuffer = startfloorResult.rows[0].File;
+    if (fileBuffer) {
+      start_floorBase64 = fileBuffer.toString('base64');
     }
   }
 
-  // 건물 내부 이동 도면 (시작 1층)
-  const firstfloorResult = await floor.getFloorNumber(1, from_building);
+  // 입구(탈출) 층 도면
   let end_floorBase64 = null;
-  if (firstfloorResult && firstfloorResult.rows && firstfloorResult.rows.length > 0) {
-    const fileBuffer = firstfloorResult.rows[0].File; // File 컬럼 (Buffer 타입)
+  const entranceFloorResult = await floor.getFloorNumber(entrance_floor, from_building);
+  if (entranceFloorResult && entranceFloorResult.rows && entranceFloorResult.rows.length > 0) {
+    const fileBuffer = entranceFloorResult.rows[0].File;
     if (fileBuffer) {
-      end_floorBase64 = fileBuffer.toString('base64'); // base64로 변환
+      end_floorBase64 = fileBuffer.toString('base64');
     }
   }
 
@@ -95,12 +89,12 @@ exports.handleRoomToBuilding = async (from_building, from_floor, from_room, to_b
 
   return {
     departure_indoor: {
-      start_floorImage: start_floorBase64, // 실내 사진(base64)
-      end_floorImage: end_floorBase64,
-      path: indoorPath                // 실내 경로
+      start_floorImage: start_floorBase64, // 출발 층 도면
+      end_floorImage: end_floorBase64,     // 입구(탈출) 층 도면
+      path: indoorPath
     },
     outdoor: {
-      path: outdoorPath               // 실외 경로
+      path: outdoorPath
     }
   };
 }
