@@ -18,6 +18,19 @@ exports.getEdges = () => {
   return outdoorGraph;
 }
 
+exports.create = async (node_name, x, y) => {
+  const sql = `INSERT INTO "OutSideEdge" ("Node_Name", "Location") VALUES ($1, POINT($2, $3));`
+
+  values = [node_name, x, y]
+
+  return new Promise((resolve, reject) => {
+    con.query(sql, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 exports.update_node_location = (node_name, x, y) => {
   const sql = `UPDATE "OutSideNode" SET "Location" = POINT($1, $2) WHERE "Node_Name" = $3`;
 

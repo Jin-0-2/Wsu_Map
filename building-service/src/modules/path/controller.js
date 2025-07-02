@@ -2,6 +2,7 @@
 
 const Service = require("./service")
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
+const buildingService = require("../building/service")
 
 // 전체 조회
 exports.getPath = async (req, res) => {
@@ -53,6 +54,8 @@ exports.getPath = async (req, res) => {
       return res.status(400).json({ error: "입력값이 올바르지 않습니다." });
     }
 
+    console.log(JSON.stringify(finaly_result, null, 2))
+
     res.status(200).json(finaly_result);
   } catch (err) {
     console.error("DB 오류:", err);
@@ -88,8 +91,6 @@ exports.getEdges = async (req, res) => {
 
     const result = await Service.getEdges();
 
-    console.log(result);
-
     // 객체 → 배열 변환 로직 추가
     const nodesArray = Object.entries(result).map(([key, value]) => ({
       id: key,
@@ -119,6 +120,35 @@ exports.update_node_location = async (req, res) => {
     Service.initOutdoorGraph();
 
     res.status(200).json("변경 완료!");
+  } catch (err) {
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류");
+  }
+}
+
+exports.create = async (req, res) => {
+  try {
+    logRequestInfo(req);
+
+    const type = req.body.type;
+    const node_name = req.body.node_name;
+    const x = req.body.x;
+    const y = req.body.y;
+    const desc = !req.body.desc ? null : req.body.desc;
+
+    let result = null;
+
+    if (type === "building") {
+      const building_create_result = await buildingService.create(node_name, x, y, desc);
+      result = await Service.create(node_name, x, y);
+    } else if (type == "node") {
+      result = await Service.create(node_name, x, y);
+    }
+    
+    Service.initOutdoorGraph();
+
+    res.status(200).json("추가 완료!");
   } catch (err) {
     console.error("DB 오류:", err);
 

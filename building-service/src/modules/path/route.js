@@ -13,4 +13,7 @@ router.get("/edges", controller.getEdges)
 
 router.put("/", controller.update_node_location)
 
+// 건물/경로 추가
+router.post("/create", controller.create)
+
 module.exports = router
