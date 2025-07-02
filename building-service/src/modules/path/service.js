@@ -128,6 +128,7 @@ exports.handleBuildingToRoom = async (from_building, to_building, to_floor, to_r
 // 호실 ↔ 호실 경로 탐색
 exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_building, to_floor, to_room) => {
   try {
+    console.log(indoorLocations);
     console.log(indoorGraph);
     if (from_building === to_building) {
       // 같은 건물 내부 이동: 실내 경로만 탐색
