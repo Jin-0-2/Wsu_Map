@@ -116,17 +116,11 @@ exports.update_node_location = async (req, res) => {
 
     const result = await Service.update_node_location(node_name, x, y);
 
-    console.log(result);
+    console.log(result.rowCount);
+    
+    Service.initOutdoorGraph();
 
-    // 객체 → 배열 변환 로직 추가
-    const nodesArray = Object.entries(result).map(([key, value]) => ({
-      id: key,
-      nodes: value
-    }));
-
-    console.log(nodesArray);
-
-    res.status(200).json(nodesArray);
+    res.status(200).json("변경 완료!");
   } catch (err) {
     console.error("DB 오류:", err);
 

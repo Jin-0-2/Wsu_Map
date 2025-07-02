@@ -114,7 +114,7 @@ exports.handleBuildingToRoom = async (from_building, to_building, to_floor, to_r
   const indoorPath = dijkstra(indoorGraph, indoorLocations, entery_enterance, entry_room);
 
   // 도착 방이 1층일 때 > 1층만 반환
-  const firstfloorResult = await floor.getFloorNumber(1, from_building);
+  const firstfloorResult = await floor.getFloorNumber(1, to_building);
   let entry_first_floorBase64 = null;
   if (firstfloorResult && firstfloorResult.rows && firstfloorResult.rows.length > 0) {
     const fileBuffer = firstfloorResult.rows[0].File; // File 컬럼 (Buffer 타입)
@@ -126,7 +126,7 @@ exports.handleBuildingToRoom = async (from_building, to_building, to_floor, to_r
   // 도착방이 2층 이상일 때 
   let entry_end_floorBase64 = null;
   if (from_floor != 1) {
-    const endfloorResult = await floor.getFloorNumber(from_floor, from_building);
+    const endfloorResult = await floor.getFloorNumber(to_floor, to_building);
     if (endfloorResult && endfloorResult.rows && endfloorResult.rows.length > 0) {
       const fileBuffer = endfloorResult.rows[0].File; // File 컬럼 (Buffer 타입)
       if (fileBuffer) {
@@ -241,7 +241,7 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
       // 도착방이 2층 이상일 때 
       let entry_start_floorImage = null;
       if (from_floor != 1) {
-        const result = await floor.getFloorNumber(from_floor, from_building);
+        const result = await floor.getFloorNumber(to_floor, to_building);
         if (result && result.rows && result.rows.length > 0) {
           const fileBuffer = result.rows[0].File; // File 컬럼 (Buffer 타입)
           if (fileBuffer) {
@@ -252,7 +252,7 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
 
       // 도착 방이 1층일 때 > 1층만 반환
       let entry_first_floorImage = null;
-      const entryFirstFloorResult = await floor.getFloorNumber(1, from_building);
+      const entryFirstFloorResult = await floor.getFloorNumber(1, to_building);
       if (entryFirstFloorResult && entryFirstFloorResult.rows && entryFirstFloorResult.rows.length > 0) {
         const fileBuffer = entryFirstFloorResult.rows[0].File; // File 컬럼 (Buffer 타입)
         if (fileBuffer) {
