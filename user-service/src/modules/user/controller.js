@@ -1,6 +1,7 @@
 // src/modules/user/controller.js
 
 const userService = require("./service")
+const nodemailer = require('nodemailer');
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
 
 // 회원 전체 조회
@@ -184,3 +185,41 @@ exports.delete = async (req, res) => {
     res.status(500).send("회원 삭제 처리 중 오류");
   }
 };
+
+// 아이디 찾기
+exports.find_id = async (req, res) => {
+try {
+    logRequestInfo(req);
+
+    const { email } = req.body.email;
+
+    const result = await userService.find_id(email);
+    if (result.rowCount === 0) {
+      // 삭제된 행이 없음 → 잘못된 id
+      return res.status(404).send("존재하지 않는 사용자입니다.");
+    }
+
+    const id = result.rows[0].Id;
+
+    const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'jjy020815@gmail.com',
+      pass: 'aa3125010'
+    }
+  });
+
+  const mailOptions = {
+    from: 'jjy020815@gmail.com',
+    to: email,
+    subject: '비밀번호 재설정 인증 코드',
+    text: `인증 코드는 ${code} 입니다.`
+  };
+
+    res.status(200).send(result.rows);
+  } catch (err) {
+    console.error("회원 삭제 처리 중 오류:", err);
+
+    res.status(500).send("회원 삭제 처리 중 오류");
+  }
+}

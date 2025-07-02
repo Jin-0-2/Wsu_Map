@@ -35,4 +35,7 @@ router.put("/update_location", controller.update_location);
 // 회원정보 삭제
 router.delete("/delete", controller.delete)
 
+// 아이디 찾기
+router.post("/find_id", controller.find_id)
+
 module.exports = router

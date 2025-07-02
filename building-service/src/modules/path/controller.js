@@ -137,13 +137,21 @@ exports.create = async (req, res) => {
     const y = req.body.y;
     const desc = !req.body.desc ? null : req.body.desc;
 
+    console.log(type, node_name, x, y, desc);
+
+
+
     let result = null;
 
     if (type === "building") {
       const building_create_result = await buildingService.create(node_name, x, y, desc);
+      console.log("빌딩에 추가완료")
       result = await Service.create(node_name, x, y);
+      console.log("노드에 추가완료")
     } else if (type == "node") {
       result = await Service.create(node_name, x, y);
+      console.log("노드에 추가완료")
+
     }
     
     Service.initOutdoorGraph();

@@ -140,7 +140,7 @@ exports.update_location = async (id, x, y) => {
   const update_location_Qurey = `UPDATE "User" SET "Last_Location" = POINT($1, $2) WHERE "Id" = $3`
 
   const values = [x, y, id];
-  
+
   return new Promise((resolve, reject) => {
     con.query(sql, values, (err, result) => {
       if (err) return reject(err);
@@ -162,3 +162,17 @@ exports.delete = (id) => {
     });
   });
 };
+
+// 아이디 찾기
+exports.find_id = async (email) => {
+  const deleteQuery = 'SELECT "Id" FROM "User" WHERE "Email" = $1'
+
+  const values = [email]
+
+  return new Promise((resolve, reject) => {
+    con.query(deleteQuery, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
