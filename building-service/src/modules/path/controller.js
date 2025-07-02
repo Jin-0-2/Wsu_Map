@@ -92,8 +92,8 @@ exports.getEdges = async (req, res) => {
 
     // 객체 → 배열 변환 로직 추가
     const nodesArray = Object.entries(result).map(([key, value]) => ({
-      key,
-      value
+      id: key,
+      nodes: value
     }));
 
     console.log(nodesArray);
