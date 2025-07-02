@@ -54,6 +54,8 @@ exports.getPath = async (req, res) => {
       return res.status(400).json({ error: "입력값이 올바르지 않습니다." });
     }
 
+    console.log(finaly_result);
+
     res.status(200).json(finaly_result);
   } catch (err) {
     console.error("DB 오류:", err);
@@ -76,7 +78,7 @@ exports.getNodes = async (req, res) => {
     }));
 
     console.log(nodesArray);
-    
+
     res.status(200).json(nodesArray);
   } catch (err) {
     console.error("DB 오류:", err);
