@@ -2,7 +2,6 @@
 
 const Service = require("./service")
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
-const { ConnectionPool } = require("mssql");
 
 // 전체 조회
 exports.getPath = async (req, res) => {
