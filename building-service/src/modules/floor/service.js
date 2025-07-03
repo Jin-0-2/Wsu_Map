@@ -16,7 +16,7 @@ exports.getAll = () => {
 
 // 건물 별 층 조회 (2d)
 exports.getFloors = (building_name) => {
-  const query = 'SELECT * FROM "Floor" WHERE "Building_Name" = $1'
+  const query = 'SELECT * FROM "Floor" WHERE "Building_Name" = $1 ORDER BY "Floor_Number";'
 
   const values = [building_name]
 
