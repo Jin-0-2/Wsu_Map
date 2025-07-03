@@ -85,7 +85,7 @@ exports.connect = async (from_node, to_node) => {
 
 // 노드 연결 해제
 exports.disconnect = async (from_node, to_node) => {
-  const delete_OutSideEdge = `DELETE FROM "OutSideEdge" WHERE "From_Node" = $1 OR "To_Node" = $1`;
+  const delete_OutSideEdge = `DELETE FROM "OutSideEdge" WHERE ("From_Node" = $1 AND "To_Node" = $2) OR ("From_Node" = $2 AND "To_Node" = $1)`;
 
   const values = [from_node, to_node];
 
