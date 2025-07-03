@@ -42,6 +42,8 @@ exports.getFloors = async (req, res) => {
       ...row,
       file: row.File ? row.File.toString('base64') : null
     }));
+
+    console.log(floors);
     
 
     res.status(200).json(floors);
