@@ -10,14 +10,27 @@ exports.getPath = async (req, res) => {
     logRequestInfo(req);
 
     // body에서 출발/도착 정보 추출
-    const {
-      from_building,
+    let {
+      from_location = null,
+      from_building = null,
       from_floor = null,
       from_room = null,
       to_building,
       to_floor = null,
       to_room = null
     } = req.body;
+
+    // --- 주요 변경 사항 1: 출발지 유효성 검사 ---
+    // from_location과 from_building 둘 다 없거나, 둘 다 있으면 오류 처리
+    if ((!from_location && !from_building) || (from_location && from_building)) {
+      return res.status(400).json({
+        error: "출발지는 'from_location' 또는 'from_building' 중 하나만, 그리고 반드시 입력해야 합니다.",
+      });
+    }
+
+    if (from_location) {
+      from_building = await Service.getCloseNode(from_location);
+    }
 
     const fromType = from_room ? "room" : "building";
     const toType = to_room ? "room" : "building";

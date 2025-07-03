@@ -97,6 +97,34 @@ exports.disconnect = async (from_node, to_node) => {
   });
 }
 
+// 현위치에서 가장 가까운 노드 찾기
+exports.getCloseNode = async (from_location) => {
+  let closestNodeName = null;
+  let minDistance = Infinity; // 최소 거리를 저장할 변수 (초기값은 무한대)
+
+  // outdoorLocations 객체의 모든 노드를 순회합니다.
+  for (const nodeName in outdoorLocations) {
+    if (outdoorLocations.hasOwnProperty(nodeName)) {
+      const nodeCoords = outdoorLocations[nodeName];
+      
+      // 이미 있는 haversineDistance 함수를 사용하여 거리를 계산합니다.
+      const distance = haversineDistance(from_location, nodeCoords);
+
+      // 만약 계산된 거리가 지금까지 찾은 최소 거리보다 짧다면,
+      if (distance < minDistance) {
+        minDistance = distance;       // 최소 거리를 현재 거리로 업데이트
+        closestNodeName = nodeName;   // 가장 가까운 노드의 이름을 현재 노드 이름으로 업데이트
+      }
+    }
+  }
+  
+  // 디버깅을 위해 콘솔에 로그를 남깁니다. (단위: 미터)
+  console.log(`[getCloseNode] 가장 가까운 노드: '${closestNodeName}', 거리: 약 ${minDistance.toFixed(1)}m`);
+  
+  // 찾은 가장 가까운 노드의 이름을 반환합니다.
+  return closestNodeName;
+};
+
 // 건물 ↔ 건물 (외부만 사용)
 exports.handleBuildingToBuilding = (from_building, to_building) => {
   console.log(outdoorLocations);
