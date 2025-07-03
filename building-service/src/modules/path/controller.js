@@ -4,7 +4,7 @@ const Service = require("./service")
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
 const buildingService = require("../building/service")
 
-// 전체 조회
+// 길찾기 경로 반환
 exports.getPath = async (req, res) => {
   try {
     logRequestInfo(req);
