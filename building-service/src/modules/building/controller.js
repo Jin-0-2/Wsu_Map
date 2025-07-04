@@ -11,6 +11,8 @@ exports.getAll = async (req, res) => {
     logRequestInfo(req);
     
     const result = await Service.getAll();
+
+    console.log(result.rows);
     
     res.status(200).json(result.rows);
   } catch (err) {
