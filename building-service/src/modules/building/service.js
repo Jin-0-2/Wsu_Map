@@ -4,7 +4,22 @@ const con = require("../../core/db")
 
 // 건물 전체 조회
 exports.getAll = () => {
-  const query = 'SELECT * FROM "Building"'
+  const query = `
+  SELECT *
+  FROM "Building"
+  ORDER BY
+    -- 1. 'W'로 시작하는 건물과 그 외 건물을 그룹으로 나눔
+    CASE
+        WHEN "Building_Name" LIKE 'W%' THEN 1
+        ELSE 2
+    END,
+    -- 2. 'W' 건물 그룹 내에서 숫자 부분만 추출하여 숫자로 변환 후 정렬
+    CASE
+        WHEN "Building_Name" LIKE 'W%' THEN CAST(substring("Building_Name" from 'W([0-9]+)') AS INTEGER)
+    END,
+    -- 3. 같은 번호의 W건물(W17-동관, W17-서관)과 한글 건물들을 이름순으로 정렬
+    "Building_Name";
+`
 
   return new Promise((resolve, reject) => {
     con.query(query, (err, result) => {
