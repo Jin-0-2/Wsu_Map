@@ -1,6 +1,7 @@
 // src/modules/floor/service.js
 
 const con = require("../../core/db")
+const cheerio = require('cheerio');
 
 // 전체 조회
 exports.getAll = () => {
@@ -128,3 +129,4 @@ exports.delete = (building_name, floor_number, room_name) => {
 
     });
 };
+

@@ -1,6 +1,7 @@
 // src/modules/floor/controller.js
 
 const Service = require("./service")
+const roomService = require("../room/service")
 const multer = require('multer');
 const upload = multer();
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
@@ -20,8 +21,6 @@ exports.getAll = async (req, res) => {
   }
 };
 
-
-
 // 건물 별 층 조회 (2d)
 exports.getFloors = async (req, res) => {
   try {
@@ -38,7 +37,6 @@ exports.getFloors = async (req, res) => {
     res.status(500).send("DB 오류");
   }
 };
-
 
 exports.getFloorNames = async (req, res) => {
   try {
@@ -92,10 +90,36 @@ exports.create = [
         return res.status(400).send("floor_number와 building_name을 모두 입력하세요.");
       }
 
-      let fileUrl = Service.upload(building_name, floor_number, file);// DB에 저장될 최종 파일 URL
+      let fileUrl = null;
+      let parsedNodes = [];
 
-      const result = await Service.create(building_name, floor_number, fileUrl);
+      if (file) {
+        // SVG 파싱과 S3 업로드를 병렬로 처리하여 시간 단축
+        [parsedNodes, fileUrl] = await Promise.all([
+          parseNavigationNodes(file.buffer),
+          Service.uploadFile(building_name, floor_number, file)
+        ]);
+      }
 
+      // 1. 먼저 Floor 정보를 DB에 생성하고, 생성된 floor의 정보를 받아옵니다.
+      // (반드시 새로 생성된 Floor의 ID를 반환하도록 floorService.create를 수정해야 합니다)
+      const newFloor = await Service.create(building_name, floor_number, fileUrl);
+
+
+      // 2. 파싱된 노드가 있다면, 각 노드를 DB에 저장합니다.
+      if (parsedNodes.length > 0) {
+        // 모든 노드 생성 작업을 Promise 배열로 만듭니다.
+        const nodeCreationPromises = parsedNodes.map(node => {
+          const { nodeId, x, y } = node;
+          
+          // 요청하신 파라미터 순서에 맞게 roomService.create 호출
+          // newFloor.id는 새로 생성된 Floor의 Primary Key입니다.
+          return roomService.create(newFloor.id, nodeId, "", x, y);
+        });
+
+        // 모든 노드 생성 작업이 끝날 때까지 기다립니다.
+        await Promise.all(nodeCreationPromises);
+      }
       res.status(201).json({
         message: "층 추가가 완료되었습니다",
       });
@@ -106,7 +130,7 @@ exports.create = [
   }
 ];
 
-// 층 수정
+// 층 수정  추가에 맞게 수정을 해줘야할듯.
 exports.update = [
   upload.single('file'),
   async (req, res) => {

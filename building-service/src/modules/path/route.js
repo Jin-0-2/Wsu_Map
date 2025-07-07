@@ -13,6 +13,7 @@ router.get("/edges", controller.getEdges)
 
 router.put("/", controller.update_node_location)
 
+// 외부
 // 건물/경로 추가
 router.post("/create", controller.create)
 
@@ -24,5 +25,8 @@ router.post("/connect", controller.connect)
 
 // 노드 연결 해제
 router.delete("/disconnect", controller.disconnect)
+
+// 내부
+
 
 module.exports = router

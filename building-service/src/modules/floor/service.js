@@ -136,3 +136,46 @@ exports.delete = async (building_name, floor_number) => {
     throw err; // 오류를 다시 던져서 상위 호출자에게 알림
   }
 };
+
+// svg 파일 파싱
+exports.parseNavigationNodes = (svgBuffer) => {
+  if (!svgBuffer) {
+    console.log("SVG 파일 데이터가 없습니다.");
+    return [];
+  }
+
+  const svgString = svgBuffer.toString('utf-8');
+  const $ = cheerio.load(svgString, { xmlMode: true }); // SVG는 XML로 파싱합니다.
+
+  const nodes = [];
+
+  // 1. id가 'navigationNode'인 그룹(g 태그)을 찾습니다.
+  const navigationLayer = $('#navigationNode');
+
+  if (navigationLayer.length === 0) {
+    console.log("'navigationNode' ID를 가진 레이어(그룹)를 찾을 수 없습니다.");
+    return [];
+  }
+
+  // 2. 해당 그룹 내부에 있는 모든 circle과 rect 태그를 찾습니다.
+  navigationLayer.find('circle').each((index, element) => {
+    const elem = $(element);
+    const nodeId = elem.attr('id');
+    let x, y;
+
+    // 3. 태그 종류에 따라 좌표를 추출합니다.
+    if (element.tagName.toLowerCase() === 'circle') {
+      // circle 태그의 경우 cx, cy 속성이 중심 좌표입니다.
+      x = parseFloat(elem.attr('cx'));
+      y = parseFloat(elem.attr('cy'));
+    }
+
+    // 4. ID와 좌표가 유효한 경우에만 배열에 추가합니다.
+    if (nodeId && !isNaN(x) && !isNaN(y)) {
+      nodes.push({ nodeId, x, y });
+    }
+  });
+
+  console.log(`SVG 파싱 완료: 총 ${nodes.length}개의 네비게이션 노드를 추출했습니다.`);
+  return nodes;
+};
