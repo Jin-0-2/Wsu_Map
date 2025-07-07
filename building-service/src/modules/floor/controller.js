@@ -11,14 +11,8 @@ exports.getAll = async (req, res) => {
     logRequestInfo(req);
 
     const result = await Service.getAll();
-
-     // file(Buffer) → Base64로 변환
-    const floors = result.rows.map(row => ({
-      ...row,
-      file: row.File ? row.File.toString('base64') : null
-    }));
     
-    res.status(200).json(floors);
+    res.status(200).json(result);
   } catch (err) {
     console.error("DB 오류:", err);
     
@@ -37,16 +31,7 @@ exports.getFloors = async (req, res) => {
 
     const result = await Service.getFloors(building_name);
 
-    // file(Buffer) → Base64로 변환
-    const floors = result.rows.map(row => ({
-      ...row,
-      file: row.File ? row.File.toString('base64') : null
-    }));
-
-    console.log(floors);
-    
-
-    res.status(200).json(floors);
+    res.status(200).json(result);
   } catch (err) {
     console.error("DB 오류:", err);
 
@@ -84,19 +69,8 @@ exports.getFloorNumber = async (req, res) => {
     if (!result.rows.length) {
       return res.status(404).send("해당 층 도면이 없습니다.");
     }
-    
-    const fileBuffer = result.rows[0].File; // bytea 컬럼
-    if (!fileBuffer) {
-      return res.status(404).send("도면 파일이 없습니다.");
-    }
-
-    // Content-Type: PNG
-    res.setHeader('Content-Type', 'image/png');
-    // 파일명 예시: W15_2층.png
-    const fileName = `${building_name}_${floor}.png`;
-    res.setHeader('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(fileName)}`);
-
-    res.status(200).send(fileBuffer);
+  
+    res.status(200).send(result);
   } catch (err) {
     console.error("DB 오류:", err);
 
@@ -108,20 +82,21 @@ exports.getFloorNumber = async (req, res) => {
 exports.create = [
   upload.single('file'),
   async (req, res) => {
-  try {
-    logRequestInfo(req);
+    try {
+      logRequestInfo(req);
 
-    const { building_name, floor_number } = req.body
-    const file = req.file ? req.file.buffer : null; //파일이 없으면 null
-    console.log(`${building_name}, ${floor_number}`)
+      const { building_name, floor_number } = req.body
+      const file = req.file ? req.file.buffer : null; //파일이 없으면 null
 
-    if (!floor_number || !building_name) {
+      if (!floor_number || !building_name) {
         return res.status(400).send("floor_number와 building_name을 모두 입력하세요.");
-    }
+      }
 
-    const result = await Service.create(building_name, floor_number, file);
+      let fileUrl = Service.upload(building_name, floor_number, file);// DB에 저장될 최종 파일 URL
 
-    res.status(201).json({
+      const result = await Service.create(building_name, floor_number, fileUrl);
+
+      res.status(201).json({
         message: "층 추가가 완료되었습니다",
       });
     } catch (err) {
@@ -139,7 +114,7 @@ exports.update = [
     logRequestInfo(req);
 
     const floor_number = req.params.floor;
-    const building_name = req.params.building;
+    const building_name = req.params.building;;
     const file = req.file ? req.file.buffer : undefined;
 
     if (!floor_number || !building_name) {
@@ -149,14 +124,14 @@ exports.update = [
     const result = await Service.updateFloorFile(building_name, floor_number, file);
 
     if (result.rowCount === 0) {
-      return res.status(404).send("해당 이름의 건물이 없습니다.");
+      return res.status(404).send("해당 이름의 건물/층이 없습니다.");
     }
 
-    res.status(200).send("건물정보가 수정되었습니다.");
+    res.status(200).send("층 파일이 수정되었습니다.")
   } catch (err) {
-    console.error("건물정보 수정 중 오류:", err);
+    console.error("층 파일 수정 중 오류:", err);
 
-    res.status(500).send("건물정보 수정 중 오류");
+    res.status(500).send("층 파일 수정 중 오류");
   }
 }]; 
 
