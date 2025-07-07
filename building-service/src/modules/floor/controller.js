@@ -77,7 +77,7 @@ exports.getFloorNumber = async (req, res) => {
 };
 
 // 층 추가
-exports.create = [
+exports.create = (req, res) [
   upload.single('file'),
   async (req, res) => {
     try {
@@ -131,7 +131,7 @@ exports.create = [
 ];
 
 // 층 수정  추가에 맞게 수정을 해줘야할듯.
-exports.update = [
+exports.update = (req, res) [
   upload.single('file'),
   async (req, res) => {
   try {
