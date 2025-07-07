@@ -159,13 +159,13 @@ exports.parseNavigationNodes = (svgBuffer) => {
   }
 
   // 2. 해당 그룹 내부에 있는 모든 circle과 rect 태그를 찾습니다.
-  navigationLayer.find('circle').each((index, element) => {
+  navigationLayer.find('circle' || 'ellipse').each((index, element) => {
     const elem = $(element);
     const nodeId = elem.attr('id');
     let x, y;
 
     // 3. 태그 종류에 따라 좌표를 추출합니다.
-    if (element.tagName.toLowerCase() === 'circle') {
+    if (element.tagName.toLowerCase() === 'circle' || element.tagName.toLowerCase() === 'ellipse') {
       // circle 태그의 경우 cx, cy 속성이 중심 좌표입니다.
       x = parseFloat(elem.attr('cx'));
       y = parseFloat(elem.attr('cy'));
