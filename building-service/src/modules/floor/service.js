@@ -162,6 +162,8 @@ exports.parseNavigationNodes = (svgBuffer) => {
   console.log(svgString);
   console.log("=============================================================");
 
+  const $ = cheerio.load(svgString, { xmlMode: true });
+
   const nodes = [];
 
   // 1. id가 'navigationNode'인 그룹(g 태그)을 찾습니다.
