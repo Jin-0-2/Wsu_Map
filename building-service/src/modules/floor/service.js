@@ -150,6 +150,10 @@ exports.parseNavigationNodes = (svgBuffer) => {
 
   console.log($);
 
+  console.log("================= 서버가 수신한 SVG 원본 문자열 =================");
+  console.log(svgString);
+  console.log("=============================================================");
+
   const nodes = [];
 
   // 1. id가 'navigationNode'인 그룹(g 태그)을 찾습니다.
@@ -163,7 +167,7 @@ exports.parseNavigationNodes = (svgBuffer) => {
   }
 
   // 2. 해당 그룹 내부에 있는 모든 circle과 rect 태그를 찾습니다.
-  navigationLayer.find('circle' || 'ellipse').each((index, element) => {
+  navigationLayer.find('circle', 'ellipse').each((index, element) => {
     const elem = $(element);
     const nodeId = elem.attr('id');
     let x, y;
