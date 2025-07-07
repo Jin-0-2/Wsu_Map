@@ -77,7 +77,7 @@ exports.getFloorNumber = async (req, res) => {
 };
 
 // 층 추가
-exports.create = (req, res) [
+exports.create = [
   upload.single('file'),
   async (req, res) => {
     try {
@@ -96,7 +96,7 @@ exports.create = (req, res) [
       if (file) {
         // SVG 파싱과 S3 업로드를 병렬로 처리하여 시간 단축
         [parsedNodes, fileUrl] = await Promise.all([
-          parseNavigationNodes(file.buffer),
+          Service.parseNavigationNodes(file.buffer),
           Service.uploadFile(building_name, floor_number, file)
         ]);
       }
@@ -131,7 +131,7 @@ exports.create = (req, res) [
 ];
 
 // 층 수정  추가에 맞게 수정을 해줘야할듯.
-exports.update = (req, res) [
+exports.update = [
   upload.single('file'),
   async (req, res) => {
   try {
