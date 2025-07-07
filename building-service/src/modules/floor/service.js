@@ -155,6 +155,8 @@ exports.parseNavigationNodes = (svgBuffer) => {
   // 1. id가 'navigationNode'인 그룹(g 태그)을 찾습니다.
   const navigationLayer = $('#Navigation_Nodes');
 
+  console.log(navigationLayer);
+
   if (navigationLayer.length === 0) {
     console.log("'Navigation_Nodes' ID를 가진 레이어(그룹)를 찾을 수 없습니다.");
     return [];
