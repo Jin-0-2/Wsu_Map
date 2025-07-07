@@ -129,7 +129,7 @@ exports.getCloseNode = async (from_location) => {
 exports.handleBuildingToBuilding = (from_building, to_building) => {
   console.log(outdoorLocations);
 
-  const outdoorPath = dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);
+  const outdoorPath = dijkstra(outdoorGraph, from_building, to_building, outdoorLocations);
 
   console.log(outdoorPath);
   return {
@@ -144,20 +144,16 @@ exports.handleRoomToBuilding = async (from_building, from_floor, from_room, to_b
   const start_room = `${from_building}@${from_floor}@${from_room}`;
 
   let start_enterance = ``;
-  let entrance_floor = 1;
 
-  if (from_building === "W15") {
-    entrance_floor = 2;
-    start_enterance = `${from_building}@2@입구`;
+  if (from_building === "W15" || from_building === "W17-동관") {
+    start_enterance = `${from_building}@2@enterence`;
   } else {
-    start_enterance = `${from_building}@1@입구`;
+    start_enterance = `${from_building}@1@enterence`;
   }
 
 
   // 건물 내부 탈출 (1층 입구까지 가는건 동일)
-  const indoorPath = dijkstra(indoorGraph, indoorLocations, start_room, start_enterance);
-
-
+  const indoorPath = dijkstra(indoorGraph, start_room, start_enterance);
 
   // 출발 층 도면
   let start_floorBase64 = null;
@@ -180,7 +176,7 @@ exports.handleRoomToBuilding = async (from_building, from_floor, from_room, to_b
   }
 
   // 건물 -> 건물
-  const outdoorPath = dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);
+  const outdoorPath = dijkstra(outdoorGraph, from_building, to_building, outdoorLocations);
 
   return {
     departure_indoor: {
@@ -197,19 +193,19 @@ exports.handleRoomToBuilding = async (from_building, from_floor, from_room, to_b
 // 건물 ↔ 호실 (외부 -> 내부)
 exports.handleBuildingToRoom = async (from_building, to_building, to_floor, to_room) => {
   // 건물 간 이동
-  const outdoorPath = dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);
+  const outdoorPath = dijkstra(outdoorGraph, from_building, to_building, outdoorLocations);
 
   // 건물 도착 후 실내 경로
   let entery_enterance = ``;
-      if (to_building === "W15") {
-        entery_enterance = `${to_building}@2@입구`
-      } else {
-        entery_enterance = `${to_building}@1@입구`;
-      }
-      const entry_room = `${to_building}@${to_floor}@${to_room}`;
+  if (to_building === "W15" || from_building === "W17-동관") {
+    entery_enterance = `${to_building}@2@enterence`
+  } else {
+    entery_enterance = `${to_building}@1@enterence`;
+  }
+  const entry_room = `${to_building}@${to_floor}@${to_room}`;
 
   // 건물 내부 이동 (1층 입구부터  가는건 동일)
-  const indoorPath = dijkstra(indoorGraph, indoorLocations, entery_enterance, entry_room);
+  const indoorPath = dijkstra(indoorGraph, entery_enterance, entry_room);
 
   // 도착 방이 1층일 때 > 1층만 반환
   const firstfloorResult = await floor.getFloorNumber(1, to_building);
@@ -253,7 +249,7 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
       const start_room = `${from_building}@${from_floor}@${from_room}`;
       const end_room = `${to_building}@${to_floor}@${to_room}`;
 
-      const indoorPath = dijkstra(indoorGraph, indoorLocations, start_room, end_room);
+      const indoorPath = dijkstra(indoorGraph, start_room, end_room);
 
       let start_floorBase64 = null;
       if (from_floor != to_floor) {
@@ -288,11 +284,11 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
       // 1. 출발 호실 → 출발 건물 출입구(실내)
       const start_room = `${from_building}@${from_floor}@${from_room}`;
       // 출발 건물 입구: W15는 2층, 그 외는 1층
-      let start_entrance_floor = (from_building === "W15") ? 2 : 1;
-      let start_enterance = `${from_building}@${start_entrance_floor}@입구`;
+      let start_entrance_floor = (from_building === "W15" || from_building === "W17-동관") ? 2 : 1;
+      let start_enterance = `${from_building}@${start_entrance_floor}@enterence`;
 
 
-      const exit_indoor_path = dijkstra(indoorGraph, indoorLocations, start_room, start_enterance)
+      const exit_indoor_path = dijkstra(indoorGraph, start_room, start_enterance)
 
       // 출발 층 도면
       let exit_start_floorImage = null;
@@ -317,16 +313,16 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
       }
 
       // 2. 출발 건물 출입구 → 도착 건물 출입구(실외)
-      const outdoorPath = dijkstra(outdoorGraph, outdoorLocations, from_building, to_building);
+      const outdoorPath = dijkstra(outdoorGraph, from_building, to_building, outdoorLocations);
 
       // 3. 도착 건물 출입구 → 도착 호실(실내)
       // 도착 건물 입구: W15는 2층, 그 외는 1층
       let entry_entrance_floor = (to_building === "W15") ? 2 : 1;
-      let entery_enterance = `${to_building}@${entry_entrance_floor}@입구`;
+      let entery_enterance = `${to_building}@${entry_entrance_floor}@enterence`;
       const entry_room = `${to_building}@${to_floor}@${to_room}`;
 
       // 건물 내부 이동 (입구 -> 방)
-      const entry_indoor_path = dijkstra(indoorGraph, indoorLocations, entery_enterance, entry_room);
+      const entry_indoor_path = dijkstra(indoorGraph, entery_enterance, entry_room);
 
 
       // 도착 층 도면
@@ -370,8 +366,7 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
   } catch (err) {
     throw err;
   }
-};
-
+}
 
 // 내부
 // ✅ 두 좌표 간의 유클리드 거리 계산 함수
@@ -382,7 +377,7 @@ const euclideanDistance = (a, b) =>
 async function buildIndoorGraph() {
   // 방 위치 정보 가져오기
   const roomRes = await con.query(`
-    SELECT "Building_Name", "Floor_Number", "Room_Name", "Room_Location"
+    SELECT "Building_Name", "Floor_Number", "Room_Name"
     FROM "Floor_R" JOIN "Floor" ON "Floor_R"."Floor_Id" = "Floor"."Floor_Id"
   `);
 
@@ -402,10 +397,8 @@ async function buildIndoorGraph() {
 
   // 방 좌표를 저장할 객체: key = Building@Floor@Room
   const locations = {};
-  roomRes.rows.forEach(({ Building_Name, Floor_Number, Room_Name, Room_Location }) => {
+  roomRes.rows.forEach(({ Building_Name, Floor_Number, Room_Name }) => {
     const key = `${Building_Name}@${Floor_Number}@${Room_Name}`;
-    const { x, y } = Room_Location;
-    locations[key] = { x: Number(x), y: Number(y) };
   });
 
   // 그래프 객체 초기화
@@ -499,7 +492,7 @@ async function initOutdoorGraph() {
 }
 
 // 최단경로 탐색
-function dijkstra(graph, locations, startNode, endNode) {
+function dijkstra(graph, startNode, endNode, locations = {}) {
   const distances = {};
   const visited = {};
   const previous = {};
@@ -551,31 +544,26 @@ function dijkstra(graph, locations, startNode, endNode) {
   }
   console.log(pathKeys);
 
-  const path = pathKeys
-    .map(key => {
-      const loc = locations[key];
-      if (loc) {
-        const x = loc.x !== undefined ? loc.x : loc.lat;
-        const y = loc.x !== undefined ? loc.y : loc.lng;
-        return { name : key, x, y}
-      }
-      return null
-    })
-    .filter(Boolean);
-  /*
-  {
-    distance: 46.21, // (예시 값)
-    path: [
-      { x: 10, y: 20 },
-      { x: 30, y: 40 },
-      { x: 50, y: 60 },
-      { x: 100, y: 200 },
-      { x: 120, y: 220 }
-    ]
-  }
-  */
+  // locations 객체가 존재하고, 비어있지 않은지 확인합니다.
+  if (locations && Object.keys(locations).length > 0) {
+    // locations 정보가 있으면, 좌표를 매핑하여 반환합니다.
+    const path = pathKeys
+      .map(key => {
+        const loc = locations[key];
+        if (loc) {
+          const x = loc.x !== undefined ? loc.x : loc.lat;
+          const y = loc.y !== undefined ? loc.y : loc.lng;
+          return { name: key, x, y };
+        }
+        return null;
+      })
+      .filter(Boolean); // 혹시라도 loc 정보가 없는 경우 null을 제거합니다.
 
-  return { distance: distances[endNode], path };
+    return { distance: distances[endNode], path };
+  } else {
+    // locations 정보가 없으면, pathKeys 배열을 그대로 반환합니다.
+    return { distance: distances[endNode], path: pathKeys };
+  }
 }
 
 exports.initIndoorGraph = initIndoorGraph;
