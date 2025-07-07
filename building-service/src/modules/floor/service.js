@@ -148,6 +148,8 @@ exports.parseNavigationNodes = (svgBuffer) => {
   const svgString = svgBuffer.toString('utf-8');
   const $ = cheerio.load(svgString, { xmlMode: true }); // SVG는 XML로 파싱합니다.
 
+  console.log($);
+
   const nodes = [];
 
   // 1. id가 'navigationNode'인 그룹(g 태그)을 찾습니다.
