@@ -145,10 +145,18 @@ exports.parseNavigationNodes = (svgBuffer) => {
     return [];
   }
 
-  const svgString = svgBuffer.toString('utf-8');
-  const $ = cheerio.load(svgString, { xmlMode: true }); // SVG는 XML로 파싱합니다.
-
-  console.log($);
+  let svgString;
+  // svgBuffer가 Buffer 타입인지 ArrayBuffer 타입인지 확인하여 적절하게 변환합니다.
+  if (svgBuffer instanceof Buffer) {
+    svgString = svgBuffer.toString('utf-8');
+  } else if (svgBuffer instanceof ArrayBuffer) {
+    const decoder = new TextDecoder('utf-8');
+    svgString = decoder.decode(svgBuffer);
+  } else {
+    // 예상치 못한 타입일 경우 처리
+    console.log("CRITICAL: svgBuffer의 타입이 예상과 다릅니다.", typeof svgBuffer);
+    return [];
+  }
 
   console.log("================= 서버가 수신한 SVG 원본 문자열 =================");
   console.log(svgString);
