@@ -431,6 +431,8 @@ async function initIndoorGraph() {
   indoorLocations = locations;
 
   console.log(indoorGraph);
+  console.log(indoorLocations);
+
   console.log('실내 그래프 캐싱 완료!');
 }
 
