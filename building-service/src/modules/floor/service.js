@@ -81,7 +81,7 @@ exports.uploadFile = async (building_name, floor_number, file) => {
     await s3Client.send(command);
 
     // 4. DB에 저장할 객체 URL을 생성합니다.
-    return `https://${bucketName}.s3.${s3Client.config.region}.amazonaws.com/${key}`;
+    return `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/${key}`;
   }
 }
 
