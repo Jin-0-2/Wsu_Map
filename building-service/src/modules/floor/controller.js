@@ -114,7 +114,7 @@ exports.create = [
           
           // 요청하신 파라미터 순서에 맞게 roomService.create 호출
           // newFloor.id는 새로 생성된 Floor의 Primary Key입니다.
-          return roomService.create(newFloor.id, nodeId, "", x, y);
+          return roomService.create(building_name, floor_number, nodeId, "", x, y);
         });
 
         // 모든 노드 생성 작업이 끝날 때까지 기다립니다.
