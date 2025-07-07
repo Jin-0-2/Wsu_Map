@@ -153,7 +153,7 @@ exports.parseNavigationNodes = (svgBuffer) => {
   const nodes = [];
 
   // 1. id가 'navigationNode'인 그룹(g 태그)을 찾습니다.
-  const navigationLayer = $('#Navigation_Nodes');
+  const navigationLayer = $('[id="Navigation_Nodes"]');
 
   console.log(navigationLayer);
 
