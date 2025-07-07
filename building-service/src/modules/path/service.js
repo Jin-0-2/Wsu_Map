@@ -429,6 +429,8 @@ async function initIndoorGraph() {
   const { graph, locations } = await buildIndoorGraph();
   indoorGraph = graph;
   indoorLocations = locations;
+
+  console.log(indoorGraph);
   console.log('실내 그래프 캐싱 완료!');
 }
 
@@ -488,8 +490,6 @@ async function initOutdoorGraph() {
   const { graph, locations } = await buildOutdoorGraph();
   outdoorGraph = graph;
   outdoorLocations = locations;
-
-  console.log(outdoorGraph);
   console.log('실외 그래프 캐싱 완료!');
 }
 
