@@ -399,6 +399,7 @@ async function buildIndoorGraph() {
   const locations = {};
   roomRes.rows.forEach(({ Building_Name, Floor_Number, Room_Name }) => {
     const key = `${Building_Name}@${Floor_Number}@${Room_Name}`;
+    locations[key] = true;
   });
 
   // 그래프 객체 초기화
