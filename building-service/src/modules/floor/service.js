@@ -1,6 +1,7 @@
 // src/modules/floor/service.js
 
 const con = require("../../core/db")
+const cheerio = require('cheerio')
 
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
