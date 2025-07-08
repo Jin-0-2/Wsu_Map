@@ -29,12 +29,7 @@ exports.getBuildingLocationsByCategory = async (req, res) => {
     const category_name = req.params.category;
     const result = await Service.getBuildingLocationsByCategory(category_name);
 
-    const rows = result.rows.map(row => ({
-      ...row,
-      Location: Service.parsePoint(row.Category_Location)
-    }));
-
-    res.status(200).json(rows);
+    res.status(200).json(result.rows);
   } catch (err) {
     console.error("DB 오류:", err);
 
