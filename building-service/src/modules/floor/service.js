@@ -6,7 +6,7 @@ const cheerio = require('cheerio')
 const { S3Client, PutObjectCommand, DeleteObjectCommand  } = require("@aws-sdk/client-s3");
 
 const s3Client = new S3Client({
-  region: "ap-northeast-2", // 예: 서울 리전
+  region: "ap-southeast-2", // 예: 서울 리전
 });
 
 // 층 전체 조회
@@ -81,7 +81,7 @@ exports.uploadFile = async (building_name, floor_number, file) => {
     await s3Client.send(command);
 
     // 4. DB에 저장할 객체 URL을 생성합니다.
-    return `https://${bucketName}.s3.ap-northeast-2.amazonaws.com/${key}`;
+    return `https://${bucketName}.s3.ap-southeast-2.amazonaws.com/${key}`;
   }
 }
 
