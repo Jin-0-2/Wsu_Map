@@ -130,3 +130,23 @@ exports.delete = (building_name, floor_number, room_name) => {
     });
 };
 
+// 1. 이름으로 업데이트하는 함수 (신규 추가 필요)
+exports.updateByName = async (building_name, floor_number, nodeId, dataToUpdate, { transaction }) => {
+  const { x, y } = dataToUpdate;
+  const query = `UPDATE "Floor_R"
+  SET "Room_Location" = POINT($1, $2)
+  WHERE "Floor_Id" = (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $3 AND "Floor_Number" = $4)
+  AND "Room_Name" = $5;`;
+  await con.query(query, [x, y, building_name, floor_number, nodeId], { transaction });
+}
+
+// 2. 이름으로 삭제하는 함수 (신규 추가 필요)
+exports.deleteByName = async (building_name, floor_number, nodeId, { transaction }) => {
+  const query = `DELETE FROM "Floor_R" WHERE "Floor_Id" = (
+      SELECT "Floor_Id"
+      FROM "Floor"
+      WHERE "Building_Name" = $1 AND "Floor_Number" = $2)
+      AND "Room_Name" = $3;
+      `;
+  await db.query(query, [building_name, floor_number, nodeId], { transaction });
+}
