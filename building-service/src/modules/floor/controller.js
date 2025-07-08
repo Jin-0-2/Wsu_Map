@@ -3,7 +3,6 @@
 const Service = require("./service")
 const roomService = require("../room/service")
 const multer = require('multer');
-const cheerio = require('cheerio');
 const upload = multer();
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
 
@@ -30,6 +29,8 @@ exports.getFloors = async (req, res) => {
     const building_name = req.params.building;
 
     const result = await Service.getFloors(building_name);
+
+    console.log(result)
 
     res.status(200).json(result);
   } catch (err) {
