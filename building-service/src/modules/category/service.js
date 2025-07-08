@@ -16,7 +16,7 @@ exports.getAll = () => {
 
 // 카테고리 검색(카테고리 이름 > 건물 위치) 메인화면에서 상단부분 필터 클릭 시
 exports.getBuildingLocationsByCategory = (category_name) => {
-  const query = 'SELECT c."Building_Name", b."Location" FROM "Categories" c JOIN "Building" b ON c."Building_Name" = b."Building_Name" WHERE c."Category_Name" = $1';
+  const query = 'select "Building_Name" from "Categories" where "Category_Name" = $1';
   
   const values = [category_name]
 
