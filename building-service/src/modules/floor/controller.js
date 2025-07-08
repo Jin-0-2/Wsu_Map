@@ -5,6 +5,7 @@ const roomService = require("../room/service")
 const multer = require('multer');
 const upload = multer();
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
+const { parse } = require("dotenv");
 
 // 전체 조회
 exports.getAll = async (req, res) => {
@@ -103,6 +104,8 @@ exports.create = [
         ]);
       }
 
+      console.log(parsedNodes);
+
       // 1. 먼저 Floor 정보를 DB에 생성하고, 생성된 floor의 정보를 받아옵니다.
       // (반드시 새로 생성된 Floor의 ID를 반환하도록 floorService.create를 수정해야 합니다)
       const newFloor = await Service.create(building_name, floor_number, fileUrl);
@@ -197,7 +200,7 @@ exports.update = [
       for (const nameToDelete of existingNodeNameSet) {
         // (DELETE) 새 도면에 없는 노드 -> 삭제
         // roomService.deleteByName은 복합 키를 사용해 삭제해야 합니다.
-        promises.push(roomService.delete(
+        promises.push(roomService.deleteByName(
           building_name, 
           floor_number, 
           nameToDelete, 
