@@ -35,7 +35,7 @@ exports.getFloors = async (req, res) => {
 
     console.log(result.rows)
 
-    res.status(200).json(result.rows);
+    res.status(200).json(result);
   } catch (err) {
     console.error("DB 오류:", err);
 
