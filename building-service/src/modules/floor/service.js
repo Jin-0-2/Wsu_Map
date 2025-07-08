@@ -177,7 +177,7 @@ exports.parseNavigationNodes = (svgBuffer) => {
   }
 
   // 2. 해당 그룹 내부에 있는 모든 circle과 rect 태그를 찾습니다.
-  navigationLayer.find('circle', 'ellipse').each((index, element) => {
+  navigationLayer.find('circle, ellipse').each((index, element) => {
     const elem = $(element);
     const nodeId = elem.attr('id');
     let x, y;
