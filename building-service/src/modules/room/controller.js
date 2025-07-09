@@ -43,7 +43,7 @@ exports.getRoomDescByName = async (req, res) => {
     logRequestInfo(req);
     const building_name = req.params.building;
     const floor_number = req.params.floor;
-    const room_name = req.body.room_name;
+    const room_name = req.params.room;
     
     const result = await Service.getRoomDescByName(building_name, floor_number, room_name);
 
