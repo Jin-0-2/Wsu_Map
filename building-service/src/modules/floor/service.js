@@ -65,7 +65,7 @@ exports.getFloorNumber = (floor, building_name) => {
 // 층 도면 aws에 추가
 exports.uploadFile = async (building_name, floor_number, file) => {
   if (file) {
-    const bucketName = "wsu-map-svg"; // 실제 S3 버킷 이름으로 변경하세요.
+    const bucketName = "wsu-map"; // 실제 S3 버킷 이름으로 변경하세요.
     // 파일 이름을 고유하게 생성합니다 (예: 도면/w19_1.svg)
     const key = `${building_name}_${floor_number}.svg`;
 
