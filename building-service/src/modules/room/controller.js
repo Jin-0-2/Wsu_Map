@@ -41,6 +41,7 @@ exports.getRoombyBuildingFloor = async (req, res) => {
 exports.getRoomDescByName = async (req, res) => {
   try {
     logRequestInfo(req);
+    
     const building_name = req.params.building;
     const floor_number = req.params.floor;
     const room_name = req.params.room;

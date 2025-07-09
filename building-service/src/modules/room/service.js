@@ -112,6 +112,22 @@ exports.create = (building_name, floor_number, room_name, room_desc, x, y) => {
     });
 };
 
+// 방 추가
+exports.create_tran = async (building_name, floor_number, room_name, room_desc, x, y, { client }) => {
+  const insertQuery = `
+  INSERT INTO "Floor_R" ("Floor_Id", "Room_Name", "Room_Description", "Room_Location")
+  VALUES (
+  (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2),
+  $3, $4, POINT($5, $6)
+  );`;
+
+  const values = [building_name, floor_number, room_name, room_desc, x, y];
+
+  const result = await con.query(insertQuery, values);
+
+  return result;
+};
+
 // 방 수정
 exports.update = (building_name, floor_number, old_room_name, room_name, room_desc) => {
   const updateQuery = `UPDATE "Floor_R"
@@ -171,4 +187,20 @@ exports.deleteByName = async (building_name, floor_number, nodeId, { transaction
       AND "Room_Name" = $3;
       `;
   await db.query(query, [building_name, floor_number, nodeId], { transaction });
+}
+
+exports.findAllByFloor = async (building_name, floor_number, { client }) => {
+  const selectQuery = `
+    SELECT "FR"."Room_Name"
+    FROM "Floor_R" AS "FR"
+    JOIN "Floor" AS "F" ON "FR"."Floor_Id" = "F"."Floor_Id"
+    WHERE "F"."Building_Name" = $1 AND "F"."Floor_Number" = $2;
+  `;
+
+  const values = [building_name, floor_number];
+
+  // 인자로 전달받은 client를 사용해 쿼리를 실행합니다.
+  const result = await client.query(selectQuery, values);
+
+  return result.rows.map(row => row.Room_Name);
 }

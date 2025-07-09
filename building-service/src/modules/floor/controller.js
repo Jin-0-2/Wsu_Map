@@ -2,7 +2,7 @@
 
 const Service = require("./service")
 const roomService = require("../room/service")
-const db = require('../../core/db')
+const client = require('../../core/db')
 const multer = require('multer');
 const upload = multer();
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
@@ -140,20 +140,21 @@ exports.create = [
 exports.update = [
   upload.single('file'),
   async (req, res) => {
-    // DB 트랜잭션 시작 (사용하는 DB 라이브러리에 맞게 구현. 예: knex, TypeORM)
-    const transaction = await db.beginTransaction();
     try {
+      await client.query('BEGIN')
       logRequestInfo(req);
+
       const { building_name, floor_number } = req.body;
       const file = req.file ? req.file.buffer : null;
 
       if (!floor_number || !building_name) {
+        await client.query('ROLLBACK');
         return res.status(400).send("floor_number와 building_name을 모두 입력하세요.");
       }
 
       // 1. 기존 노드 '이름' 목록 조회
-      // roomService.findAllByFloor는 이제 ['201호', '202호', ...] 같은 문자열 배열을 반환해야 합니다.
-      const existingNodeNames = await roomService.findAllByFloor(building_name, floor_number);
+      // 모든 DB 작업에 client 객체를 직접 전달합니다.
+      const existingNodeNames = await roomService.findAllByFloor(building_name, floor_number, { client });
       // 빠른 조회를 위해 Set으로 변환
       const existingNodeNameSet = new Set(existingNodeNames);
 
@@ -170,42 +171,26 @@ exports.update = [
       // 새롭게 파싱된 노드를 기준으로 반복
       for (const newNode of newParsedNodes) {
         if (existingNodeNameSet.has(newNode.nodeId)) {
-          // (UPDATE) 기존에 있던 노드 -> 좌표 정보 업데이트
-          // roomService.updateByName은 복합 키를 사용해 업데이트해야 합니다.
+          // UPDATE
           promises.push(roomService.updateByName(
-            building_name, 
-            floor_number, 
-            newNode.nodeId, 
-            { x: newNode.x, y: newNode.y }, 
-            { transaction }
+            building_name, floor_number, newNode.nodeId, 
+            { x: newNode.x, y: newNode.y }, { client }
           ));
-
-          // 처리된 노드는 Set에서 제거하여, 남은 노드들이 삭제 대상이 되도록 함
           existingNodeNameSet.delete(newNode.nodeId);
         } else {
-          // (CREATE) 새로 생긴 노드 -> 생성
-          // create 함수는 이미 필요한 파라미터를 다 받고 있으므로 변경 없음
-          promises.push(roomService.create(
-            building_name, 
-            floor_number, 
-            newNode.nodeId, 
-            "", 
-            newNode.x, 
-            newNode.y, 
-            { transaction }
+          // CREATE
+          promises.push(roomService.create_tran(
+            building_name, floor_number, newNode.nodeId, 
+            "", newNode.x, newNode.y, { client }
           ));
         }
       }
 
       // 5. 삭제될 노드 처리 (Set에 남아있는 이름들)
       for (const nameToDelete of existingNodeNameSet) {
-        // (DELETE) 새 도면에 없는 노드 -> 삭제
-        // roomService.deleteByName은 복합 키를 사용해 삭제해야 합니다.
+        // DELETE
         promises.push(roomService.deleteByName(
-          building_name, 
-          floor_number, 
-          nameToDelete, 
-          { transaction }
+          building_name, floor_number, nameToDelete, { client }
         ));
       }
 
@@ -213,13 +198,13 @@ exports.update = [
       await Promise.all(promises);
 
       // 모든 작업이 성공하면 트랜잭션 커밋
-      await db.commit(transaction);
+      await client.query('COMMIT');
 
       res.status(200).json({ message: "층 수정이 완료되었습니다." });
 
     } catch (err) {
       // 오류 발생 시 모든 변경 사항 롤백
-      await db.rollback(transaction);
+      await client.query('ROLLBACK');
       console.error("층 수정 처리 중 오류:", err);
       res.status(500).send("층 수정 처리 중 오류가 발생했습니다.");
     }
