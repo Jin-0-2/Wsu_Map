@@ -378,7 +378,6 @@ async function buildIndoorGraph() {
   return { graph, locations }; // 그래프와 위치 정보 반환
 }
 
-
 async function initIndoorGraph() {
   const { graph, locations } = await buildIndoorGraph();
   indoorGraph = graph;

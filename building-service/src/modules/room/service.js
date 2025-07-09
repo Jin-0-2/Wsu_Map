@@ -186,7 +186,7 @@ exports.deleteByName = async (building_name, floor_number, nodeId, { client }) =
       WHERE "Building_Name" = $1 AND "Floor_Number" = $2)
       AND "Room_Name" = $3;
       `;
-  await db.query(query, [building_name, floor_number, nodeId]);
+  await con.query(query, [building_name, floor_number, nodeId]);
 }
 
 exports.findAllByFloor = async (building_name, floor_number, { client }) => {
