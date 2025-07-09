@@ -6,6 +6,39 @@ const cheerio = require('cheerio');
 // 전체 조회
 exports.getAll = () => {
   const query = `SELECT
+      f."Building_Name",
+      f."Floor_Number",
+      r."Room_Name",
+      r."Room_Description"
+    FROM
+      "Floor_R" r
+    JOIN
+      "Floor" f ON r."Floor_Id" = f."Floor_Id"
+    WHERE
+      r."Room_Name" NOT LIKE 'b%'
+      AND r."Room_Name" NOT LIKE '%stairs'
+	  and r."Room_Name" Not like 'enterence'
+	  and r."Room_Name" not like 'to%'
+	ORDER BY
+    CASE
+        WHEN "Building_Name" LIKE 'W%' THEN 1
+        ELSE 2
+    END,
+    CASE
+        WHEN "Building_Name" LIKE 'W%' THEN CAST(substring("Building_Name" from 'W([0-9]+)') AS INTEGER)
+    END,
+    "Building_Name";`
+
+  return new Promise((resolve, reject) => {
+    con.query(query, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
+exports.getRoombyBuilding = (building_name) => {
+  const query = `SELECT
   f."Building_Name",
   f."Floor_Number",
   r."Room_Name",
@@ -28,42 +61,7 @@ ORDER BY
   CAST(substring(r."Room_Name" from '^[0-9]+') AS INTEGER) ASC NULLS LAST,
   
   -- 3. 숫자 정렬이 불가능하거나 같은 숫자일 경우, 전체 이름으로 오름차순 정렬
-  r."Room_Name" ASC;
-`
-
-  return new Promise((resolve, reject) => {
-    con.query(query, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
-}
-
-exports.getRoombyBuilding = (building_name) => {
-  const query = `SELECT
-      f."Building_Name",
-      f."Floor_Number",
-      r."Room_Name",
-      r."Room_Description"
-    FROM
-      "Floor_R" r
-    JOIN
-      "Floor" f ON r."Floor_Id" = f."Floor_Id"
-    WHERE
-      f."Building_Name" = $1 AND
-      r."Room_Name" NOT LIKE 'b%'
-      AND r."Room_Name" NOT LIKE '%stairs'
-	  and r."Room_Name" Not like 'enterence'
-	  and r."Room_Name" not like 'to%'
-	ORDER BY
-    CASE
-        WHEN "Building_Name" LIKE 'W%' THEN 1
-        ELSE 2
-    END,
-    CASE
-        WHEN "Building_Name" LIKE 'W%' THEN CAST(substring("Building_Name" from 'W([0-9]+)') AS INTEGER)
-    END,
-    "Building_Name";`
+  r."Room_Name" ASC;`
 
   const values = [building_name];
 
