@@ -48,12 +48,6 @@ exports.getRoomDescByName = async (req, res) => {
     
     const result = await Service.getRoomDescByName(building_name, floor_number, room_name);
 
-    console.log(result)
-
-    console.log(result.rows)
-    console.log(result.rows[0])
-
-
     res.status(200).json(result.rows[0]);
   } catch (err) {
     console.error("DB 오류:", err);
