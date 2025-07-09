@@ -378,59 +378,6 @@ async function buildIndoorGraph() {
   return { graph, locations }; // 그래프와 위치 정보 반환
 }
 
-// ✅ DB에서 그래프 구성
-async function buildIndoorGraph() {
-  // 방 위치 정보 가져오기
-  const roomRes = await con.query(`
-    SELECT "Building_Name", "Floor_Number", "Room_Name", "Room_Location"
-    SELECT "Building_Name", "Floor_Number", "Room_Name"
-    FROM "Floor_R" JOIN "Floor" ON "Floor_R"."Floor_Id" = "Floor"."Floor_Id"
-  `);
-
-  // 방 간 연결 정보 가져오기
-  const edgeRes = await con.query(`
-    SELECT
-     f_from."Building_Name" AS "From_Building_Name",
-     f_from."Floor_Number" AS "From_Floor_Number",
-     e."From_Room_Name",
-     f_to."Building_Name" AS "To_Building_Name",
-     f_to."Floor_Number" AS "To_Floor_Number",
-     e."To_Room_Name"
-    FROM "InSideEdge" e
-    JOIN "Floor" f_from ON e."From_Floor_Id" = f_from."Floor_Id"
-    JOIN "Floor" f_to   ON e."To_Floor_Id"   = f_to."Floor_Id"
-  `);
-
-  // 방 좌표를 저장할 객체: key = Building@Floor@Room
-  const locations = {};
-  roomRes.rows.forEach(({ Building_Name, Floor_Number, Room_Name,  }) => {
-    const key = `${Building_Name}@${Floor_Number}@${Room_Name}`;
-    locations[key] = true;
-  });
-
-  // 그래프 객체 초기화
-  const graph = {};
-  Object.keys(locations).forEach(key => {
-    graph[key] = [];
-  });
-
-  // 간선 정보로 그래프 연결 구성
-  edgeRes.rows.forEach(
-    ({
-      From_Building_Name, From_Floor_Number, From_Room_Name,
-      To_Building_Name, To_Floor_Number, To_Room_Name }) => {
-      const fromKey = `${From_Building_Name}@${From_Floor_Number}@${From_Room_Name}`;
-      const toKey = `${To_Building_Name}@${To_Floor_Number}@${To_Room_Name}`;
-
-      // 연결 노드 모두 존재할 때만 처리
-      if (locations[fromKey] && locations[toKey]) {
-        const distance = euclideanDistance(locations[fromKey], locations[toKey]);
-        graph[fromKey].push({ node: toKey, weight: distance });
-      }
-    });
-
-  return { graph, locations }; // 그래프와 위치 정보 반환
-}
 
 async function initIndoorGraph() {
   const { graph, locations } = await buildIndoorGraph();
