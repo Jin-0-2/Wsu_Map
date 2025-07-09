@@ -229,6 +229,8 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
       const start_room = `${from_building}@${from_floor}@${from_room}`;
       const end_room = `${to_building}@${to_floor}@${to_room}`;
 
+      console.log(indoorGraph);
+
       const indoorPath = dijkstra(indoorGraph, start_room, end_room);
 
       let start_svg = null;
