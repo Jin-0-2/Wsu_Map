@@ -37,6 +37,19 @@ exports.getAll = () => {
   });
 }
 
+exports.getRoombyBuilding = (building_name) => {
+  const query = 'SELECT f."Building_Name", f."Floor_Number", r."Romm"Name", r."Romm_Description", FROM "Floor_R" r JOIN "Floor" f ON r."Floor_Id" = f."Floor_Id" WHERE f."Building_Name" = $1'
+
+  const values = [building_name];
+
+  return new Promise((resolve, reject) => {
+    con.query(query, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 exports.getRoombyBuildingFloor = (building_name, floor_number) => {
   const query = 'SELECT r."Romm"Name", r."Romm_Description", r."Room_Location" FROM "Floor_R" r JOIN "Floor" f ON r."Floor_Id" = f."Floor_Id" WHERE f."Building_Name" = $1 AND f."Floor_Number" = $2'
 

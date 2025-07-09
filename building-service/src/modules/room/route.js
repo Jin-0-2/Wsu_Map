@@ -7,6 +7,9 @@ const controller = require("./controller")
 // 방 목록 전부다 : 관리자
 router.get("/", controller.getAll)
 
+// 건물만 해서 모든 층의 방 반환
+router.get("/:building", controller.getRoombyBuilding)
+
 // 건물_층의 방 목록 조회 : 관리자
 router.get("/:building/:floor", controller.getRoombyBuildingFloor)
 

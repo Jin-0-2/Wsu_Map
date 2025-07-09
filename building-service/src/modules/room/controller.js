@@ -20,6 +20,19 @@ exports.getAll = async (req, res) => {
     res.status(500).send("DB 오류");
   }
 };
+exports.getRoombyBuilding = async (req, res) => {
+  try {r 
+    const building_name = req.params.building;
+
+    const result = await Service.getRoombyBuildingFloor(building_name, floor_number);
+    
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("DB 오류:", err);
+
+    res.status(500).send("DB 오류");
+  }
+}
 
 // 건물_층의 방 목록 조회 : 관리자
 exports.getRoombyBuildingFloor = async (req, res) => {
