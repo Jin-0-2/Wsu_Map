@@ -81,7 +81,7 @@ exports.getBuilding_3d = (building_name) => {
 exports.create = (building_name, x, y, desc) => {
   const insertQuery = `
     INSERT INTO "Building" ("Building_Name", "Location", "Description")
-    VALUES ($1, point($2, $3), $4,  $5) 
+    VALUES ($1, point($2, $3), $4) 
   `
   const values = [building_name, x, y, desc]
 
