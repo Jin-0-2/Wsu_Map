@@ -229,8 +229,6 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
       const start_room = `${from_building}@${from_floor}@${from_room}`;
       const end_room = `${to_building}@${to_floor}@${to_room}`;
 
-      console.log(indoorGraph);
-
       const indoorPath = dijkstra(indoorGraph, start_room, end_room);
 
       let start_svg = null;
@@ -382,8 +380,6 @@ async function initIndoorGraph() {
   const { graph, locations } = await buildIndoorGraph();
   indoorGraph = graph;
   indoorLocations = locations;
-
-  console.log(indoorGraph);
 
   console.log('실내 그래프 캐싱 완료!');
 }
