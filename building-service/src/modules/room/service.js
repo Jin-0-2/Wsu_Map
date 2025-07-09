@@ -6,28 +6,30 @@ const cheerio = require('cheerio');
 // 전체 조회
 exports.getAll = () => {
   const query = `SELECT
-      f."Building_Name",
-      f."Floor_Number",
-      r."Room_Name",
-      r."Room_Description"
-    FROM
-      "Floor_R" r
-    JOIN
-      "Floor" f ON r."Floor_Id" = f."Floor_Id"
-    WHERE
-      r."Room_Name" NOT LIKE 'b%'
-      AND r."Room_Name" NOT LIKE '%stairs'
-	  and r."Room_Name" Not like 'enterence'
-	  and r."Room_Name" not like 'to%'
-	ORDER BY
-    CASE
-        WHEN "Building_Name" LIKE 'W%' THEN 1
-        ELSE 2
-    END,
-    CASE
-        WHEN "Building_Name" LIKE 'W%' THEN CAST(substring("Building_Name" from 'W([0-9]+)') AS INTEGER)
-    END,
-    "Building_Name";`
+  f."Building_Name",
+  f."Floor_Number",
+  r."Room_Name",
+  r."Room_Description"
+FROM
+  "Floor_R" r
+JOIN
+  "Floor" f ON r."Floor_Id" = f."Floor_Id"
+WHERE
+  f."Building_Name" = $1 AND
+  r."Room_Name" NOT LIKE 'b%' AND
+  r."Room_Name" NOT LIKE '%stairs' AND
+  r."Room_Name" NOT LIKE 'entrance' AND -- 'enterence' 오타 수정
+  r."Room_Name" NOT LIKE 'to%'
+ORDER BY
+  -- 1. 층 번호를 숫자로 변환하여 오름차순 정렬 (1층, 2층, 3층, ...)
+  CAST(f."Floor_Number" AS INTEGER) ASC,
+  
+  -- 2. 같은 층 내에서는 방 이름의 숫자 부분을 추출하여 오름차순 정렬 (101호, 102호, ...)
+  CAST(substring(r."Room_Name" from '^[0-9]+') AS INTEGER) ASC NULLS LAST,
+  
+  -- 3. 숫자 정렬이 불가능하거나 같은 숫자일 경우, 전체 이름으로 오름차순 정렬
+  r."Room_Name" ASC;
+`
 
   return new Promise((resolve, reject) => {
     con.query(query, (err, result) => {
