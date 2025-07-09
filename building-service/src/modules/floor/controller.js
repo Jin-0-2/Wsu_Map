@@ -2,6 +2,7 @@
 
 const Service = require("./service")
 const roomService = require("../room/service")
+const db = require('../../core/db')
 const multer = require('multer');
 const upload = multer();
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
