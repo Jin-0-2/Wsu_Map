@@ -48,10 +48,10 @@ exports.getRoomDescByName = async (req, res) => {
     
     const result = await Service.getRoomDescByName(building_name, floor_number, room_name);
 
-    console.log(reslut)
+    console.log(result)
 
-    console.log(reslut.rows)
-    console.log(reslut.rows[0])
+    console.log(result.rows)
+    console.log(result.rows[0])
 
 
     res.status(200).json(result.rows[0]);
