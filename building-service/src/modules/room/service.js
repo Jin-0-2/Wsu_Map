@@ -38,7 +38,30 @@ exports.getAll = () => {
 }
 
 exports.getRoombyBuilding = (building_name) => {
-  const query = 'SELECT f."Building_Name", f."Floor_Number", r."Romm"Name", r."Romm_Description", FROM "Floor_R" r JOIN "Floor" f ON r."Floor_Id" = f."Floor_Id" WHERE f."Building_Name" = $1'
+  const query = `SELECT
+      f."Building_Name",
+      f."Floor_Number",
+      r."Room_Name",
+      r."Room_Description"
+    FROM
+      "Floor_R" r
+    JOIN
+      "Floor" f ON r."Floor_Id" = f."Floor_Id"
+    WHERE
+      f."Building_Name" = $1 AND
+      r."Room_Name" NOT LIKE 'b%'
+      AND r."Room_Name" NOT LIKE '%stairs'
+	  and r."Room_Name" Not like 'enterence'
+	  and r."Room_Name" not like 'to%'
+	ORDER BY
+    CASE
+        WHEN "Building_Name" LIKE 'W%' THEN 1
+        ELSE 2
+    END,
+    CASE
+        WHEN "Building_Name" LIKE 'W%' THEN CAST(substring("Building_Name" from 'W([0-9]+)') AS INTEGER)
+    END,
+    "Building_Name";`
 
   const values = [building_name];
 
