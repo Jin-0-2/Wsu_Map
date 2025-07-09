@@ -41,12 +41,18 @@ exports.getRoombyBuildingFloor = async (req, res) => {
 exports.getRoomDescByName = async (req, res) => {
   try {
     logRequestInfo(req);
-    
+
     const building_name = req.params.building;
     const floor_number = req.params.floor;
     const room_name = req.params.room;
     
     const result = await Service.getRoomDescByName(building_name, floor_number, room_name);
+
+    console.log(reslut)
+
+    console.log(reslut.rows)
+    console.log(reslut.rows[0])
+
 
     res.status(200).json(result.rows[0]);
   } catch (err) {
