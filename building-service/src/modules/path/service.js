@@ -319,6 +319,7 @@ const euclideanDistance = (a, b) =>
 async function buildIndoorGraph() {
   // 방 위치 정보 가져오기
   const roomRes = await con.query(`
+    SELECT "Building_Name", "Floor_Number", "Room_Name", "Room_Location"
     SELECT "Building_Name", "Floor_Number", "Room_Name"
     FROM "Floor_R" JOIN "Floor" ON "Floor_R"."Floor_Id" = "Floor"."Floor_Id"
   `);
@@ -339,9 +340,10 @@ async function buildIndoorGraph() {
 
   // 방 좌표를 저장할 객체: key = Building@Floor@Room
   const locations = {};
-  roomRes.rows.forEach(({ Building_Name, Floor_Number, Room_Name }) => {
+  roomRes.rows.forEach(({ Building_Name, Floor_Number, Room_Name, Room_Location }) => {
     const key = `${Building_Name}@${Floor_Number}@${Room_Name}`;
-    locations[key] = true;
+    const { x, y } = Room_Location;
+    locations[key] = { x: Number(x), y: Number(y) };
   });
 
   // 그래프 객체 초기화
@@ -372,6 +374,8 @@ async function initIndoorGraph() {
   const { graph, locations } = await buildIndoorGraph();
   indoorGraph = graph;
   indoorLocations = locations;
+
+  console.log(indoorGraph);
 
   console.log('실내 그래프 캐싱 완료!');
 }
