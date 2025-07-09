@@ -319,8 +319,13 @@ const euclideanDistance = (a, b) =>
 async function buildIndoorGraph() {
   // 1. 방 위치 정보 가져오기: "Room_Location" 컬럼을 추가로 조회합니다.
   const roomRes = await con.query(`
-    SELECT "Floor"."Building_Name", "Floor"."Floor_Number", "Floor_R"."Room_Name", "Floor_R"."Room_Location"
-    FROM "Floor_R" JOIN "Floor" ON "Floor_R"."Floor_Id" = "Floor"."Floor_Id"
+        SELECT
+      F."Building_Name",
+      F."Floor_Number",
+      FR."Room_Name",
+      FR."Room_Location"
+    FROM "Floor_R" AS FR
+    JOIN "Floor" AS F ON FR."Floor_Id" = F."Floor_Id"
   `);
 
   // 방 간 연결 정보 가져오기
