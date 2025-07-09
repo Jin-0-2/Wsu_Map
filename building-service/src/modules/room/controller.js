@@ -21,10 +21,10 @@ exports.getAll = async (req, res) => {
   }
 };
 exports.getRoombyBuilding = async (req, res) => {
-  try {r 
+  try {
     const building_name = req.params.building;
 
-    const result = await Service.getRoombyBuildingFloor(building_name, floor_number);
+    const result = await Service.getRoombyBuilding(building_name);
     
     res.status(200).json(result.rows);
   } catch (err) {
