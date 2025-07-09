@@ -11,7 +11,7 @@ router.get("/", controller.getAll)
 router.get("/:building/:floor", controller.getRoombyBuildingFloor)
 
 // 2D도면에서 방 클릭 시 보여줄 방 이름 및 설명 : 앱
-router.get("/desc/:building/:floor", controller.getRoomDescByName)
+router.post("/desc/:building/:floor", controller.getRoomDescByName)
 
 // 길찾기용 포인트 (수정 필요)
 router.get("/point/:building/:floor", controller.getRoomPointByName)
