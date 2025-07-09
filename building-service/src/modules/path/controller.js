@@ -158,7 +158,7 @@ exports.create = async (req, res) => {
     let result = null;
 
     if (type === "building") {
-      const building_create_result = await buildingService.create(node_name, x, y, desc, null);
+      const building_create_result = await buildingService.create(node_name, x, y, desc);
       console.log("빌딩에 추가완료")
       result = await Service.create(node_name, x, y);
       console.log("노드에 추가완료")

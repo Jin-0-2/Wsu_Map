@@ -98,13 +98,13 @@ exports.create = [
     logRequestInfo(req);
 
     const { building_name, x, y, desc } = req.body
-    const file = req.file ? req.file.buffer : null; //파일이 없으면 null
+    // const file = req.file ? req.file.buffer : null; //파일이 없으면 null
 
     if (!building_name || !x || !y || !desc) {
       return res.status(400).send("모든 항목을 입력하세요.")
     }
 
-    const result = await Service.create(building_name, x, y, desc, file);
+    const result = await Service.create(building_name, x, y, desc);
 
     res.status(201).json({
       message: "건물추가가 완료되었습니다",
