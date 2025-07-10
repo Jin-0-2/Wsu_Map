@@ -71,6 +71,8 @@ exports.getFloorNumber = async (req, res) => {
     if (!result.rows.length) {
       return res.status(404).send("해당 층 도면이 없습니다.");
     }
+
+    console.log(result.rows);
   
     res.status(200).send(result.rows);
   } catch (err) {
