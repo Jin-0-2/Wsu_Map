@@ -107,7 +107,7 @@ exports.create = [
       }
 
       console.log(parsedNodes);
-      console.log(categories);
+      // console.log(categories);
 
       // 1. 먼저 Floor 정보를 DB에 생성하고, 생성된 floor의 정보를 받아옵니다.
       // (반드시 새로 생성된 Floor의 ID를 반환하도록 floorService.create를 수정해야 합니다)
