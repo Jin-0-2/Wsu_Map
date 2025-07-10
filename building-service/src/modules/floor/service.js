@@ -162,8 +162,12 @@ exports.parseNavigationNodes = (svgBuffer) => {
 
   const nodes = [];
 
+  // const categories = [];
+
   // 1. id가 'navigationNode'인 그룹(g 태그)을 찾습니다.
   const navigationLayer = $('[id="Navigation_Nodes"]');
+
+  // const categoryLayer = $('[id="Category"]');
 
 
   if (navigationLayer.length === 0) {
@@ -189,6 +193,16 @@ exports.parseNavigationNodes = (svgBuffer) => {
       nodes.push({ nodeId, x, y });
     }
   });
+
+  // // 3. 해당 그룹 내부에 있는 모든 circle과 reat 태그를 찾기
+  // categoryLayer.find('circle, ellipse').each((index, element) => {
+  //   const elem = $(element);
+  //   const nodeId = elem.attr('id');
+
+  //   if(nodeId) {
+  //     categories.push({nodeId});
+  //   }
+  // });
 
   console.log(`SVG 파싱 완료: 총 ${nodes.length}개의 네비게이션 노드를 추출했습니다.`);
   return nodes;
