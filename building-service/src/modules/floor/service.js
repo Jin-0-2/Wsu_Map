@@ -108,7 +108,7 @@ exports.updateFloorFile = (building_name, floor_number, file) => {
 
 // 층 삭제
 exports.delete = async (building_name, floor_number) => {
-  const bucketName = "wsu-map-svg";
+  const bucketName = "wsu-svg";
   const s3Key = `${building_name}_${floor_number}.svg`;
 
   try {
