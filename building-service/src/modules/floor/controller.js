@@ -168,7 +168,7 @@ exports.update = [
         Service.parseNavigationNodes(file),
         Service.uploadFile(building_name, floor_number, file)
       ]);
-      const newFloor = await Service.create(building_name, floor_number, fileUrl);
+      const newFloor = await Service.create(building_name, floor_number, newFileUrl);
 
       const promises = [];
 
