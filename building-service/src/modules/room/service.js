@@ -232,7 +232,7 @@ exports.updateByName = async (building_name, floor_number, nodeId, dataToUpdate,
   const { x, y } = dataToUpdate;
   const query = `UPDATE "Floor_R"
   SET "Room_Location" = POINT($1, $2)
-  WHERE "Floor_Id" = (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $3 AND "Floor_Number" = $4)
+  WHERE "Floor_Id" = (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $3 AND "Floor_Number" = $4 LIMIT 1)
   AND "Room_Name" = $5;`;
   await con.query(query, [x, y, building_name, floor_number, nodeId]);
 }
