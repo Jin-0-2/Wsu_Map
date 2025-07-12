@@ -1,6 +1,7 @@
 // src/modules/room/controller.js
 
 const Service = require("./service")
+const pathService = require("../path/service")
 const multer = require('multer');
 const upload = multer();
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
@@ -177,13 +178,12 @@ exports.connect = async (req, res) => {
 
     const result = await Service.connect(from_building, from_floor, from_node, to_building, to_floor, to_node);
 
+    pathService.initIndoorGraph();
+    
+    res.status(200).send("성공");
   } catch (err) {
     console.error("실내 노드 연결 중 오류:", err);
 
     res.status(500).send("실내 노드 연결 중 오류");
   }
-  
-
-  
-
 };
