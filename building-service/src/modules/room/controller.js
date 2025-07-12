@@ -198,7 +198,7 @@ exports.disconnect = async (req, res) => {
     const to_floor = req.body.to_floor;
     const to_node = req.body.to_node;
 
-    const result = await Service.connect(from_building, from_floor, from_node, to_building, to_floor, to_node);
+    const result = await Service.disconnect(from_building, from_floor, from_node, to_building, to_floor, to_node);
 
     pathService.initIndoorGraph();
     
