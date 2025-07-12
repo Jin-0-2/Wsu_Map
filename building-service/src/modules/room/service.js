@@ -263,3 +263,25 @@ exports.findAllByFloor = async (building_name, floor_number, { client }) => {
 
   return result.rows.map(row => row.Room_Name);
 }
+
+// 실내 패스 도면 연결
+exports.connect = async (from_building, from_floor, from_node, to_building, to_floor, to_node) => {
+  const insert_InSideEdge = `
+  insert into "InSideEdge" ("From_Floor_Id", "From_Room_Name", "To_Floor_Id", "To_Room_Name") 
+  values 
+  ((select "Floor_Id" from "Floor" where "Building_Name" = $1 and "Floor_Number" = $2), $3, 
+  (select "Floor_Id" from "Floor" where "Building_Name" = $4 and "Floor_Number" = $5), $6),
+  ((select "Floor_Id" from "Floor" where "Building_Name" = $4 and "Floor_Number" = $5), $6, 
+  (select "Floor_Id" from "Floor" where "Building_Name" = $1 and "Floor_Number" = $2), $3);
+  `;
+
+  const values = [from_building, from_floor, from_node, to_building, to_floor, to_node]
+
+  return new Promise((resolve, reject) => {
+    con.query(insertQuery, values, (err, result) => {
+      if (err) return reject(err);
+
+      resolve(result);
+    })
+  });
+}

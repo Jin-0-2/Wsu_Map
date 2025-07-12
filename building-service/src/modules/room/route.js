@@ -19,13 +19,17 @@ router.get("/desc/:building/:floor/:room", controller.getRoomDescByName)
 // 길찾기용 포인트 (수정 필요)
 router.get("/point/:building/:floor", controller.getRoomPointByName)
 
-// 방 추가
-router.post("/:building/:floor", controller.create)
-
 // 방 수정
 router.put("/:building/:floor", controller.update)
 
+// 실내 패스 도면 연결
+router.post("/connect", controller.connect);
+
+
+// 필ㅇ없ㅇㅁ.
+// 방 추가
+router.post("/:building/:floor", controller.create)
+
 // 방 삭제
 router.delete("/:building/:floor", controller.delete)
-
 module.exports = router
