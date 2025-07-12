@@ -278,7 +278,29 @@ exports.connect = async (from_building, from_floor, from_node, to_building, to_f
   const values = [from_building, from_floor, from_node, to_building, to_floor, to_node]
 
   return new Promise((resolve, reject) => {
-    con.query(insertQuery, values, (err, result) => {
+    con.query(insert_InSideEdge, values, (err, result) => {
+      if (err) return reject(err);
+
+      resolve(result);
+    })
+  });
+}
+
+// 실내 패스 끊기
+exports.disconnect = async (from_building, from_floor, from_node, to_building, to_floor, to_node) => {
+  const delete_InSideEdge = `
+  DELETE FROM "InSideEdge"
+  WHERE
+  ("From_Floor_Id" = (select "Floor_Id" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2) AND "From_Room_Name" = $3 AND 
+  "To_Floor_Id" =  (select "Floor_Id" FROM "Floor" WHERE "Building_Name" = $4 AND "Floor_Number" = $5) AND "To_Room_Name" = $6) OR
+  ("From_Floor_Id" = (select "Floor_Id" FROM "Floor" WHERE "Building_Name" = $4 AND "Floor_Number" = $5) AND "From_Room_Name" = $6 AND 
+  "To_Floor_Id" =  (select "Floor_Id" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2) AND "To_Room_Name" = $3)
+  `;
+
+  const values = [from_building, from_floor, from_node, to_building, to_floor, to_node]
+
+  return new Promise((resolve, reject) => {
+    con.query(delete_InSideEdge, values, (err, result) => {
       if (err) return reject(err);
 
       resolve(result);

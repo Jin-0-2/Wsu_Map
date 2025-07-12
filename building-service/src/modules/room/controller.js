@@ -179,6 +179,28 @@ exports.connect = async (req, res) => {
     const result = await Service.connect(from_building, from_floor, from_node, to_building, to_floor, to_node);
 
     pathService.initIndoorGraph();
+
+    res.status(200).send("성공");
+  } catch (err) {
+    console.error("실내 노드 연결 중 오류:", err);
+
+    res.status(500).send("실내 노드 연결 중 오류");
+  }
+};
+
+exports.disconnect = async (req, res) => {
+  try {
+    logRequestInfo(req);
+    const from_building = req.body.from_building;
+    const from_floor = req.body.from_floor;
+    const from_node = req.body.from_node;
+    const to_building = req.body.to_building;
+    const to_floor = req.body.to_floor;
+    const to_node = req.body.to_node;
+
+    const result = await Service.connect(from_building, from_floor, from_node, to_building, to_floor, to_node);
+
+    pathService.initIndoorGraph();
     
     res.status(200).send("성공");
   } catch (err) {
