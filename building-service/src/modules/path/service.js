@@ -18,6 +18,19 @@ exports.getEdges = () => {
   return outdoorGraph;
 }
 
+exports.getIndoorEdges = (building_name, floor) => {
+  const prefix = `${building_name}@${floor}@`;
+
+  const filteredGraph = Object.entries(indoorGraph)
+    .filter(([key]) => key.startsWith(prefix))
+    .reduce((obj, [key, value]) => {
+      obj[key] = value;
+      return obj;
+    }, {});
+
+  return filteredGraph;
+}
+
 // 건물/노드 생성
 exports.create = async (node_name, x, y) => {
   const sql = `INSERT INTO "OutSideNode" ("Node_Name", "Location") VALUES ($1, POINT($2, $3));`

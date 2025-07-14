@@ -2,6 +2,7 @@
 
 const Service = require("./service")
 const roomService = require("../room/service")
+const pathService = require("../path/service")
 const client = require('../../core/db')
 const multer = require('multer');
 const upload = multer();
@@ -68,13 +69,18 @@ exports.getFloorNumber = async (req, res) => {
 
     const result = await Service.getFloorNumber(floor, building_name);
 
+    const nodes = await pathService.getIndoorEdges(building_name, floor);
+
     if (!result.rows.length) {
       return res.status(404).send("해당 층 도면이 없습니다.");
     }
 
-    console.log(result.rows);
-  
-    res.status(200).send(result.rows);
+    const file = result.rows[0].File;
+
+    res.status(200).json({
+      File : file,
+      nodes
+    })
   } catch (err) {
     console.error("DB 오류:", err);
 
