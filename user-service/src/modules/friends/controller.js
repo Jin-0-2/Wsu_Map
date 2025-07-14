@@ -65,6 +65,8 @@ exports.request_list = async (req, res) => {
 
     const result = await Service.request_list(id);
 
+    console.log(result.rows)
+
     res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
