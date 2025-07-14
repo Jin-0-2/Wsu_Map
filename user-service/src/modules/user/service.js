@@ -14,6 +14,18 @@ exports.getAll = () => {
   });
 }
 
+// 로그인 중인 회원만 조회
+exports.getislogin = () => {
+  const query = `SELECT "Id", "Name", "Last_Location" FROM "User" WHERE "Is_Login" = true`
+
+  return new Promise((resolve, reject) => {
+    con.query(query, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 exports.getUser = (id) => {
   const query = `SELECT "Id", "Pw", "Name", "Stu_Num", "Phone", "Email" FROM "User" WHERE "Id" = $1`;
 

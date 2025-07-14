@@ -8,6 +8,9 @@ const controller = require("./controller")
 // 회원 전체 조회
 router.get("/", controller.getAll)
 
+// 로그인 중인 회원만 조회
+router.get("/islogin", controller.getislogin)
+
 // 회원 한명 조회 마이페이지
 router.get("/:id", controller.getUser)
 

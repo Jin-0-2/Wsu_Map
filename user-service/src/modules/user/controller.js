@@ -19,6 +19,21 @@ exports.getAll = async (req, res) => {
   }
 };
 
+
+// 로그인 중인 회원만 조회
+exports.getislogin = async (req, res) => {
+  try {
+    logRequestInfo(req);
+    
+    const result = await userService.getislogin();
+    
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("DB 오류:", err);
+    
+    res.status(500).send("DB 오류");
+  }
+}
 // 회원 한명 조회 마이페이지
 exports.getUser = async (req, res) => {
   try{

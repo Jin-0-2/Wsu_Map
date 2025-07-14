@@ -5,9 +5,11 @@ const router = express.Router();
 
 // 도메인별 라우터 import
 const userRouter = require("../modules/user/route");
+const friendRouter = require("../modules/friends/route");
 
 // 도메인별 엔드포인트 등록
 router.use("/user", userRouter);
+router.use("/friend", friendRouter)
 
 // 필요하다면 메인 페이지 라우트도 추가
 router.get("/", (req, res) => {

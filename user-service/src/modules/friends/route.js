@@ -4,37 +4,25 @@ const express = require("express")
 const router = express.Router()
 const controller = require("./controller")
 
-// 성공!
-// 회원 전체 조회
+// 친구 목록 전체 조회
 router.get("/", controller.getAll)
 
-// 회원 한명 조회 마이페이지
-router.get("/:id", controller.getUser)
+// 내 친구 조회
+router.get("/myfriend/:id", controller.getMyFreind)
 
-// 성공!
-// 회원가입
-router.post("/register", controller.register)
+// 친구 추가
+router.post("/add", controller.add)
 
-// 성공!
-// 로그인
-router.post("/login", controller.login)
+// 친구추가 받은 요청 목록 조회
+router.get("/request_list/:id", controller.request_list)
 
-// 성공!
-// 로그아웃
-router.post("/logout", controller.logout)
+// 친구 요청 수락
+router.post("/accept", controller.accept)
 
-// ...
-// 회원정보 수정
-router.put("/update", controller.update)
+// 친구 요청 거절
+router.post("/reject", controller.reject)
 
-// 현재 위치 전송
-router.put("/update_location", controller.update_location);
-
-// 성공!
-// 회원정보 삭제
+// 친구 삭제
 router.delete("/delete", controller.delete)
-
-// 아이디 찾기
-router.post("/find_id", controller.find_id)
 
 module.exports = router
