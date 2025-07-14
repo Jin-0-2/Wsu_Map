@@ -117,7 +117,7 @@ exports.delete = async (req, res) => {
     const my_id = req.body.my_id;
     const add_id = req.body.add_id;
 
-    await Service.delete(my_id, add_id);
+    const result = await Service.delete(my_id, add_id);
 
     if (result.rowCount > 0) {
       res.status(200).json({ success: true, message: "친구 삭제 완료" });
