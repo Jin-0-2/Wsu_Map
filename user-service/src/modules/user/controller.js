@@ -26,6 +26,8 @@ exports.getislogin = async (req, res) => {
     logRequestInfo(req);
     
     const result = await userService.getislogin();
+
+    console.log(result.rows);
     
     res.status(200).json(result.rows);
   } catch (err) {
