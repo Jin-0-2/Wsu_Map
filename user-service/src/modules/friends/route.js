@@ -1,4 +1,4 @@
-// src/modules/user/route.js
+// src/modules/friends/route.js
 
 const express = require("express")
 const router = express.Router()

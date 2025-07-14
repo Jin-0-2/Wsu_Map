@@ -1,4 +1,4 @@
-// src/modules/user/controller.js
+// src/modules/friends/controller.js
 
 const Service = require("./service")
 // const nodemailer = require('nodemailer');
