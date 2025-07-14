@@ -182,7 +182,7 @@ exports.create_tran = async (building_name, floor_number, room_name, room_desc, 
 
   const values = [building_name, floor_number, room_name, room_desc, x, y];
 
-  const result = await con.query(insertQuery, values);
+  const result = await client.query(insertQuery, values);
 
   return result;
 };
@@ -227,42 +227,6 @@ exports.delete = (building_name, floor_number, room_name) => {
     });
 };
 
-// 1. 이름으로 업데이트하는 함수 (신규 추가 필요)
-exports.updateByName = async (building_name, floor_number, nodeId, dataToUpdate, { client }) => {
-  const { x, y } = dataToUpdate;
-  const query = `UPDATE "Floor_R"
-  SET "Room_Location" = POINT($1, $2)
-  WHERE "Floor_Id" = (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $3 AND "Floor_Number" = $4 LIMIT 1)
-  AND "Room_Name" = $5;`;
-  await con.query(query, [x, y, building_name, floor_number, nodeId]);
-}
-
-// 2. 이름으로 삭제하는 함수 (신규 추가 필요)
-exports.deleteByName = async (building_name, floor_number, nodeId, { client }) => {
-  const query = `DELETE FROM "Floor_R" WHERE "Floor_Id" = (
-      SELECT "Floor_Id"
-      FROM "Floor"
-      WHERE "Building_Name" = $1 AND "Floor_Number" = $2)
-      AND "Room_Name" = $3;
-      `;
-  await con.query(query, [building_name, floor_number, nodeId]);
-}
-
-exports.findAllByFloor = async (building_name, floor_number, { client }) => {
-  const selectQuery = `
-    SELECT "FR"."Room_Name"
-    FROM "Floor_R" AS "FR"
-    JOIN "Floor" AS "F" ON "FR"."Floor_Id" = "F"."Floor_Id"
-    WHERE "F"."Building_Name" = $1 AND "F"."Floor_Number" = $2;
-  `;
-
-  const values = [building_name, floor_number];
-
-  // 인자로 전달받은 client를 사용해 쿼리를 실행합니다.
-  const result = await client.query(selectQuery, values);
-
-  return result.rows.map(row => row.Room_Name);
-}
 
 // 실내 패스 도면 연결
 exports.connect = async (from_building, from_floor, from_node, to_building, to_floor, to_node) => {
@@ -306,4 +270,51 @@ exports.disconnect = async (from_building, from_floor, from_node, to_building, t
       resolve(result);
     })
   });
+}
+
+// 1. 이름으로 업데이트하는 함수 (신규 추가 필요)
+exports.updateByName = async (building_name, floor_number, nodeId, dataToUpdate, { client }) => {
+  const { x, y } = dataToUpdate;
+  const query = `UPDATE "Floor_R"
+  SET "Room_Location" = POINT($1, $2)
+  WHERE "Floor_Id" = (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $3 AND "Floor_Number" = $4 LIMIT 1)
+  AND "Room_Name" = $5;`;
+  await client.query(query, [x, y, building_name, floor_number, nodeId]);
+}
+
+// 2. 이름으로 삭제하는 함수 (신규 추가 필요)
+exports.deleteByName = async (building_name, floor_number, nodeId, { client }) => {
+  const query = `DELETE FROM "Floor_R" WHERE "Floor_Id" = (
+      SELECT "Floor_Id"
+      FROM "Floor"
+      WHERE "Building_Name" = $1 AND "Floor_Number" = $2)
+      AND "Room_Name" = $3;
+      `;
+  await client.query(query, [building_name, floor_number, nodeId]);
+}
+exports.findAllByFloor = async (building_name, floor_number, { client }) => {
+  const selectQuery = `
+    SELECT "FR"."Room_Name"
+    FROM "Floor_R" AS "FR"
+    JOIN "Floor" AS "F" ON "FR"."Floor_Id" = "F"."Floor_Id"
+    WHERE "F"."Building_Name" = $1 AND "F"."Floor_Number" = $2;
+  `;
+
+  const values = [building_name, floor_number];
+
+  // 인자로 전달받은 client를 사용해 쿼리를 실행합니다.
+  const result = await client.query(selectQuery, values);
+
+  return result.rows.map(row => row.Room_Name);
+}
+
+exports.deleteAllNodeLinks = async (building_name, floor_number, { client }) => {
+  const delete_Qurey = `
+  DELETE FROM "InSideEdge" 
+  WHERE "From_Floor_Id" = (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2 LIMIT 1) 
+  OR "To_Floor_Id" = (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2 LIMIT 1)`;
+
+  const values = [building_name, floor_number];
+
+  await client.query(delete_Qurey, values);
 }

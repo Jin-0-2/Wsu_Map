@@ -162,6 +162,7 @@ exports.update = [
       // 빠른 조회를 위해 Set으로 변환
       const existingNodeNameSet = new Set(existingNodeNames);
 
+      await roomService.deleteAllNodeLinks(building_name, floor_number, { client });
 
       // 2. 새로운 파일 파싱 및 업로드
       const [newParsedNodes, newFileUrl] = await Promise.all([

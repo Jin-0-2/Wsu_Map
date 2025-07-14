@@ -15,7 +15,6 @@ router.get("/:id", controller.getUser)
 // 회원가입
 router.post("/register", controller.register)
 
-
 // 성공!
 // 로그인
 router.post("/login", controller.login)
