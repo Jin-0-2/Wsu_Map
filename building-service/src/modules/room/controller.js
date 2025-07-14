@@ -185,7 +185,7 @@ exports.connect = async (req, res) => {
   } catch (err) {
     console.error("실내 노드 연결 중 오류:", err);
 
-    res.status(500).send("실내 노드 연결 중 오류");
+    res.status(500).send(err);
   }
 };
 

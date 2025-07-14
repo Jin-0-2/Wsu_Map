@@ -25,6 +25,9 @@ router.put("/:building/:floor", controller.update)
 // 실내 패스 도면 연결
 router.post("/connect", controller.connect);
 
+// 실내 패스 도면 연결 해제
+router.post("/disconnect", controller.disconnect);
+
 
 // 필ㅇ없ㅇㅁ.
 // 방 추가
