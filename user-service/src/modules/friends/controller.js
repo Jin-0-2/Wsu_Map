@@ -30,7 +30,7 @@ exports.getMyFreind = async (req, res) => {
 
     res.status(200).json(result.rows);
   } catch (err) {
-    console.err(err);
+    console.error(err);
     res.status(500).json(err);
   }
 }
@@ -85,7 +85,7 @@ exports.accept = async (req, res) => {
     res.status(200).json({ success: true, message: "친구 요청을 수락했습니다." })
 
   } catch (err) {
-    console.err(err);
+    console.error(err);
     res.status(500).json(err);
   }
 }
@@ -102,7 +102,7 @@ exports.reject = async (req, res) => {
 
     res.status(200).json({ success: true, message: "친구 요청을 거절했습니다." });
   } catch (err) {
-    console.err(err);
+    console.error(err);
     res.status(500).json(err);
   }
 }
