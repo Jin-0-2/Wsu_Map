@@ -178,7 +178,7 @@ exports.connect = async (req, res) => {
 
     const result = await Service.connect(from_building, from_floor, from_node, to_building, to_floor, to_node);
 
-    pathService.initIndoorGraph();
+    await pathService.initIndoorGraph();
 
     res.status(200).send("성공");
     console.log("성공!");
