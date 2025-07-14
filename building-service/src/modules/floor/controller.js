@@ -77,6 +77,9 @@ exports.getFloorNumber = async (req, res) => {
 
     const file = result.rows[0].File;
 
+    console.log({      File : file,
+      nodes});
+
     res.status(200).json({
       File : file,
       nodes
