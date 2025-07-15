@@ -218,7 +218,21 @@ exports.stairs = async (req, res) => {
     logRequestInfo(req);
     const building = req.params.building;
 
-    const result = await pathService.getStairs(building);
+    let result = await pathService.getStairs(building);
+
+    result = result.sort((a, b) => {
+      const [buildingA, floorA] = a.split('@');
+      const [buildingB, floorB] = b.split('@');
+      const isSameA = buildingA === building_name;
+      const isSameB = buildingB === building_name;
+
+      if (isSameA && !isSameB) return -1;
+      if (!isSameA && isSameB) return 1;
+      if (buildingA !== buildingB) return buildingA.localeCompare(buildingB);
+
+      return parseInt(floorA) - parseInt(floorB);
+    });
+
 
     console.log(result);
 
