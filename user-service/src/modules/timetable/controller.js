@@ -27,10 +27,28 @@ exports.add = async (req, res) => {
     logRequestInfo(req);
 
     const id  = req.params.id;
+    const {
+      title,
+      day_of_week,
+      start_time,
+      end_time,
+      building_name,
+      floor_number,
+      room_name,
+      professor,
+      color,
+      memo,
+    } = req.body;
     
-    const result = await Service.add(id);
-    
-    res.status(200).json(result.rows);
+    const result = await Service.add(
+        id, title, day_of_week, 
+        start_time, end_time, 
+        building_name, floor_number, room_name,
+        professor,
+        color, memo
+    );
+
+    res.status(201).json({ success: true, result });
   } catch (err) {
     console.error("DB 오류:", err);
     
