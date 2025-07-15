@@ -220,8 +220,8 @@ exports.stairs = async (req, res) => {
 
     const result = await pathService.getStairs(building);
 
+    console.log(result);
 
-   
     res.status(200).json({
       stairs : result
     });
