@@ -26,8 +26,6 @@ exports.getRoombyBuilding = async (req, res) => {
     const building_name = req.params.building;
 
     const result = await Service.getRoombyBuilding(building_name);
-
-    console.log(result.rows)
     
     res.status(200).json(result.rows);
   } catch (err) {

@@ -12,8 +12,6 @@ exports.getAll = async (req, res) => {
     
     const result = await Service.getAll();
 
-    console.log(result.rows);
-
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("DB 오류:", err);

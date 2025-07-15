@@ -1,4 +1,4 @@
-// src/modules/user/service.js
+// src/modules/table/service.js
 
 const con = require("../../core/db")
 
