@@ -31,7 +31,6 @@ router.delete("/disconnect", controller.disconnect);
 // 경로 연결 시 다른 층의 계단 검색
 router.get("/stairs/:building", controller.stairs);
 
-
 // 필ㅇ없ㅇㅁ.
 // 방 추가
 router.post("/:building/:floor", controller.create)
