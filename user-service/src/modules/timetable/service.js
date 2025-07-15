@@ -82,3 +82,18 @@ exports.update = (id, title, day_of_week, start_time, end_time, building_name, f
         });
     });
 }
+
+// 시간표 삭제
+exports.delete = (id, title) => {
+    const query = `
+    DELETE FROM "timetable" WHERE "user_id" = $1 AND "title" = $2;
+  `
+  const values = [id, title]
+
+  return new Promise((resolve, reject) => {
+    con.query(query, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}

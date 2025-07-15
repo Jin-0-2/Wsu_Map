@@ -105,13 +105,15 @@ exports.delete = async (req, res) => {
     logRequestInfo(req);
 
     const id  = req.params.id;
+    const title = req.body.title;
     
-    const result = await Service.delete(id);
+    const result = await Service.delete(id, title);
     
-    res.status(200).json(result.rows);
+    res.status(200).json({
+        success: true
+    });
   } catch (err) {
     console.error("DB 오류:", err);
-    
     res.status(500).send("DB 오류");
   }
 };
