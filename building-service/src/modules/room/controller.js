@@ -21,6 +21,7 @@ exports.getAll = async (req, res) => {
     res.status(500).send("DB 오류");
   }
 };
+
 exports.getRoombyBuilding = async (req, res) => {
   try {
     const building_name = req.params.building;
@@ -164,6 +165,7 @@ exports.delete = async (req, res) => {
   }
 };
 
+// 실내 노드 연결
 exports.connect = async (req, res) => {
   try {
     logRequestInfo(req);
@@ -187,6 +189,7 @@ exports.connect = async (req, res) => {
   }
 };
 
+// 실내 노드 연결 해제
 exports.disconnect = async (req, res) => {
   try {
     logRequestInfo(req);
@@ -206,5 +209,23 @@ exports.disconnect = async (req, res) => {
     console.error("실내 노드 연결 중 오류:", err);
 
     res.status(500).send("실내 노드 연결 중 오류");
+  }
+};
+
+// 경로 연결 시 다른 층의 계단 검색
+exports.stairs = async (req, res) => {
+  try {
+    logRequestInfo(req);
+    const building = req.body.building;
+
+    const result = await pathService.getStairs(building);
+
+    console.log(result);
+    
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).send("계단 검색 중 오류");
   }
 };

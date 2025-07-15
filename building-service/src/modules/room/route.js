@@ -28,6 +28,9 @@ router.post("/connect", controller.connect);
 // 실내 패스 도면 연결 해제
 router.delete("/disconnect", controller.disconnect);
 
+// 경로 연결 시 다른 층의 계단 검색
+router.get("/stairs", controller.stairs);
+
 
 // 필ㅇ없ㅇㅁ.
 // 방 추가

@@ -1,7 +1,6 @@
 // src/modules/path/service.js
 
 const con = require("../../core/db")
-
 const floor = require("../floor/service")
 
 // ✅ 전역 변수: 그래프, 좌표 캐싱
@@ -29,6 +28,46 @@ exports.getIndoorEdges = (building_name, floor) => {
     }, {});
 
   return filteredGraph;
+}
+
+exports.getStairs = (building) => {
+  // 특정 건물 조합 정의
+  const w15Group = ["W15", "W17-동관"];
+  const w17DongGroup = ["W17-동관", "W15", "W17-서관"];
+  const w17SeogwanGroup = ["W17-서관", "W17-동관"];
+  
+  // 세 번째 세그먼트에 'stairs'가 포함됐는지 확인
+  const isStairs = (key) => {
+    const parts = key.split('@');
+    return parts[2] && parts[2].includes('stairs');
+  };
+
+  if (building === "W15") {
+    // W15 또는 W17-동관의 계단만
+    return Object.keys(indoorLocations).filter(key => {
+      const buildName = key.split('@')[0];
+      return w15Group.includes(buildName) && isStairs(key);
+    });
+  }
+  if (building === "W17-동관") {
+    // W15, W17-동관, W17-서관의 계단만
+    return Object.keys(indoorLocations).filter(key => {
+      const buildName = key.split('@')[0];
+      return w17DongGroup.includes(buildName) && isStairs(key);
+    });
+  }
+  if (building === "W17-서관") {
+    // W17-동관의 계단만
+    return Object.keys(indoorLocations).filter(key => {
+      const buildName = key.split('@')[0];
+      return w17SeogwanGroup.includes(buildName) && isStairs(key);
+    });
+  }
+  // 기본: 자기 건물의 계단만
+  const prefix = `${building}@`;
+  return Object.keys(indoorLocations).filter(
+    key => key.startsWith(prefix) && isStairs(key)
+  );
 }
 
 // 건물/노드 생성

@@ -16,5 +16,4 @@ router.put("/:id", controller.update)
 // 사간표 삭제
 router.delete("/:id", controller.delete);
 
-
 module.exports = router
