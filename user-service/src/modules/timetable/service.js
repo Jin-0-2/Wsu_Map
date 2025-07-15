@@ -37,10 +37,10 @@ exports.add = (id, title, day_of_week, start_time, end_time, building_name, floo
 }
 
 
-exports.update = (id, title, day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo) => {
+exports.update = (id, origin_title, origin_day_of_week, new_title, new_day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo) => {
     const fields = {
-        title,
-        day_of_week,
+        new_title,
+        new_day_of_week,
         start_time,
         end_time,
         building_name,
@@ -67,13 +67,15 @@ exports.update = (id, title, day_of_week, start_time, end_time, building_name, f
     }
 
     values.push(id);
+    values.push(origin_title);
+    values.push(origin_day_of_week);
 
 
     // 쿼리 완성
     const query = `
     UPDATE "timetable" SET
     ${setClauses.join(", ")}
-    WHERE "user_id" = ?
+    WHERE "user_id" = ? AND "title" = ? AND "day_of_week" = ?
   `;
 
   console.log(query);

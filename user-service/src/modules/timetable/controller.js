@@ -77,8 +77,10 @@ exports.update = async (req, res) => {
     const id  = req.params.id;
 
     const {
-      title,
-      day_of_week,
+      origin_title,
+      origin_day_of_week,
+      new_title,
+      new_day_of_week,
       start_time,
       end_time,
       building_name,
@@ -89,7 +91,7 @@ exports.update = async (req, res) => {
       memo,
     } = req.body;
 
-    const result = await Service.update(id, title, day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo);
+    const result = await Service.update(id, origin_title, origin_day_of_week, new_title, new_day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo);
     
     res.status(200).json({ success: true, updated: result.rows });
   } catch (err) {
