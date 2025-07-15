@@ -200,7 +200,7 @@ exports.handleBuildingToRoom = async (from_building, to_building, to_floor, to_r
   let entrance_floor = 1;
 
   // to_building이 W15이거나 from_building이 W17-동관일 경우 입구는 2층
-  if (to_building === "W15" || from_building === "W17-동관") {
+  if (to_building === "W15" || to_building === "W17-동관") {
     entrance_floor = 2;
   }
 

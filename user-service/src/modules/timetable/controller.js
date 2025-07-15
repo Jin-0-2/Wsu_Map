@@ -69,7 +69,7 @@ exports.add = async (req, res) => {
   }
 };
 
-// 시간표 추가
+// 시간표 수정
 exports.update = async (req, res) => {
   try {
     logRequestInfo(req);
