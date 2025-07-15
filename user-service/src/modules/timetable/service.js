@@ -68,12 +68,15 @@ exports.update = (id, title, day_of_week, start_time, end_time, building_name, f
 
     values.push(id);
 
+
     // 쿼리 완성
     const query = `
     UPDATE "timetable" SET
     ${setClauses.join(", ")}
     WHERE "user_id" = ?
   `;
+
+  console.log(query);
 
     return new Promise((resolve, reject) => {
         con.query(query, values, (err, result) => {
