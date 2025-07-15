@@ -38,47 +38,18 @@ exports.add = (id, title, day_of_week, start_time, end_time, building_name, floo
 
 
 exports.update = (id, origin_title, origin_day_of_week, new_title, new_day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo) => {
-    const fields = {
-        new_title,
-        new_day_of_week,
-        start_time,
-        end_time,
-        building_name,
-        floor_number,
-        room_name,
-        professor,
-        color,
-        memo: memo === undefined ? null : memo
-    };
-    const setClauses = [];
-    const values = [];
 
-    Object.entries(fields).forEach(([key, value]) => {
-        // undefined/null 체크: null도 업데이트 원하면 'value !== undefined' 만 사용
-        if (value !== undefined) {
-            setClauses.push(`"${key}" = ?`);
-            values.push(value);
-        }
-    });
-
-    // 아무 필드도 없다면 오류 반환
-    if (setClauses.length === 0) {
-        return Promise.reject(new Error("업데이트할 값이 없습니다."));
-    }
-
-    values.push(id);
-    values.push(origin_title);
-    values.push(origin_day_of_week);
 
 
     // 쿼리 완성
     const query = `
-    UPDATE "timetable" SET
-    ${setClauses.join(", ")}
-    WHERE "user_id" = ? AND "title" = ? AND "day_of_week" = ?
+    UPDATE "timetable" SET "title" = $1, "day_of_week" = $2, "start_time" = $3, "end_time" = $4, "building_name" = $5, "floor_number" = $6, "room_name" = $7, "professor" = $8, "color" = $9, "memo" = $10
+    WHERE "user_id" = $11 AND "title" = $12 AND "day_of_week" = $13
   `;
 
-  console.log(query);
+    const values = [new_title, new_day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo, id, origin_title, origin_day_of_week]
+
+    console.log(query);
 
     return new Promise((resolve, reject) => {
         con.query(query, values, (err, result) => {
