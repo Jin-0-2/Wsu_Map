@@ -89,8 +89,10 @@ exports.delete = (id, title, day_of_week) => {
     DELETE FROM "timetable" WHERE "user_id" = $1 AND "title" = $2 AND "day_of_week" = $3;
     `
 
-    console.log(query);
     const values = [id, title, day_of_week]
+    console.log(query);
+    console.log(values);
+
 
     return new Promise((resolve, reject) => {
         con.query(query, values, (err, result) => {
