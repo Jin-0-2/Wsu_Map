@@ -87,13 +87,15 @@ exports.update = (id, title, day_of_week, start_time, end_time, building_name, f
 exports.delete = (id, title, day_of_week) => {
     const query = `
     DELETE FROM "timetable" WHERE "user_id" = $1 AND "title" = $2 AND "day_of_week" = $3;
-  `
-  const values = [id, title, day_of_week]
+    `
 
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
+    console.log(query);
+    const values = [id, title, day_of_week]
+
+    return new Promise((resolve, reject) => {
+        con.query(query, values, (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+        });
     });
-  });
 }
