@@ -38,9 +38,6 @@ exports.add = (id, title, day_of_week, start_time, end_time, building_name, floo
 
 
 exports.update = (id, origin_title, origin_day_of_week, new_title, new_day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo) => {
-
-
-
     // 쿼리 완성
     const query = `
     UPDATE "timetable" SET "title" = $1, "day_of_week" = $2, "start_time" = $3, "end_time" = $4, "building_name" = $5, "floor_number" = $6, "room_name" = $7, "professor" = $8, "color" = $9, "memo" = $10
@@ -48,8 +45,6 @@ exports.update = (id, origin_title, origin_day_of_week, new_title, new_day_of_we
   `;
 
     const values = [new_title, new_day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo, id, origin_title, origin_day_of_week]
-
-    console.log(query);
 
     return new Promise((resolve, reject) => {
         con.query(query, values, (err, result) => {
