@@ -216,7 +216,7 @@ exports.disconnect = async (req, res) => {
 exports.stairs = async (req, res) => {
   try {
     logRequestInfo(req);
-    const building = req.body.building;
+    const building = req.params.building;
 
     const result = await pathService.getStairs(building);
 
