@@ -140,8 +140,6 @@ exports.getCloseNode = async (from_location) => {
 
 // 건물 ↔ 건물 (외부만 사용)
 exports.handleBuildingToBuilding = (from_building, to_building) => {
-  console.log(outdoorLocations);
-
   const outdoorPath = dijkstra(outdoorGraph, from_building, to_building, outdoorLocations);
 
   console.log(outdoorPath);
