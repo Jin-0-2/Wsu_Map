@@ -6,7 +6,7 @@ exports.getAll = (id) => {
     const select_query = `
     SELECT * FROM "timetable" where "user_id" = $1
     `
-    
+
     const values = [id]
 
     return new Promise((resolve, reject) => {
@@ -37,16 +37,48 @@ exports.add = (id, title, day_of_week, start_time, end_time, building_name, floo
 }
 
 
-exports.update = () => {
-  const query = `
-      UPDATE "timetable" SET 
-  `
-  const values = [id, title, day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo === undefined ? null : memo]
+exports.update = (id, title, day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo) => {
+    const fields = {
+        title,
+        day_of_week,
+        start_time,
+        end_time,
+        building_name,
+        floor_number,
+        room_name,
+        professor,
+        color,
+        memo: memo === undefined ? null : memo
+    };
+    const setClauses = [];
+    const values = [];
 
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
+    Object.entries(fields).forEach(([key, value]) => {
+        // undefined/null 체크: null도 업데이트 원하면 'value !== undefined' 만 사용
+        if (value !== undefined) {
+            setClauses.push(`"${key}" = ?`);
+            values.push(value);
+        }
     });
-  });    
+
+    // 아무 필드도 없다면 오류 반환
+    if (setClauses.length === 0) {
+        return Promise.reject(new Error("업데이트할 값이 없습니다."));
+    }
+
+    values.push(id);
+
+    // 쿼리 완성
+    const query = `
+    UPDATE "timetable" SET
+    ${setClauses.join(", ")}
+    WHERE "user_id" = ?
+  `;
+
+    return new Promise((resolve, reject) => {
+        con.query(query, values, (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+        });
+    });
 }

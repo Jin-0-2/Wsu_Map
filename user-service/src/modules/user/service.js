@@ -154,7 +154,7 @@ exports.update_location = async (id, x, y) => {
   const values = [x, y, id];
 
   return new Promise((resolve, reject) => {
-    con.query(sql, values, (err, result) => {
+    con.query(update_location_Qurey, values, (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });

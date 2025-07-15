@@ -75,10 +75,23 @@ exports.update = async (req, res) => {
     logRequestInfo(req);
 
     const id  = req.params.id;
+
+    const {
+      title,
+      day_of_week,
+      start_time,
+      end_time,
+      building_name,
+      floor_number,
+      room_name,
+      professor,
+      color,
+      memo,
+    } = req.body;
+
+    const result = await Service.update(id, title, day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo);
     
-    const result = await Service.update(id);
-    
-    res.status(200).json(result.rows);
+    res.status(200).json({ success: true, updated: result.rows });
   } catch (err) {
     console.error("DB 오류:", err);
     
