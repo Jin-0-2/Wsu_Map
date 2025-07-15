@@ -47,9 +47,23 @@ exports.getFloorNames = async (req, res) => {
 
     const building_name = req.params.building;
 
-    const result = await Service.getFloorNames(building_name);   
+    let result = await Service.getFloorNames(building_name);
+    // result: 계단 key배열, param_building: 요청한 건물명
+    result =  result.sort((a, b) => {
+      const [buildingA, floorA] = a.split('@');
+      const [buildingB, floorB] = b.split('@');
+      const isSameA = buildingA === param_building;
+      const isSameB = buildingB === param_building;
 
-    res.status(200).json(result.rows);
+      if (isSameA && !isSameB) return -1;
+      if (!isSameA && isSameB) return 1;
+      if (buildingA !== buildingB) return buildingA.localeCompare(buildingB);
+
+      return parseInt(floorA) - parseInt(floorB);
+    });
+
+
+    res.status(200).json({ stairs : result});
   } catch (err) {
     console.error("DB 오류:", err);
 
