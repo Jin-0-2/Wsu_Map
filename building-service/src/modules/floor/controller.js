@@ -48,6 +48,8 @@ exports.getFloorNames = async (req, res) => {
     const building_name = req.params.building;
 
     const result = await Service.getFloorNames(building_name);
+
+    console.log(result.rows);
     
 
     res.status(200).json(result.rows);
