@@ -223,8 +223,8 @@ exports.stairs = async (req, res) => {
     result = result.sort((a, b) => {
       const [buildingA, floorA] = a.split('@');
       const [buildingB, floorB] = b.split('@');
-      const isSameA = buildingA === building_name;
-      const isSameB = buildingB === building_name;
+      const isSameA = buildingA === building;
+      const isSameB = buildingB === building;
 
       if (isSameA && !isSameB) return -1;
       if (!isSameA && isSameB) return 1;
