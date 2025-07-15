@@ -2,9 +2,24 @@
 
 const con = require("../../core/db")
 
+exports.getAll = (id) => {
+    const select_query = `
+    SELECT * FROM "timetable" where "user_id" = $1
+    `
+    
+    const values = [id]
+
+    return new Promise((resolve, reject) => {
+        con.query(select_query, values, (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+        });
+    });
+}
+
 // 시간표 추가
 exports.add = (id, title, day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo) => {
-  const query = `
+    const query = `
       INSERT INTO "timetable" (
       "user_id", "title", "day_of_week", "start_time", "end_time",
       "building_name", "floor_number", "room_name", "professor",
