@@ -203,7 +203,7 @@ exports.disconnect = async (req, res) => {
 
     pathService.initIndoorGraph();
     
-    res.status(200).send("성공");
+    res.status(200).json("성공");
   } catch (err) {
     console.error("실내 노드 연결 중 오류:", err);
 
