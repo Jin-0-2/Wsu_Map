@@ -15,7 +15,6 @@ router.get("/:building", controller.getFloors)
 // 건물 별 층 목록만! 조회
 router.get("/names/:building", controller.getFloorNames)
 
-
 // 성공!
 // 층 조회 (2D)
 router.get("/:floor/:building", controller.getFloorNumber)
