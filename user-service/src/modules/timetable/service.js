@@ -84,11 +84,11 @@ exports.update = (id, title, day_of_week, start_time, end_time, building_name, f
 }
 
 // 시간표 삭제
-exports.delete = (id, title) => {
+exports.delete = (id, title, day_of_week) => {
     const query = `
-    DELETE FROM "timetable" WHERE "user_id" = $1 AND "title" = $2;
+    DELETE FROM "timetable" WHERE "user_id" = $1 AND "title" = $2 AND "day_of_week" = $3;
   `
-  const values = [id, title]
+  const values = [id, title, day_of_week]
 
   return new Promise((resolve, reject) => {
     con.query(query, values, (err, result) => {
