@@ -140,6 +140,9 @@ exports.create = [
         // 모든 노드 생성 작업이 끝날 때까지 기다립니다.
         await Promise.all(nodeCreationPromises);
       }
+
+      await pathService.initIndoorGraph();
+
       res.status(201).json({
         message: "층 추가가 완료되었습니다",
       });
@@ -216,6 +219,8 @@ exports.update = [
       // 모든 작업이 성공하면 트랜잭션 커밋
       await client.query('COMMIT');
 
+      await pathService.initIndoorGraph();
+
       res.status(200).json({ message: "층 수정이 완료되었습니다." });
 
     } catch (err) {
@@ -240,6 +245,8 @@ exports.delete = async (req, res) => {
       // 삭제된 행이 없음 → 잘못된 id
       return res.status(404).send("존재하지 않는 층입니다.");
     }
+
+    await pathService.initIndoorGraph();
 
     res.status(200).send("층 삭제 성공");
   } catch (err) {
