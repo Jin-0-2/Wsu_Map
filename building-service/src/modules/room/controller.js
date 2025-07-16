@@ -261,8 +261,21 @@ exports.stairs = async (req, res) => {
 
     console.log(filtered);
 
+
+    const nodes = await pathService.getIndoorEdges(building_name, floor);
+
+    const filteredNodeKeys = Object.keys(nodes).filter(key => {
+      const stairName = key.split('@').pop();
+      return stairName === id;
+    });
+    // nodes에서 해당 stairName에 해당하는 모든 [Object] 뽑기
+    const matchedNodes = filteredNodeKeys
+      .map(key => nodes[key]) // [ [Object], ... ]
+      .flat();
+
     res.status(200).json({
-      stairs: filtered
+      stairs: filtered,
+      nodes: matchedNodes
     });
   } catch (err) {
     console.error(err);
