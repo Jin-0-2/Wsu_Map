@@ -245,7 +245,11 @@ exports.stairs = async (req, res) => {
       if (parts[0] === building) {
         // 같은 building: floor ±1만 포함
         const fl = parseInt(parts[1]);
-        return Math.abs(fl - currentFloor) === 1;
+        if (Math.abs(fl - currentFloor) === 1) {
+          // 세 번째 파트가 to로 시작하면 제외
+          return !(parts[2] && parts[2].startsWith('to'));
+        }
+        return false;
       } else if (isToId) {
         // 다른 building: id가 to로 시작하면만, parts[2]가 to로 시작하면 포함
         return parts[2] && parts[2].startsWith('to');
