@@ -273,6 +273,8 @@ exports.stairs = async (req, res) => {
       .map(key => nodes[key]) // [ [Object], ... ]
       .flat();
 
+    console.log(matchedNodes);
+
     res.status(200).json({
       stairs: filtered,
       nodes: matchedNodes
