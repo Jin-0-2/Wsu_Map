@@ -303,17 +303,21 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
       const exit_floor = (from_building === "W15" || from_building === "W17-동관") ? 2 : 1;
       const exit_entrance = `${from_building}@${exit_floor}@enterence`;
 
+      console.log(start_room, exit_entrance )
+
       const departure_indoor_path = dijkstra(indoorGraph, start_room, exit_entrance);
 
 
       // 출발 층(from_floor) 도면 가져오기
       let departure_start_floorImage = await floor.getFloorNumber(from_floor, from_building);
+      console.log(departure_start_floorImage)
 
       // 출구 층(exit_floor) 도면 가져오기 (출발 층과 다른 경우에만)
       let departure_end_floorImage = null;
       if (Number(from_floor) !== exit_floor) {
         departure_end_floorImage = await floor.getFloorNumber(exit_floor, from_building);
       }
+
 
       // 2. 출발 건물 출입구 → 도착 건물 출입구(실외)
       const outdoorPath = dijkstra(outdoorGraph, from_building, to_building, outdoorLocations);
@@ -323,7 +327,7 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
       const entry_entrance = `${to_building}@${entry_floor}@enterence`;
       const entry_room = `${to_building}@${to_floor}@${to_room}`;
 
-      const arrival_indoor_path = dijkstra(indoorGraph, entry_entrance, entry_room);
+      console.log(entry_entrance, entry_room)
 
       // 건물 내부 이동 (입구 -> 방)
       const entry_indoor_path = dijkstra(indoorGraph, entry_entrance, entry_room);
@@ -349,7 +353,7 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
         arrival_indoor: {
           start_floorImage: arrival_start_floorImage,  // 입구 층 도면
           end_floorImage: arrival_end_floorImage,     // 도착 층 도면
-          path: arrival_indoor_path
+          path: entry_indoor_path
         }
       };
     }
