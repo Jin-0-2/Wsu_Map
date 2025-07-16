@@ -216,8 +216,8 @@ exports.stairs = async (req, res) => {
   try {
     logRequestInfo(req);
     const building = req.params.building;
-    const floor = req.body.floor;
-    const room = req.body.room;
+    const floor = req.params.floor;
+    const id = req.params.id;
 
     let result = await pathService.getStairs(building);
 
@@ -234,6 +234,11 @@ exports.stairs = async (req, res) => {
       return parseInt(floorA) - parseInt(floorB);
     });
 
+    console.log(result);
+
+    const currentFloor = parseInt(floor);
+    const isToId = id && id.startsWith('to');
+
     const filtered = result.filter(item => {
       const parts = item.split('@');
 
@@ -241,15 +246,19 @@ exports.stairs = async (req, res) => {
         // 같은 building: floor ±1만 포함
         const fl = parseInt(parts[1]);
         return Math.abs(fl - currentFloor) === 1;
-      } else {
-        // 다른 building: 세 번째 파트가 to로 시작하는 것만 포함
+      } else if (isToId) {
+        // 다른 building: id가 to로 시작하면만, parts[2]가 to로 시작하면 포함
         return parts[2] && parts[2].startsWith('to');
+      } else {
+        // 나머지는 포함하지 않음
+        return false;
       }
     });
+
     console.log(filtered);
 
     res.status(200).json({
-      stairs: result
+      stairs: filtered
     });
   } catch (err) {
     console.error(err);

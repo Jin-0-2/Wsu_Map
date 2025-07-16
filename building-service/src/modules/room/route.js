@@ -7,7 +7,7 @@ const controller = require("./controller")
 // 방 목록 전부다 : 관리자
 router.get("/", controller.getAll)
 // 경로 연결 시 다른 층의 계단 검색
-router.get("/stairs/:building", controller.stairs);
+router.get("/stairs/:building/:floor/:id", controller.stairs);
 
 
 // 건물만 해서 모든 층의 방 반환
