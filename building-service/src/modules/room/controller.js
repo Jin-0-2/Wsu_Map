@@ -284,7 +284,7 @@ exports.stairs = async (req, res) => {
 
     res.status(200).json({
       stairs: filtered,
-      nodes: matchedNodes
+      nodes: stairsNodes
     });
   } catch (err) {
     console.error(err);
