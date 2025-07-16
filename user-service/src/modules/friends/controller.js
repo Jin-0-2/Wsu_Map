@@ -57,6 +57,11 @@ exports.add = async (req, res) => {
   }
 }
 
+// 친구추가 보낸 요청 목록 조회
+exports.my_req_list = async (req, res) = {
+
+}
+
 // 친구추가 받은 요청 목록 조회
 exports.request_list = async (req, res) => {
   try {
