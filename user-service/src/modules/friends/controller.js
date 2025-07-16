@@ -62,6 +62,11 @@ exports.my_req_list = async (req, res) => {
   try {
     logRequestInfo(req);
 
+    const result = await Service.my_req_list(id);
+
+    console.log(result.rows)
+
+    res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({error: err.message});

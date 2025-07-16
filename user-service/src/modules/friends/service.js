@@ -50,6 +50,24 @@ exports.getMyFreind = async (id) => {
   });
 }
 
+exports.my_req_list = async (id) => {
+  const select_query = `
+    SELECT u."Id", u."Name"
+    FROM "friendship" f
+    JOIN "User" u ON u."Id" = f."friend_id"
+    WHERE f."user_id" = $1
+      AND f."status" = 'pending'
+  `
+  const values = [id];
+
+  return new Promise((resolve, reject) => {
+    con.query(select_query, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 exports.request_list = async (id) => {
   const select_query = `
     SELECT u."Id", u."Name"
