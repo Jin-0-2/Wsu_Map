@@ -11,7 +11,20 @@ const s3Client = new S3Client({
 
 // 층 전체 조회
 exports.getAll = () => {
-  const query = 'SELECT * FROM "Floor"'
+  const query = `
+  SELECT *
+  FROM "Floor"
+  ORDER BY
+  -- W 뒤 숫자 추출
+  CAST(REGEXP_REPLACE("Building_Name", '[^0-9]', '', 1, 0) AS INTEGER),
+  -- 동관/서관 정렬(동관 먼저, 서관 나중이면)
+  CASE
+    WHEN "Building_Name" LIKE '%동관%' THEN 1
+    WHEN "Building_Name" LIKE '%서관%' THEN 2
+    ELSE 0
+  END,
+  CAST("Floor_Number" AS INTEGER)
+;`
 
   return new Promise((resolve, reject) => {
     con.query(query, (err, result) => {
