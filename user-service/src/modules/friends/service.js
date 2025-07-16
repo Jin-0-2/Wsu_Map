@@ -33,7 +33,7 @@ exports.add = (my_id, add_id) => {
 
 exports.getMyFreind = async (id) => {
   const select_query = `
-  SELECT u.*
+  SELECT u."Id", u."Name", u."Phone", u."Is_Login", u."Last_Location"
   FROM "friendship" f
   JOIN "User" u ON u."Id" = f."friend_id"
   WHERE f."user_id" = $1
