@@ -9,6 +9,7 @@ router.get("/", controller.getAll)
 // 경로 연결 시 다른 층의 계단 검색
 router.get("/stairs/:building", controller.stairs);
 
+
 // 건물만 해서 모든 층의 방 반환
 router.get("/:building", controller.getRoombyBuilding)
 
