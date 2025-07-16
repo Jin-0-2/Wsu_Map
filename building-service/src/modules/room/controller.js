@@ -275,6 +275,13 @@ exports.stairs = async (req, res) => {
 
     console.log(matchedNodes);
 
+    const stairsNodes = matchedNodes.filter(node =>
+      // 예시: node.name 에 stairs가 들어가는지 확인 (필드명 맞게 수정)
+      node.name && node.name.includes('stairs')
+    );
+
+    console.log(stairsNodes);
+
     res.status(200).json({
       stairs: filtered,
       nodes: matchedNodes
