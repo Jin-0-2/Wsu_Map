@@ -262,7 +262,7 @@ exports.stairs = async (req, res) => {
     console.log(filtered);
 
 
-    const nodes = await pathService.getIndoorEdges(building_name, floor);
+    const nodes = await pathService.getIndoorEdges(building, floor);
 
     const filteredNodeKeys = Object.keys(nodes).filter(key => {
       const stairName = key.split('@').pop();
