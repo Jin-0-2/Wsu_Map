@@ -36,7 +36,7 @@ exports.getFloors = (building_name) => {
 }
 
 exports.getFloorNames = (building_name) => {
-  const query = 'SELECT "Floor_Number" FROM "Floor" WHERE "Building_Name" = $1'
+  const query = 'SELECT "Floor_Number" FROM "Floor" WHERE "Building_Name" = $1 ORDER BY "Floor_Number"'
 
   const values = [building_name]
 
