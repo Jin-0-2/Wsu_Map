@@ -326,7 +326,7 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
       const arrival_indoor_path = dijkstra(indoorGraph, entry_entrance, entry_room);
 
       // 건물 내부 이동 (입구 -> 방)
-      const entry_indoor_path = dijkstra(indoorGraph, entery_enterance, entry_room);
+      const entry_indoor_path = dijkstra(indoorGraph, entry_entrance, entry_room);
 
       // 도착 건물 입구 층(entry_floor) 도면 가져오기
       let arrival_start_floorImage = await floor.getFloorNumber(entry_floor, to_building);;
