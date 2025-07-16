@@ -58,8 +58,14 @@ exports.add = async (req, res) => {
 }
 
 // 친구추가 보낸 요청 목록 조회
-exports.my_req_list = async (req, res) = {
+exports.my_req_list = async (req, res) => {
+  try {
+    logRequestInfo(req);
 
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({error: err.message});
+  }
 }
 
 // 친구추가 받은 요청 목록 조회
