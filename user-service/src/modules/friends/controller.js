@@ -86,10 +86,25 @@ exports.request_list = async (req, res) => {
     res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({error: err.message});
+    res.status(500).json({ error: err.message });
   }
 }
 
+// 오 마이 미스테이크
+exports.mistake = async (req, res) => {
+  try {
+    logRequestInfo(req);
+    const id = req.params.id;
+    const friend_id = req.body.friend_id;
+
+    const result = await Service.mistake(id, friend_id);
+
+    res.status(200).json({ message: "실수 인정" })
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+}
 // 친구 요청 수락
 exports.accept = async (req, res) => {
   try {

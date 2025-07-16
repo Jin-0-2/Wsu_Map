@@ -86,6 +86,21 @@ exports.request_list = async (id) => {
   });
 }
 
+exports.mistake = async (id, friend_id) => {
+  const delete_qurey =`
+  DELETE FROM "friendship" WHERE "user_id" = $1 AND "friend_id" = $2
+  `;
+
+  const values = [id, friend_id];
+
+  return new Promise((resolve, reject) => {
+    con.query(delete_qurey, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 exports.accept = async (my_id, add_id) => {
   try {
     await con.query('BEGIN');

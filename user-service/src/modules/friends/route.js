@@ -19,6 +19,9 @@ router.get("/my_request_list/:id", controller.my_req_list)
 // 친구추가 받은 요청 목록 조회
 router.get("/request_list/:id", controller.request_list)
 
+// 내가 보낸 친구 요청 취소
+router.post("/mistake/:id", controller.mistake);
+
 // 친구 요청 수락
 router.post("/accept", controller.accept)
 
