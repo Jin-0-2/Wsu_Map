@@ -18,9 +18,11 @@ app.use(express.json());
 const redisClient = createClient({ socket: { host: 'redis.address', port: 6379 } });
 redisClient.connect().catch(console.error);
 
+const store = new RedisStore({ client: redisClient });
+
 // ⭐️ 세션 등록은 라우터 등록(=app.use("/")) "이전"에! ⭐️
 app.use(session({
-  store: new RedisStore({ client: redisClient }),
+  store,
   secret: 'YJB_20250711',
   resave: false,
   saveUninitialized: false,
