@@ -148,10 +148,10 @@ exports.update = (id, pw, phone, email) => {
 };
 
 // 현재 위치 업데이트
-exports.update_location = async (id, x, y) => {
-  const update_location_Qurey = `UPDATE "User" SET "Last_Location" = POINT($1, $2) WHERE "Id" = $3`
+exports.update_location = async (id, x, y, timestamp) => {
+  const update_location_Qurey = `UPDATE "User" SET "Last_Location" = POINT($1, $2), "Last_Location_Time" =  to_timestamp($3 / 1000.0) WHERE "Id" = $4`
 
-  const values = [x, y, id];
+  const values = [x, y, timestamp, id];
 
   return new Promise((resolve, reject) => {
     con.query(update_location_Qurey, values, (err, result) => {
