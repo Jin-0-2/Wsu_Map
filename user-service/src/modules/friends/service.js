@@ -14,6 +14,7 @@ exports.getAll = () => {
   });
 }
 
+// 친구 추가
 exports.add = (my_id, add_id) => {
   const query = `
     INSERT INTO "friendship" ("user_id", "friend_id", "status")
@@ -31,6 +32,7 @@ exports.add = (my_id, add_id) => {
   });
 }
 
+// 내 친구 목록 조회
 exports.getMyFreind = async (id) => {
   const select_query = `
   SELECT u."Id", u."Name", u."Phone", u."Is_Login", u."Last_Location"
@@ -50,6 +52,7 @@ exports.getMyFreind = async (id) => {
   });
 }
 
+// 내가 보낸 친구 조회 리스트
 exports.my_req_list = async (id) => {
   const select_query = `
     SELECT u."Id", u."Name"
@@ -68,6 +71,7 @@ exports.my_req_list = async (id) => {
   });
 }
 
+// 친구 요청 받은 리스트 조회
 exports.request_list = async (id) => {
   const select_query = `
     SELECT u."Id", u."Name"
@@ -86,6 +90,7 @@ exports.request_list = async (id) => {
   });
 }
 
+// 내가 보낸 친구 요청 취소 mistake;;
 exports.mistake = async (id, friend_id) => {
   const delete_qurey =`
   DELETE FROM "friendship" WHERE "user_id" = $1 AND "friend_id" = $2
@@ -101,6 +106,7 @@ exports.mistake = async (id, friend_id) => {
   });
 }
 
+// 친구 요청 받기
 exports.accept = async (my_id, add_id) => {
   try {
     await con.query('BEGIN');
@@ -129,7 +135,7 @@ exports.accept = async (my_id, add_id) => {
   }
 };
 
-
+// 친구 요청 거절하기.
 exports.reject = async (my_id, add_id) => {
   const query = `
     UPDATE "friendship"

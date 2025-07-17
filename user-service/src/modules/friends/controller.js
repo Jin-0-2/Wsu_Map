@@ -62,6 +62,8 @@ exports.my_req_list = async (req, res) => {
   try {
     logRequestInfo(req);
 
+    const id = req.params.id;
+
     const result = await Service.my_req_list(id);
 
     console.log(result.rows)
