@@ -2,7 +2,8 @@
 
 const express = require('express');
 const session = require('express-session');
-const RedisStore = require('connect-redis')(session);
+const RedisStore = require('connect-redis').default;
+const { createClient } = require('redis');
 
 const app = express();
 const userRouter = require('./routes/index');
@@ -14,9 +15,12 @@ const AWS_IP = `http://${IP}:`
 
 app.use(express.json());
 
+const redisClient = createClient({ socket: { host: 'redis.address', port: 6379 } });
+redisClient.connect().catch(console.error);
+
 // ⭐️ 세션 등록은 라우터 등록(=app.use("/")) "이전"에! ⭐️
 app.use(session({
-  store: new RedisStore({ host: 'redis.address', port: 6379 }),
+  store: new RedisStore({ client: redisClient }),
   secret: 'YJB_20250711',
   resave: false,
   saveUninitialized: false,
@@ -30,7 +34,7 @@ app.use("/", userRouter);
 
 // ▼ 자동 로그아웃 배치 (필요시)
 setInterval(async () => {
-  const N_MIN = 1; // 10분
+  const N_MIN = 1; // 1분
   const sql = `
     UPDATE "User"
     SET "Is_Login" = false
