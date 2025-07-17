@@ -17,7 +17,7 @@ const app = express();
 
 const redisClient = createClient({
   socket: {
-    host: IP,
+    host: '127.0.0.1',
     port: 6379,
   },
 });
