@@ -58,35 +58,6 @@ exports.getBuilding_Location = async (req, res) => {
   }
 };
 
-// 건물 조회 3D(바이너리로 전송)
-exports.getBuilding_3d = async (req, res) => {
-  try {
-    logRequestInfo(req);
-
-    const building_name = req.params.id;
-
-    const result = await Service.getBuilding_3d(building_name);
-
-    if (!result.rows.length) {
-      return res.status(404).send("해당 건물이 존재하지 않습니다.");
-    }
-
-    const fileBuffer = result.rows[0].File; // bytea 컬럼
-    if (!fileBuffer) {
-      return res.status(404).send("파일이 없습니다.");
-    }
-
-    // Content-Type 설정 (예: glb 파일)
-    res.setHeader('Content-Type', 'model/gltf-binary'); // 파일 타입에 따라 변경
-    res.setHeader('Content-Disposition', `attachment; filename="${building_name}.glb"`);
-
-    res.send(fileBuffer);
-  } catch (err) {
-    console.error("DB 오류:", err);
-    
-    res.status(500).send("DB 오류");
-  }
-};
 
 // 건물 추가
 exports.create = [
@@ -123,13 +94,12 @@ exports.update = [
 
     const building_name = req.params.name;
     const desc  = req.body.desc;
-    const file = req.file ? req.file.buffer : undefined;
 
-    if (!desc  && !file) {
+    if (!desc) {
       return res.status(400).send("수정할 항목이 없습니다.")
     }
 
-    const result = await Service.update(building_name, desc, file);
+    const result = await Service.update(building_name, desc);
 
     if (result.rowCount === 0) {
       return res.status(404).send("해당 이름의 건물이 없습니다.");

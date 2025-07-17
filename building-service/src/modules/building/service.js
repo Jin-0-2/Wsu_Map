@@ -63,19 +63,6 @@ exports.parsePoint = (pointStr) => {
   return { x: parseFloat(match[1]), y: parseFloat(match[2]) };
 };
 
-// 건물 조회 3D
-exports.getBuilding_3d = (building_name) => {
-  const query = 'SELECT "File" FROM "Building" WHERE "Building_Name" = $1'
-
-  const values = [building_name]
-
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
-}
 
 // 건물 추가
 exports.create = (building_name, x, y, desc) => {
@@ -94,22 +81,10 @@ exports.create = (building_name, x, y, desc) => {
 };
 
 // 건물 정보 수정(동적 쿼리)
-exports.update = (building_name, desc, file) => {
-  let fields = [];
-  let values = [];
-  let idx = 1;
+exports.update = (building_name, desc) => {
+  const sql = `UPDATE "Building" SET "Description" = $1 WHERE "Building_Name" = $2`;
 
-  if (desc !== undefined) {
-    fields.push(`"Description" = $${idx++}`);
-    values.push(desc);
-  }
-  if (file !== undefined) {
-    fields.push(`"File" = $${idx++}`);
-    values.push(file);
-  }
-  values.push(building_name);
-
-  const sql = `UPDATE "Building" SET ${fields.join(", ")} WHERE "Building_Name" = $${idx}`;
+  const values = [desc, building_name]
 
   return new Promise((resolve, reject) => {
     con.query(sql, values, (err, result) => {

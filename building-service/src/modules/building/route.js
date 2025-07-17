@@ -15,15 +15,11 @@ router.get("/names", controller.getNames);
 // 빌딩 위치 조회
 router.get("/:name", controller.getBuilding_Location)
 
-// 아직.?   필요 없음.
-// 빌딩 3D 도면 출력
-router.get("/:name/3d", controller.getBuilding_3d)
 
 // 할필요 없기함. 근데 함. 성공!
 // 빌딩 추가
 router.post("/", controller.create)
 
-// 아직.
 // 빌딩 수정 (설명만 고치는 걸로)
 router.put("/:name", controller.update)
 
