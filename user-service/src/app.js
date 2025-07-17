@@ -4,6 +4,7 @@ const express = require('express');
 const session = require('express-session');
 const app = express();
 const userRouter = require('./routes/index');
+const con = require('./core/db')
 
 const AWS_IP = `http://16.176.161.244:`
 
@@ -26,9 +27,9 @@ setInterval(async () => {
     UPDATE "User"
     SET "Is_Login" = false
     WHERE "Is_Login" = true
-    AND "last_location_time" < NOW() - INTERVAL '${N_MIN} minutes'
+    AND "Last_Location_Time" < NOW() - INTERVAL '${N_MIN} minutes'
   `;
-  // con.query(sql); // DB연결 객체 명시 필요!
+  con.query(sql);
 }, 10 * 60 * 1000);
 
 const PORT = 3001;
