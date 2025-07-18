@@ -5,7 +5,7 @@ const app = express();
 const Router = require('./routes/index');
 const { initIndoorGraph, initOutdoorGraph } = require('./modules/path/service');
 
-const AWS_IP = `http://16.176.161.244:`
+const AWS_IP = `http://54.252.215.95:`
 
 app.use(express.json());
 app.use("/", Router);

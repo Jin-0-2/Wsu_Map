@@ -95,8 +95,6 @@ exports.login = async (req, res) => {
       return res.status(401).send("아이디 또는 비밀번호가 일치하지 않습니다.");
     }
 
-    req.session.userId = id;
-
     res.status(200).json(result);
   } catch (err) {
     console.error("로그인 처리 중 오류:", err);
@@ -117,16 +115,8 @@ exports.logout = async (req, res) => {
       // 업데이트된 행이 없음 → 잘못된 id
       return res.status(404).send("존재하지 않는 사용자입니다.");
     }
-
-    req.session.destroy((err) => {
-      if (err) {
-        console.error("세션 삭제 오류:", err);
-        return res.status(500).send("세션 삭제 오류");
-      }
-      // (3) 세션 쿠키도 삭제(브라우저 호환)
-      res.clearCookie('connect.sid');
       res.status(200).send("로그아웃 성공");
-    });
+
   } catch (err) {
     console.error("로그아웃 처리 중 오류:", err);
 

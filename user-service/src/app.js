@@ -5,7 +5,7 @@ const app = express();
 const userRouter = require('./routes/index');
 const con = require('./core/db')
 
-const AWS_IP = `http://16.176.161.244:`
+const AWS_IP = `http://54.252.215.95:`
 
 app.use(express.json());
 app.use("/", userRouter);
