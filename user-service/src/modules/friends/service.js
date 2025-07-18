@@ -16,27 +16,66 @@ exports.getAll = () => {
 
 // 친구 추가
 exports.add = (my_id, add_id) => {
-  const query = `
-    WITH ins AS (
-      INSERT INTO "friendship" ("user_id", "friend_id", "status")
-      VALUES ($1, $2, 'pending')
-      ON CONFLICT ("user_id", "friend_id") DO NOTHING
-      RETURNING "user_id"
-    )
-    SELECT u."Name" AS user_name
-    FROM ins
-    JOIN "User" u ON u."Id" = ins."user_id";
-    `;
-
-  const values = [my_id, add_id];
+  const checkQuery = `
+    SELECT "status" FROM "friendship"
+    WHERE "user_id" = $1 AND "friend_id" = $2
+  `;
+  const insertQuery = `
+    INSERT INTO "friendship" ("user_id", "friend_id", "status")
+    VALUES ($1, $2, 'pending')
+    RETURNING "user_id"
+  `;
+  const updateQuery = `
+    UPDATE "friendship"
+    SET "status" = 'pending'
+    WHERE "user_id" = $1 AND "friend_id" = $2 AND "status" = 'rejected'
+    RETURNING "user_id"
+  `;
 
   return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
+    con.query(checkQuery, [my_id, add_id], (err, result) => {
       if (err) return reject(err);
-      resolve(result);
+
+      if (result.rows.length === 0) {
+        // 친구 신청한 적 없음 → 새로 추가!
+        con.query(insertQuery, [my_id, add_id], (err2, result2) => {
+          if (err2) return reject(err2);
+
+          // 유저 이름도 같이 가져옴
+          if (result2.rows.length > 0) {
+            const nameQuery = `SELECT "Name" AS user_name FROM "User" WHERE "Id" = $1`;
+            con.query(nameQuery, [my_id], (err3, result3) => {
+              if (err3) return reject(err3);
+              result2.rows[0].user_name = result3.rows[0]?.user_name || my_id;
+              resolve(result2);
+            });
+          } else {
+            resolve(result2);
+          }
+        });
+      } else if (result.rows[0].status === 'rejected') {
+        // 거절 상태 → 다시 신청(=pending으로)!
+        con.query(updateQuery, [my_id, add_id], (err2, result2) => {
+          if (err2) return reject(err2);
+
+          if (result2.rows.length > 0) {
+            const nameQuery = `SELECT "Name" AS user_name FROM "User" WHERE "Id" = $1`;
+            con.query(nameQuery, [my_id], (err3, result3) => {
+              if (err3) return reject(err3);
+              result2.rows[0].user_name = result3.rows[0]?.user_name || my_id;
+              resolve(result2);
+            });
+          } else {
+            resolve(result2);
+          }
+        });
+      } else {
+        // 이미 pending/accepted 등 → 아무것도 안 함
+        resolve({ rows: [] });
+      }
     });
   });
-}
+};
 
 // 내 친구 목록 조회
 exports.getMyFreind = async (id) => {
