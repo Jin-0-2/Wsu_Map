@@ -59,6 +59,8 @@ wss.on('connection', (ws, req) => {
     if (userId) {
       connectedUsers.delete(userId);
       console.log(`❌ 웹소켓 해제: userId=${userId}`);
+      console.log('현재 연결된 유저:', Array.from(connectedUsers.keys()));
+
       broadcastOnlineUsers();
     }
   });
