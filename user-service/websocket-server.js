@@ -4,6 +4,7 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const cors = require('cors');
+const userService = require('./src/modules/user/service')
 
 const app = express();
 const server = http.createServer(app);
@@ -60,6 +61,8 @@ wss.on('connection', (ws, req) => {
       connectedUsers.delete(userId);
       console.log(`❌ 웹소켓 해제: userId=${userId}`);
       console.log('현재 연결된 유저:', Array.from(connectedUsers.keys()));
+
+      userService.logout(userId);
 
       broadcastOnlineUsers();
     }

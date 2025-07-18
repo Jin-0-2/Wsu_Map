@@ -106,6 +106,8 @@ exports.logout = (id) => {
 
   const values = [id]
 
+  console.log("로그아웃:", id);
+
   return new Promise((resolve, reject) => {
     con.query(updateQuery, values, (err, result) => {
       if (err) return reject(err);
