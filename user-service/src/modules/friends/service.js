@@ -25,7 +25,7 @@ exports.add = (my_id, add_id) => {
     )
     SELECT u."Name" AS user_name
     FROM ins
-    JOIN "User" u ON u."ID" = ins."user_id";
+    JOIN "User" u ON u."Id" = ins."user_id";
     `;
 
   const values = [my_id, add_id];
