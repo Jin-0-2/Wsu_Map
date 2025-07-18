@@ -11,6 +11,9 @@ exports.getAll = () => {
   f."Floor_Number",
   r."Room_Name",
   r."Room_Description"
+  r."Room_User",
+  r."User_Phone",
+  r."User_Email"
   FROM
   "Floor_R" r
   JOIN
@@ -63,7 +66,10 @@ exports.getRoombyBuilding = (building_name) => {
   f."Building_Name",
   f."Floor_Number",
   r."Room_Name",
-  r."Room_Description"
+  r."Room_Description",
+  r."Room_User",
+  r."User_Phone",
+  r."User_Email"
 FROM
   "Floor_R" r
 JOIN
@@ -100,6 +106,9 @@ exports.getRoombyBuildingFloor = (building_name, floor_number) => {
       f."Floor_Number",
       r."Room_Name",
       r."Room_Description"
+      r."Room_User",
+      r."User_Phone",
+      r."User_Email"
     FROM
       "Floor_R" r
     JOIN
