@@ -125,11 +125,15 @@ exports.update = async (req, res) => {
     const building_name = req.params.building;
     const floor_number = req.params.floor;
     const room_name = req.body.room_name;
-    const room_desc = req.body.room_desc;
+
+    const room_desc = req.body.room_desc ?? null;
+    const room_user = req.body.room_user ?? null;
+    const user_phone = req.body.user_phone ?? null;
+    const user_email = req.body.user_email ?? null;
 
     console.log(building_name, floor_number, room_name, room_desc);
 
-    const result = await Service.update(building_name, floor_number, room_name, room_desc);
+    const result = await Service.update(building_name, floor_number, room_name, room_desc, room_user, user_phone, user_email);
 
     console.log(result);
 

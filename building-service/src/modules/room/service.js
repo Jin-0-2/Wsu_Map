@@ -212,13 +212,34 @@ exports.create_tran = async (building_name, floor_number, room_name, room_desc, 
 };
 
 // 방 수정
-exports.update = (building_name, floor_number, room_name, room_desc) => {
+exports.update = (building_name, floor_number, room_name, room_desc, room_user, user_phone, user_email) => {
+  let setClause = '';
+  let value = null;
+
+  if (room_desc !== undefined && room_desc !== null) {
+    setClause = '"Room_Description" = $1';
+    value = room_desc;
+  } else if (room_user !== undefined && room_user !== null) {
+    setClause = '"Room_User" = $1';
+    value = room_user;
+  } else if (user_phone !== undefined && user_phone !== null) {
+    setClause = '"User_Phone" = $1';
+    value = user_phone;
+  } else if (user_email !== undefined && user_email !== null) {
+    setClause = '"User_Email" = $1';
+    value = user_email;
+  } else {
+    // 아무 것도 안 들어온 경우
+    return Promise.resolve({ rowCount: 0 });
+  }
+
+  
   const updateQuery = `UPDATE "Floor_R"
-  SET "Room_Description" = $1
+  SET ${setClause}
   WHERE "Floor_Id" = (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $2 AND "Floor_Number" = $3)
   AND "Room_Name" = $4;`;
 
-  const values = [room_desc, building_name, floor_number, room_name];
+  const values = [value, building_name, floor_number, room_name];
   
   return new Promise((resolve, reject) => {
     con.query(updateQuery, values, (err, result) => {
