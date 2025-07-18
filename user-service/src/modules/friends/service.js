@@ -17,9 +17,15 @@ exports.getAll = () => {
 // 친구 추가
 exports.add = (my_id, add_id) => {
   const query = `
-    INSERT INTO "friendship" ("user_id", "friend_id", "status")
-    VALUES ($1, $2, 'pending')
-    ON CONFLICT ("user_id", "friend_id") DO NOTHING
+    WITH ins AS (
+      INSERT INTO "friendship" ("user_id", "friend_id", "status")
+      VALUES ($1, $2, 'pending')
+      ON CONFLICT ("user_id", "friend_id") DO NOTHING
+      RETURNING "user_id"
+    )
+    SELECT u."Name" AS user_name
+    FROM ins
+    JOIN "User" u ON u."ID" = ins."user_id";
     `;
 
   const values = [my_id, add_id];

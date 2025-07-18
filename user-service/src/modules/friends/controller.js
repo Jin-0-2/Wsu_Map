@@ -4,6 +4,8 @@ const Service = require("./service")
 // const nodemailer = require('nodemailer');
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
 
+const { notifyFriendRequest } = require('../../../websocket-server')
+
 // 친구 목록 전체 조회
 exports.getAll = async (req, res) => {
   try {
@@ -48,6 +50,10 @@ exports.add = async (req, res) => {
     }
 
     const result = await Service.add(my_id, add_id);
+
+    const my_name = result.rows[0]?.user_name || my_id;
+
+    notifyFriendRequest(my_id, my_name, add_id);
 
     res.status(200).json(result.rows);
   } catch (err) {
