@@ -3,6 +3,7 @@
 const express = require('express');
 const app = express();
 const userRouter = require('./routes/index');
+const con = require('./core/db')
 
 const AWS_IP = `http://16.176.161.244:`
 
