@@ -10,7 +10,7 @@ exports.getAll = () => {
   f."Building_Name",
   f."Floor_Number",
   r."Room_Name",
-  r."Room_Description"
+  r."Room_Description",
   r."Room_User",
   r."User_Phone",
   r."User_Email"
@@ -105,7 +105,7 @@ exports.getRoombyBuildingFloor = (building_name, floor_number) => {
       f."Building_Name",
       f."Floor_Number",
       r."Room_Name",
-      r."Room_Description"
+      r."Room_Description",
       r."Room_User",
       r."User_Phone",
       r."User_Email"
