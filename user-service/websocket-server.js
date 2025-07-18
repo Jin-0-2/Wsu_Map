@@ -58,6 +58,7 @@ wss.on('connection', (ws, req) => {
   ws.on('close', () => {
     if (userId) {
       connectedUsers.delete(userId);
+      console.log(`❌ 웹소켓 해제: userId=${userId}`);
       broadcastOnlineUsers();
     }
   });
