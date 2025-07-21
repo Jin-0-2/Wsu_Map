@@ -135,6 +135,7 @@ function disconnectUserSocket(userId) {
     ws.close(4001, '로그아웃 처리'); // 실제 네트워크 연결 종료 및 클라에 종료 이벤트 전달
     connectedUsers.delete(userId);    // 관리목록에서도 제거
   }
+  console.log("로그아웃 버튼으로 소켓 종료", userId)
 }
 
 
