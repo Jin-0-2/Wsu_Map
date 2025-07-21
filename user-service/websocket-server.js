@@ -71,9 +71,9 @@ wss.on('connection', (ws, req) => {
       } catch (err) {
         console.error('친구목록 조회 실패:', err);
       }
-      console.log(myFriends);
+      console.log(myFriends.rows);
 
-      const friendIds = myFriends.map(f => f.Id);
+      const friendIds = myFriends.rows.map(f => f.Id);
       console.log(friendIds);
 
       friendIds.forEach(friendId => {
