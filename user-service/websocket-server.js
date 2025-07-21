@@ -35,7 +35,7 @@ wss.on('connection', (ws, req) => {
           connectedUsers.set(userId, ws);
           console.log(`✅ 웹소켓 등록: userId=${userId}`);
           console.log('현재 연결된 유저:', Array.from(connectedUsers.keys()));
-  
+
           ws.send(JSON.stringify({
             type: 'registered',
             message: '웹소켓 연결 성공',
@@ -50,7 +50,7 @@ wss.on('connection', (ws, req) => {
           }));
           break;
         default:
-          // 기타 메시지 처리
+        // 기타 메시지 처리
       }
     } catch (error) {
       console.error('메시지 파싱 오류:', error);
@@ -73,15 +73,18 @@ wss.on('connection', (ws, req) => {
       }
 
       const friendIds = myFriends.map(f => f.Id);
+      console.log(friendIds);
 
       friendIds.forEach(friendId => {
-      sendToUser(friendId, {
-        type: 'friend_logged_out',
-        userId,
-        message: `${userId}님이 로그아웃하셨습니다.`,
-        timestamp: new Date().toISOString()
+        sendToUser(friendId, {
+          type: 'friend_logged_out',
+          userId,
+          message: `${userId}님이 로그아웃하셨습니다.`,
+          timestamp: new Date().toISOString()
+        });
       });
-    });
+
+      console.log("친구들에게 로그아웃 전송 완료")
 
       broadcastOnlineUsers();
     }
@@ -153,5 +156,5 @@ server.listen(PORT, () => {
 
 
 module.exports = {
-    notifyFriendRequest,
+  notifyFriendRequest,
 }
