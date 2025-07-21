@@ -65,9 +65,7 @@ wss.on('connection', (ws, req) => {
 
       userService.logout(userId);
 
-      notifyLogoutToFriends(userId);
-
-      console.log("친구들에게 로그아웃 전송 완료")
+      await notifyLogoutToFriends(userId);
 
       broadcastOnlineUsers();
     }
@@ -126,6 +124,8 @@ async function notifyLogoutToFriends(userId) {
       timestamp: new Date().toISOString()
     });
   });
+
+  console.log("친구들에게 전송 완려!")
 }
 
 
