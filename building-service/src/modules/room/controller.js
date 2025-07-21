@@ -131,7 +131,7 @@ exports.update = async (req, res) => {
     const user_phone = req.body.user_phone ?? null;
     const user_email = req.body.user_email ?? null;
 
-    console.log(building_name, floor_number, room_name, room_desc);
+    console.log(building_name, floor_number, room_name, room_desc, room_user, user_phone, user_email);
 
     const result = await Service.update(building_name, floor_number, room_name, room_desc, room_user, user_phone, user_email);
 
