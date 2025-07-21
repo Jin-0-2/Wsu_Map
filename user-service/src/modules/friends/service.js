@@ -78,7 +78,7 @@ exports.add = (my_id, add_id) => {
 };
 
 // 내 친구 목록 조회
-exports.getMyFreind = async (id) => {
+exports.getMyFriend = async (id) => {
   const select_query = `
   SELECT u."Id", u."Name", u."Phone", u."Is_Login", u."Last_Location"
   FROM "friendship" f

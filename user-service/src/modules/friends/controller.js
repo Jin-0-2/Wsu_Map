@@ -22,13 +22,13 @@ exports.getAll = async (req, res) => {
 };
 
 // 내 친구 조회
-exports.getMyFreind = async (req, res) => {
+exports.getMyFriend = async (req, res) => {
   try {
     logRequestInfo(req);
 
     const id = req.params.id;
 
-    const result = await Service.getMyFreind(id);
+    const result = await Service.getMyFriend(id);
 
     res.status(200).json(result.rows);
   } catch (err) {

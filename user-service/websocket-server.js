@@ -65,25 +65,7 @@ wss.on('connection', (ws, req) => {
 
       userService.logout(userId);
 
-      let myFriends = [];
-      try {
-        myFriends = await firendService.getMyFreind(userId);
-      } catch (err) {
-        console.error('친구목록 조회 실패:', err);
-      }
-      console.log(myFriends.rows);
-
-      const friendIds = myFriends.rows.map(f => f.Id);
-      console.log(friendIds);
-
-      friendIds.forEach(friendId => {
-        sendToUser(friendId, {
-          type: 'friend_logged_out',
-          userId,
-          message: `${userId}님이 로그아웃하셨습니다.`,
-          timestamp: new Date().toISOString()
-        });
-      });
+      notifyLogoutToFriends(userId);
 
       console.log("친구들에게 로그아웃 전송 완료")
 
@@ -123,6 +105,30 @@ function broadcastOnlineUsers() {
   });
 }
 
+async function notifyLogoutToFriends(userId) {
+  // userService.getFriends(userId)로 친구 목록 조회 (Id만 필요)
+  let myFriends = [];
+  try {
+    myFriends = await firendService.getMyFriend(userId);
+  } catch (err) {
+    console.error('친구목록 조회 실패:', err);
+  }
+  console.log(myFriends.rows);
+
+  const friendIds = myFriends.rows.map(f => f.Id);
+  console.log(friendIds);
+
+  friendIds.forEach(friendId => {
+    sendToUser(friendId, {
+      type: 'friend_logged_out',
+      userId,
+      message: `${userId}님이 로그아웃하셨습니다.`,
+      timestamp: new Date().toISOString()
+    });
+  });
+}
+
+
 // 친구 알림 함수 예시 (REST API에서 호출될 함수임)
 function notifyFriendRequest(fromUserId, fromUserName, toUserId) {
   sendToUser(toUserId, {
@@ -158,4 +164,5 @@ server.listen(PORT, () => {
 
 module.exports = {
   notifyFriendRequest,
+  notifyLogoutToFriends,
 }
