@@ -5,6 +5,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const cors = require('cors');
 const userService = require('./src/modules/user/service')
+const firendService = require('./src/modules/friends/service')
 
 const app = express();
 const server = http.createServer(app);
@@ -56,13 +57,31 @@ wss.on('connection', (ws, req) => {
     }
   });
 
-  ws.on('close', () => {
+  ws.on('close', async () => {
     if (userId) {
       connectedUsers.delete(userId);
       console.log(`❌ 웹소켓 해제: userId=${userId}`);
       console.log('현재 연결된 유저:', Array.from(connectedUsers.keys()));
 
       userService.logout(userId);
+
+      let myFriends = [];
+      try {
+        myFriends = await firendService.getMyFreind(userId);
+      } catch (err) {
+        console.error('친구목록 조회 실패:', err);
+      }
+
+      const friendIds = myFriends.map(f => f.Id);
+
+      friendIds.forEach(friendId => {
+      sendToUser(friendId, {
+        type: 'friend_logged_out',
+        userId,
+        message: `${userId}님이 로그아웃하셨습니다.`,
+        timestamp: new Date().toISOString()
+      });
+    });
 
       broadcastOnlineUsers();
     }
