@@ -8,7 +8,7 @@ const controller = require("./controller")
 router.get("/", controller.getAll)
 
 // 내 친구 조회
-router.get("/myfriend/:id", controller.getMyFreind)
+router.get("/myfriend/:id", controller.getMyFriend)
 
 // 친구 추가
 router.post("/add", controller.add)
