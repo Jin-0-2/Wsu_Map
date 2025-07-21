@@ -3,7 +3,7 @@
 const userService = require("./service")
 // const nodemailer = require('nodemailer');
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
-const { notifyLogoutToFriends } = require('../../../websocket-server')
+const { notifyLogoutToFriends, disconnectUserSocket } = require('../../../websocket-server')
 
 // 회원 전체 조회
 exports.getAll = async (req, res) => {
@@ -118,6 +118,7 @@ exports.logout = async (req, res) => {
     }
 
     await notifyLogoutToFriends(id);
+    disconnectUserSocket(id);
 
     res.status(200).send("로그아웃 성공");
 

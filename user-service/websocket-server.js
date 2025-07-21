@@ -128,6 +128,15 @@ async function notifyLogoutToFriends(userId) {
   console.log("친구들에게 전송 완려!")
 }
 
+// 연결 끊기.
+function disconnectUserSocket(userId) {
+  const ws = connectedUsers.get(userId);
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.close(4001, '로그아웃 처리'); // 실제 네트워크 연결 종료 및 클라에 종료 이벤트 전달
+    connectedUsers.delete(userId);    // 관리목록에서도 제거
+  }
+}
+
 
 // 친구 알림 함수 예시 (REST API에서 호출될 함수임)
 function notifyFriendRequest(fromUserId, fromUserName, toUserId) {
@@ -165,4 +174,5 @@ server.listen(PORT, () => {
 module.exports = {
   notifyFriendRequest,
   notifyLogoutToFriends,
+  disconnectUserSocket,
 }
