@@ -3,7 +3,7 @@
 const userService = require("./service")
 // const nodemailer = require('nodemailer');
 const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
-const { notifyLogoutToFriends, disconnectUserSocket } = require('../../../websocket-server')
+const { notifyLogoutToFriends, disconnectUserSocket, isUserConnected } = require('../../../websocket-server')
 
 // 회원 전체 조회
 exports.getAll = async (req, res) => {
@@ -111,14 +111,15 @@ exports.logout = async (req, res) => {
 
     const { id } = req.body;
 
-    const result = await userService.logout(id);
-    if (result.rowCount === 0) {
-      // 업데이트된 행이 없음 → 잘못된 id
-      return res.status(404).send("존재하지 않는 사용자입니다.");
+    if (isUserConnected(id)) {
+      disconnectUserSocket(id);
+    } else {
+      const result = await userService.logout(id);
+      if (result.rowCount === 0) {
+        // 업데이트된 행이 없음 → 잘못된 id
+        return res.status(404).send("존재하지 않는 사용자입니다.");
+      }
     }
-
-    await notifyLogoutToFriends(id);
-    disconnectUserSocket(id);
 
     res.status(200).send("로그아웃 성공");
 

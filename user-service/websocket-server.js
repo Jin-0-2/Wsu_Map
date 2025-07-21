@@ -138,6 +138,11 @@ function disconnectUserSocket(userId) {
   console.log("로그아웃 버튼으로 소켓 종료", userId)
 }
 
+// 커넥트 되어있는지 확인
+function isUserConnected(userId) {
+  return connectedUsers.has(userId);
+}
+
 
 // 친구 알림 함수 예시 (REST API에서 호출될 함수임)
 function notifyFriendRequest(fromUserId, fromUserName, toUserId) {
@@ -176,4 +181,5 @@ module.exports = {
   notifyFriendRequest,
   notifyLogoutToFriends,
   disconnectUserSocket,
+  isUserConnected,
 }
