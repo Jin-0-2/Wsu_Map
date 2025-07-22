@@ -68,6 +68,7 @@ exports.getPath = async (req, res) => {
     }
 
     console.log(finaly_result)
+    console.log(JSON.stringify(finaly_result, null, 2)); // 순환참조 없을 때만!
 
     res.status(200).json(finaly_result);
   } catch (err) {
