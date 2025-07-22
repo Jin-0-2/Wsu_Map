@@ -135,7 +135,7 @@ exports.getRoombyBuildingFloor = (building_name, floor_number) => {
 
 // 2D도면에서 방 클릭 시 보여줄 방 이름 및 설명
 exports.getRoomDescByName = (building_name, floor_number, room_name) => {
-  const query = 'SELECT r."Room_Description" FROM "Floor_R" r JOIN "Floor" f ON r."Floor_Id" = f."Floor_Id" WHERE f."Building_Name" = $1 AND f."Floor_Number" = $2 AND r."Room_Name" = $3';
+  const query = 'SELECT r."Room_Description", r."Room_User", r."User_Phone", r."User_Email" FROM "Floor_R" r JOIN "Floor" f ON r."Floor_Id" = f."Floor_Id" WHERE f."Building_Name" = $1 AND f."Floor_Number" = $2 AND r."Room_Name" = $3';
   
   const values = [building_name, floor_number, room_name];
 
