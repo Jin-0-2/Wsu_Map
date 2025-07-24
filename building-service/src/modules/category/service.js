@@ -16,7 +16,15 @@ exports.getAll = () => {
 
 // 카테고리 검색(카테고리 이름 > 건물 위치) 메인화면에서 상단부분 필터 클릭 시
 exports.getBuildingLocationsByCategory = (category_name) => {
-  const query = 'select "Building_Name" from "Categories" where "Category_Name" = $1';
+  const query = `
+      SELECT 
+      f."Building_Name", 
+      array_agg(f."Floor_Number" ORDER BY f."Floor_Number") AS "Floor_Numbers"
+    FROM "Floor_C" c
+    JOIN "Floor" f ON c."Floor_Id" = f."Floor_Id"
+    WHERE c."Category_Name" = '라운지'
+    GROUP BY f."Building_Name", c."Category_Name"
+    ORDER BY f."Building_Name"`;
   
   const values = [category_name]
 
