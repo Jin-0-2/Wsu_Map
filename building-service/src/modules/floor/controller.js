@@ -56,8 +56,6 @@ exports.getFloorNames = async (req, res) => {
 // 층 조회 (2d), 하나만
 exports.getFloorNumber = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const floor = req.params.floor;
     const building_name = req.params.building;
 
