@@ -4,14 +4,12 @@ const Service = require("./service")
 const pathService = require("../path/service")
 const multer = require('multer');
 const upload = multer();
-const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
+const { requestLogger } = require('../../core/logger'); // 경로는 상황에 맞게
 
 
 // 전체 조회
 exports.getAll = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const result = await Service.getAll();
     
     res.status(200).json(result.rows);
@@ -55,8 +53,6 @@ exports.getRoombyBuildingFloor = async (req, res) => {
 // 2D도면에서 방 클릭 시 보여줄 방 이름 및 설명
 exports.getRoomDescByName = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const building_name = req.params.building;
     const floor_number = req.params.floor;
     const room_name = req.params.room;
@@ -74,7 +70,6 @@ exports.getRoomDescByName = async (req, res) => {
 // 길찾기용 포인트 얻기
 exports.getRoomPointByName = async (req, res) => {
   try {
-    logRequestInfo(req);
     const building = req.params.building;
     const floor = req.params.floor;
     const room_ = req.body;
@@ -97,8 +92,6 @@ exports.getRoomPointByName = async (req, res) => {
 // 방 추가
 exports.create = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const building_name = req.params.building;
     const floor_number = req.params.floor;
     const room_name = req.body.room_name;
@@ -120,8 +113,6 @@ exports.create = async (req, res) => {
 // 방 수정
 exports.update = async (req, res) => {
   try {
-    logRequestInfo(req);
-    
     const building_name = req.params.building;
     const floor_number = req.params.floor;
     const room_name = req.body.room_name;
@@ -148,8 +139,6 @@ exports.update = async (req, res) => {
 // 방 삭제: 이건 관리 페이지에서.. 목록을 보고 삭제를..
 exports.delete = async (req, res) => {
   try {
-    logRequestInfo(req);
-    
     const building_name = req.params.building;
     const floor_number = req.params.floor;
     const room_name = req.body.room_name;
@@ -171,7 +160,6 @@ exports.delete = async (req, res) => {
 // 실내 노드 연결
 exports.connect = async (req, res) => {
   try {
-    logRequestInfo(req);
     const from_building = req.body.from_building;
     const from_floor = req.body.from_floor;
     const from_node = req.body.from_node;
@@ -195,7 +183,6 @@ exports.connect = async (req, res) => {
 // 실내 노드 연결 해제
 exports.disconnect = async (req, res) => {
   try {
-    logRequestInfo(req);
     const from_building = req.body.from_building;
     const from_floor = req.body.from_floor;
     const from_node = req.body.from_node;
@@ -218,7 +205,6 @@ exports.disconnect = async (req, res) => {
 // 경로 연결 시 다른 층의 계단 검색
 exports.stairs = async (req, res) => {
   try {
-    logRequestInfo(req);
     const building = req.params.building;
     const floor = req.params.floor;
     const id = req.params.id;

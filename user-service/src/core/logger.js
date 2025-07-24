@@ -7,5 +7,9 @@ function logRequestInfo(req) {
   console.log(`[${now}] [요청] IP: ${ip}, Method: ${method}, URL: ${url}, Body: ${body}`);
 }
 
+function requestLogger(req, res, next) {
+  logRequestInfo(req);
+  next();
+}
 
-module.exports = { logRequestInfo };
+module.exports = { requestLogger };

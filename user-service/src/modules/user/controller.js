@@ -1,15 +1,12 @@
 // src/modules/user/controller.js
 
 const userService = require("./service")
-// const nodemailer = require('nodemailer');
-const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
-const { notifyLogoutToFriends, disconnectUserSocket, isUserConnected } = require('../../../websocket-server')
+const { disconnectUserSocket, isUserConnected } = require('../../../websocket-server')
 
 // 회원 전체 조회
 exports.getAll = async (req, res) => {
   try {
-    logRequestInfo(req);
-    
+
     const result = await userService.getAll();
     
     res.status(200).json(result.rows);
@@ -24,7 +21,6 @@ exports.getAll = async (req, res) => {
 // 로그인 중인 회원만 조회
 exports.getislogin = async (req, res) => {
   try {
-    logRequestInfo(req);
     
     const result = await userService.getislogin();
 
@@ -40,7 +36,6 @@ exports.getislogin = async (req, res) => {
 // 회원 한명 조회 마이페이지
 exports.getUser = async (req, res) => {
   try{
-    logRequestInfo(req);
 
     const id = req.params.id;
 
@@ -58,7 +53,6 @@ exports.getUser = async (req, res) => {
 // 회원 가입
 exports.register = async (req, res) => {
   try {
-    logRequestInfo(req);
 
     const { id, pw, name, stu_number, phone, email } = req.body
     if (!id || !pw || !name || !phone) {
@@ -83,7 +77,6 @@ exports.register = async (req, res) => {
 // 로그인
 exports.login = async (req, res) => {
   try {
-    logRequestInfo(req);
 
     const { id, pw } = req.body
     if (!id || !pw) {
@@ -107,7 +100,6 @@ exports.login = async (req, res) => {
 // 로그아웃
 exports.logout = async (req, res) => {
   try {
-    logRequestInfo(req);
 
     const { id } = req.body;
 
@@ -133,7 +125,6 @@ exports.logout = async (req, res) => {
 // 회원 수정
 exports.update = async (req, res) => {
   try {
-    logRequestInfo(req);
 
     const {
       id = null,
@@ -166,7 +157,6 @@ exports.update = async (req, res) => {
 // 현재 위치 전송
 exports.update_location = async (req, res) => {
 try {
-    logRequestInfo(req);
 
     const id = req.body.id;
     const x = req.body.x;
@@ -194,7 +184,6 @@ try {
 // 회원 삭제
 exports.delete = async (req, res) => {
   try {
-    logRequestInfo(req);
 
     const { id } = req.body;
 
@@ -214,8 +203,7 @@ exports.delete = async (req, res) => {
 
 // 아이디 찾기
 exports.find_id = async (req, res) => {
-try {
-    logRequestInfo(req);
+try { 
 
     const { email } = req.body.email;
 

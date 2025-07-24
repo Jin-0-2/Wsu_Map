@@ -1,14 +1,12 @@
 // src/modules/path/controller.js
 
 const Service = require("./service")
-const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
+const { requestLogger } = require('../../core/logger'); // 경로는 상황에 맞게
 const buildingService = require("../building/service")
 
 // 길찾기 경로 반환
 exports.getPath = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     // body에서 출발/도착 정보 추출
     let {
       from_location = null,
@@ -80,8 +78,6 @@ exports.getPath = async (req, res) => {
 
 exports.getNodes = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const result = await Service.getNodes();
 
     // 객체 → 배열 변환 로직 추가
@@ -101,8 +97,6 @@ exports.getNodes = async (req, res) => {
 
 exports.getEdges = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const result = await Service.getEdges();
 
     // 객체 → 배열 변환 로직 추가
@@ -121,8 +115,6 @@ exports.getEdges = async (req, res) => {
 
 exports.update_node_location = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const node_name = req.body.node_name;
     const x = req.body.x;
     const y = req.body.y;
@@ -144,8 +136,6 @@ exports.update_node_location = async (req, res) => {
 // 건물/노드 생성
 exports.create = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const type = req.body.type;
     const node_name = req.body.node_name;
     const x = req.body.x;
@@ -182,8 +172,6 @@ exports.create = async (req, res) => {
 // 건물/ 노드 삭제
 exports.delete = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const type = req.body.type;
     const node_name = req.body.node_name;
 
@@ -230,9 +218,7 @@ exports.connect = async (req, res) => {
 
 // 노드 연결 해제
 exports.disconnect = async (req, res) => {
-  try {
-    logRequestInfo(req);
-
+  try { 
     const from_node = req.body.from_node;
     const to_node = req.body.to_node;
 

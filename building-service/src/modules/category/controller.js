@@ -3,14 +3,12 @@
 const Service = require("./service")
 const multer = require('multer');
 const upload = multer();
-const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
+const { requestLogger } = require('../../core/logger'); // 경로는 상황에 맞게
 
 
 // 전체 조회
 exports.getAll = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const result = await Service.getAll();
     
     res.status(200).json(result.rows);
@@ -24,8 +22,6 @@ exports.getAll = async (req, res) => {
 // 카테고리 검색(카테고리 이름 > 건물 위치) 메인화면에서 상단부분 필터 클릭 시
 exports.getBuildingLocationsByCategory = async (req, res) => {
   try {
-    logRequestInfo(req);
-    
     const category_name = req.params.category;
     const result = await Service.getBuildingLocationsByCategory(category_name);
 
@@ -42,8 +38,6 @@ exports.getBuildingLocationsByCategory = async (req, res) => {
 // 2D도면에서 필터를 선택하려면 카테고리 목록이 필요하겠지? 주는거 만들어야겠지?
 exports.getCategoryListAt2D = async (req, res) => {
   try{
-    logRequestInfo(req);
-
     const building_name = req.params.building;
     const floor_number = req.params.floor;
 
@@ -60,8 +54,6 @@ exports.getCategoryListAt2D = async (req, res) => {
 // 건물_층 2d도면에 카테고리 필터 클릭시 띄우기
 exports.getCategoryLocationsAt2D = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const building_name = req.params.building;
     const floor_number = req.params.floor;
     const category = req.body.category;
@@ -84,8 +76,6 @@ exports.getCategoryLocationsAt2D = async (req, res) => {
 // 건물/층을 입력받아 그 층에 있는 모든 카테고리의 이름과 좌표 반환
 exports.getCategoryForManager = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const building_name = req.params.building;
     const floor_number = req.params.floor;
 
@@ -105,8 +95,6 @@ exports.getCategoryForManager = async (req, res) => {
 // 카테고리 추가(2d도면에서 좌표 지정, 이름 지정을 하면, 카테고리스, floor_c에 들거가게끔)
 exports.create = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const building_name = req.params.building;
     const floor_number = req.params.floor;
     const category = req.body.category;
@@ -128,8 +116,6 @@ exports.create = async (req, res) => {
 // 카테고리 삭제: 이건 관리 페이지에서.. 목록을 보고 삭제를..
 exports.delete = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const building_name = req.params.building;
     const floor_number = req.params.floor;
     const category_name = req.body.category_name;

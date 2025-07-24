@@ -1,14 +1,10 @@
 // src/modules/user/controller.js
 
 const Service = require("./service")
-// const nodemailer = require('nodemailer');
-const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
 
 // 내 시간표 불러오기
 exports.getAll = async (req, res) => {
     try {
-        logRequestInfo(req);
-
         const id = req.params.id;
 
         const result = await Service.getAll(id);
@@ -37,8 +33,6 @@ exports.getAll = async (req, res) => {
 // 시간표 추가
 exports.add = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const id  = req.params.id;
     const {
       title,
@@ -72,8 +66,6 @@ exports.add = async (req, res) => {
 // 시간표 수정
 exports.update = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const id  = req.params.id;
 
     const {
@@ -103,9 +95,7 @@ exports.update = async (req, res) => {
 
 // 시간표 삭제
 exports.delete = async (req, res) => {
-  try {
-    logRequestInfo(req);
-
+  try {   
     const id  = req.params.id;
     const title = req.body.title;
     const day_of_week = req.body.day_of_week;

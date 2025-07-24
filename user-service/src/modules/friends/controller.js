@@ -1,15 +1,11 @@
 // src/modules/friends/controller.js
 
 const Service = require("./service")
-// const nodemailer = require('nodemailer');
-const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
-
 const { notifyFriendRequest } = require('../../../websocket-server')
 
 // 친구 목록 전체 조회
 exports.getAll = async (req, res) => {
   try {
-    logRequestInfo(req);
     
     const result = await Service.getAll();
     
@@ -24,7 +20,6 @@ exports.getAll = async (req, res) => {
 // 내 친구 조회
 exports.getMyFriend = async (req, res) => {
   try {
-    logRequestInfo(req);
 
     const id = req.params.id;
 
@@ -40,7 +35,6 @@ exports.getMyFriend = async (req, res) => {
 // 친구 추가
 exports.add = async (req, res) => {
   try {
-    logRequestInfo(req);
 
     const my_id = req.body.my_id;
     const add_id = req.body.add_id;
@@ -66,7 +60,6 @@ exports.add = async (req, res) => {
 // 친구추가 보낸 요청 목록 조회
 exports.my_req_list = async (req, res) => {
   try {
-    logRequestInfo(req);
 
     const id = req.params.id;
 
@@ -84,7 +77,6 @@ exports.my_req_list = async (req, res) => {
 // 친구추가 받은 요청 목록 조회
 exports.request_list = async (req, res) => {
   try {
-    logRequestInfo(req);
     const id = req.params.id;
 
     const result = await Service.request_list(id);
@@ -101,7 +93,6 @@ exports.request_list = async (req, res) => {
 // 오 마이 미스테이크
 exports.mistake = async (req, res) => {
   try {
-    logRequestInfo(req);
     const id = req.params.id;
     const friend_id = req.body.friend_id;
 
@@ -116,7 +107,6 @@ exports.mistake = async (req, res) => {
 // 친구 요청 수락
 exports.accept = async (req, res) => {
   try {
-    logRequestInfo(req);
 
     const my_id = req.body.my_id;
     const add_id = req.body.add_id;
@@ -134,7 +124,6 @@ exports.accept = async (req, res) => {
 // 친구 요청 거절
 exports.reject = async (req, res) => {
   try {
-    logRequestInfo(req);
 
     const my_id = req.body.my_id;
     const add_id = req.body.add_id;
@@ -151,8 +140,6 @@ exports.reject = async (req, res) => {
 // 친구 삭제
 exports.delete = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const my_id = req.body.my_id;
     const add_id = req.body.add_id;
 

@@ -3,13 +3,10 @@
 const Service = require("./service")
 const multer = require('multer');
 const upload = multer();
-const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
 
 // 건물 전체 조회
 exports.getAll = async (req, res) => {
   try {
-    logRequestInfo(req);
-    
     const result = await Service.getAll();
 
     res.status(200).json(result.rows);
@@ -23,8 +20,6 @@ exports.getAll = async (req, res) => {
 // 건물 전체 이름만 조회
 exports.getNames = async (req, res) => {
   try {
-    logRequestInfo(req);
-    
     const result = await Service.getNames();
     
     res.status(200).json(result.rows);
@@ -64,8 +59,6 @@ exports.create = [
   upload.single('file'),
   async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const { building_name, x, y, desc } = req.body
     // const file = req.file ? req.file.buffer : null; //파일이 없으면 null
 
@@ -90,8 +83,6 @@ exports.update = [
   upload.single('file'),
   async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const building_name = req.params.name;
     const desc  = req.body.desc;
 
@@ -116,8 +107,6 @@ exports.update = [
 // 건물 삭제  애매해! ㅈㄴ 애매해! 다 지워야해 ! ㅈㄴ 애매해!
 exports.delete = async (req, res) => {
   try {
-    logRequestInfo(req);
-    
     const building_name  = req.params.name;
 
     const result = await Service.delete(building_name);

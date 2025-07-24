@@ -6,14 +6,11 @@ const pathService = require("../path/service")
 const client = require('../../core/db')
 const multer = require('multer');
 const upload = multer();
-const { logRequestInfo } = require('../../core/logger'); // 경로는 상황에 맞게
-const { parse } = require("dotenv");
+const { requestLogger } = require('../../core/logger'); // 경로는 상황에 맞게   
 
 // 전체 조회
 exports.getAll = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const result = await Service.getAll();
     
     res.status(200).json(result.rows);
@@ -27,8 +24,6 @@ exports.getAll = async (req, res) => {
 // 건물 별 층 조회 (2d)
 exports.getFloors = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const building_name = req.params.building;
 
     const result = await Service.getFloors(building_name);
@@ -43,8 +38,6 @@ exports.getFloors = async (req, res) => {
 
 exports.getFloorNames = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const building_name = req.params.building;
 
     const result = await Service.getFloorNames(building_name);
@@ -97,8 +90,6 @@ exports.create = [
   upload.single('file'),
   async (req, res) => {
     try {
-      logRequestInfo(req);
-
       const { building_name, floor_number } = req.body
       const file = req.file ? req.file.buffer : null; //파일이 없으면 null
 
@@ -159,7 +150,6 @@ exports.update = [
   async (req, res) => {
     try {
       await client.query('BEGIN')
-      logRequestInfo(req);
 
       const { building_name, floor_number } = req.body;
       const file = req.file ? req.file.buffer : null;
@@ -235,8 +225,6 @@ exports.update = [
 // 층 삭제
 exports.delete = async (req, res) => {
   try {
-    logRequestInfo(req);
-    
     const floor_number = req.params.floor;
     const building_name  = req.params.building;
 
