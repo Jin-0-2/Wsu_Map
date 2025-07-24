@@ -174,13 +174,11 @@ exports.parseNavigationNodes = (svgBuffer) => {
   const $ = cheerio.load(svgString, { xmlMode: true });
 
   const nodes = [];
-
-  // const categories = [];
+  const categories = [];
 
   // 1. id가 'navigationNode'인 그룹(g 태그)을 찾습니다.
   const navigationLayer = $('[id="Navigation_Nodes"]');
-
-  // const categoryLayer = $('[id="Category"]');
+  const categoryLayer = $('[id="Category"]');
 
 
   if (navigationLayer.length === 0) {
@@ -207,16 +205,26 @@ exports.parseNavigationNodes = (svgBuffer) => {
     }
   });
 
-  // // 3. 해당 그룹 내부에 있는 모든 circle과 reat 태그를 찾기
-  // categoryLayer.find('circle, ellipse').each((index, element) => {
-  //   const elem = $(element);
-  //   const nodeId = elem.attr('id');
+  const categoryNameMap = {
+    lounge: "라운지",
+    water_purifier: "정수기",
+    fire_extinguisher: "소화기",
+  };
 
-  //   if(nodeId) {
-  //     categories.push({nodeId});
-  //   }
-  // });
+  // 3. 해당 그룹 내부에 있는 모든 circle과 reat 태그를 찾기
+   categoryLayer.find('rect').each((index, element) => {
+     const elem = $(element);
+     const nodeId = elem.attr('id');
+     const x = parseFloat(elem.attr('x'));
+     const y = parseFloat(elem.attr('y'));
+
+     if(nodeId) {
+      const categoryKey = nodeId.replace(/-\d+$/, '');
+      const categoryName = categoryNameMap[categoryKey] || categoryKey;
+      categories.push({nodeId: categoryName, x, y});
+   }
+   });
 
   console.log(`SVG 파싱 완료: 총 ${nodes.length}개의 네비게이션 노드를 추출했습니다.`);
-  return nodes;
+  return {nodes, categories};
 };

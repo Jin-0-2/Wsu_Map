@@ -3,6 +3,7 @@
 const Service = require("./service")
 const roomService = require("../room/service")
 const pathService = require("../path/service")
+const categoryService = require("../category/service")
 const client = require('../../core/db')
 const multer = require('multer');
 const upload = multer();
@@ -97,18 +98,18 @@ exports.create = [
 
       let fileUrl = null;
       let parsedNodes = [];
-      // let categories = []
+      let categories = []
 
       if (file) {
         // SVG 파싱과 S3 업로드를 병렬로 처리하여 시간 단축
-        [parsedNodes, fileUrl] = await Promise.all([
-          Service.parseNavigationNodes(file.buffer),
-          Service.uploadFile(building_name, floor_number, file)
-        ]);
+        const { nodes: parsedNodesResult, categories: categoriesResult } = await Service.parseNavigationNodes(file.buffer);
+        parsedNodes = parsedNodesResult;
+        categories = categoriesResult;
+        fileUrl = await Service.uploadFile(building_name, floor_number, file);
       }
 
       console.log(parsedNodes);
-      // console.log(categories);
+      console.log(categories);
 
       // 1. 먼저 Floor 정보를 DB에 생성하고, 생성된 floor의 정보를 받아옵니다.
       // (반드시 새로 생성된 Floor의 ID를 반환하도록 floorService.create를 수정해야 합니다)
@@ -128,6 +129,15 @@ exports.create = [
 
         // 모든 노드 생성 작업이 끝날 때까지 기다립니다.
         await Promise.all(nodeCreationPromises);
+      }
+
+      // 3. 파싱된 카테고리가 있다면, 각 카테고리를 DB에 저장합니다.
+      if (categories.length > 0) {
+        const categoryPromises = categories.map(cat => {
+          const { nodeId, x, y } = cat;
+          return categoryService.create(building_name, floor_number, nodeId, x, y);
+        });
+        await Promise.all(categoryPromises);
       }
 
       await pathService.initIndoorGraph();
