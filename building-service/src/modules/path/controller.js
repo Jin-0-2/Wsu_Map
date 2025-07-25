@@ -1,7 +1,7 @@
 // src/modules/path/controller.js
 
 const Service = require("./service")
-const { requestLogger } = require('../../core/logger'); // 경로는 상황에 맞게
+// const { requestLogger } = require('../../core/logger'); //  경로는 상황에 맞게
 const buildingService = require("../building/service")
 
 // 길찾기 경로 반환
@@ -199,8 +199,6 @@ exports.delete = async (req, res) => {
 // 노드끼리 잇기
 exports.connect = async (req, res) => {
   try {
-    logRequestInfo(req);
-
     const from_node = req.body.from_node;
     const to_node = req.body.to_node;
 
