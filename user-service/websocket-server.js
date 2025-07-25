@@ -171,8 +171,8 @@ function notifyFriendsLocationUpdate(friendIds, userId, x, y) {
   };
   friendIds.forEach(friendId => {
     sendToUser(friendId, locationMessage);
+    console.log("친구에게 내 위치 전송 완료", friendId)
   });
-  console.log("친구들에게 내 위치 전송 완료")
 }
 
 // 테스트 및 REST 연동용 API 엔드포인트 등 필요한 부분만 남겨도 됨
