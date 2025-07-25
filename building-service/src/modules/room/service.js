@@ -180,7 +180,7 @@ exports.create = (building_name, floor_number, room_name, room_desc, x, y) => {
   const insertQuery = `
   INSERT INTO "Floor_R" ("Floor_Id", "Room_Name", "Room_Description", "Room_Location")
   VALUES (
-  (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2),
+  (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2 LIMIT 1),
   $3, $4, POINT($5, $6)
   );`;
 

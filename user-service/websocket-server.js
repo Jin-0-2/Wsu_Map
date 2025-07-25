@@ -161,6 +161,19 @@ function notifyFriendRequest(fromUserId, fromUserName, toUserId) {
   });
 }
 
+// 친구들에게 내 위치를 전송하는 함수
+function notifyFriendsLocationUpdate(friendIds, userId, x, y) {
+  const locationMessage = {
+    type: 'friend_location_update',
+    userId,
+    x,
+    y,
+  };
+  friendIds.forEach(friendId => {
+    sendToUser(friendId, locationMessage);
+  });
+}
+
 // 테스트 및 REST 연동용 API 엔드포인트 등 필요한 부분만 남겨도 됨
 app.get('/friend/ws/status', (req, res) => {
   res.json({
@@ -182,4 +195,5 @@ module.exports = {
   notifyLogoutToFriends,
   disconnectUserSocket,
   isUserConnected,
+  notifyFriendsLocationUpdate, // 추가
 }

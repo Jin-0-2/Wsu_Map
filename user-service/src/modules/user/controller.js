@@ -1,7 +1,9 @@
 // src/modules/user/controller.js
 
 const userService = require("./service")
-const { disconnectUserSocket, isUserConnected } = require('../../../websocket-server')
+const { disconnectUserSocket, isUserConnected, notifyFriendsLocationUpdate } = require('../../../websocket-server')
+const friendService = require("../friends/service")
+
 
 // 회원 전체 조회
 exports.getAll = async (req, res) => {
@@ -157,7 +159,6 @@ exports.update = async (req, res) => {
 // 현재 위치 전송
 exports.update_location = async (req, res) => {
 try {
-
     const id = req.body.id;
     const x = req.body.x;
     const y = req.body.y;
@@ -172,6 +173,15 @@ try {
     if (result.rowCount === 0) {
       return res.status(404).send("해당 id의 사용자가 없습니다.");
     }
+
+
+    const friend_list = await friendService.getMyFriend(id);
+
+    const friendIds = friend_list.rows.map(f => f.Id);
+
+    // 내 위치 친구에게 전송
+    notifyFriendsLocationUpdate(friendIds, id, x, y);
+
 
     res.status(200).send("현재 위치 업데이트 완료");
   } catch (err) {
