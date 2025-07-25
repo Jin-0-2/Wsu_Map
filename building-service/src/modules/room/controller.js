@@ -2,10 +2,6 @@
 
 const Service = require("./service")
 const pathService = require("../path/service")
-const multer = require('multer');
-const upload = multer();
-const { requestLogger } = require('../../core/logger'); // 경로는 상황에 맞게
-
 
 // 전체 조회
 exports.getAll = async (req, res) => {

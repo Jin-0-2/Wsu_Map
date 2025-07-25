@@ -24,9 +24,6 @@ router.delete("/", controller.delete);
 router.post("/connect", controller.connect)
 
 // 노드 연결 해제
-router.delete("/disconnect", controller.disconnect)
-
-// 내부
-
+router.delete("/disconnect", controller.disconnect);
 
 module.exports = router

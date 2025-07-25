@@ -1,10 +1,6 @@
 // src/modules/floor/controller.js
 
 const Service = require("./service")
-const multer = require('multer');
-const upload = multer();
-const { requestLogger } = require('../../core/logger'); // 경로는 상황에 맞게
-
 
 // 전체 조회
 exports.getAll = async (req, res) => {
@@ -91,7 +87,6 @@ exports.getCategoryForManager = async (req, res) => {
   }
 };
 
-
 // 카테고리 추가(2d도면에서 좌표 지정, 이름 지정을 하면, 카테고리스, floor_c에 들거가게끔)
 exports.create = async (req, res) => {
   try {
@@ -111,7 +106,6 @@ exports.create = async (req, res) => {
     res.status(500).send("카테고리 추가 처리 중 오류");
   }
 }
-
 
 // 카테고리 삭제: 이건 관리 페이지에서.. 목록을 보고 삭제를..
 exports.delete = async (req, res) => {

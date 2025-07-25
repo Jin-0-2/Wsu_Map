@@ -53,7 +53,6 @@ exports.getBuilding_Location = async (req, res) => {
   }
 };
 
-
 // 건물 추가
 exports.create = [
   upload.single('file'),

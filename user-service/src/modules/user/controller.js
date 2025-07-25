@@ -35,6 +35,7 @@ exports.getislogin = async (req, res) => {
     res.status(500).send("DB 오류");
   }
 }
+
 // 회원 한명 조회 마이페이지
 exports.getUser = async (req, res) => {
   try{

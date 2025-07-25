@@ -317,6 +317,7 @@ exports.deleteByName = async (building_name, floor_number, nodeId, { client }) =
       `;
   await client.query(query, [building_name, floor_number, nodeId]);
 }
+
 exports.findAllByFloor = async (building_name, floor_number, { client }) => {
   const selectQuery = `
     SELECT "FR"."Room_Name"

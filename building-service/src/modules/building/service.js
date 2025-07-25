@@ -63,7 +63,6 @@ exports.parsePoint = (pointStr) => {
   return { x: parseFloat(match[1]), y: parseFloat(match[2]) };
 };
 
-
 // 건물 추가
 exports.create = (building_name, x, y, desc) => {
   const insertQuery = `

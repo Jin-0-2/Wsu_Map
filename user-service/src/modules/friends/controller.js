@@ -104,6 +104,7 @@ exports.mistake = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 }
+
 // 친구 요청 수락
 exports.accept = async (req, res) => {
   try {
