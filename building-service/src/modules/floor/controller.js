@@ -176,10 +176,8 @@ exports.update = [
       await roomService.deleteAllNodeLinks(building_name, floor_number, { client });
 
       // 2. 새로운 파일 파싱 및 업로드
-      const [newParsedNodes, newFileUrl] = await Promise.all([
-        Service.parseNavigationNodes(file),
-        Service.uploadFile(building_name, floor_number, file)
-      ]);
+      const { nodes: newParsedNodes, categories: newCategories } = await Service.parseNavigationNodes(file);
+      const newFileUrl = await Service.uploadFile(building_name, floor_number, file);
       // const newFloor = await Service.updateFloorFile(building_name, floor_number, newFileUrl);
 
       const promises = [];
@@ -213,6 +211,15 @@ exports.update = [
 
       // 모든 DB 변경 작업을 한번에 실행
       await Promise.all(promises);
+
+      // 파싱된 카테고리가 있다면, 각 카테고리를 DB에 저장합니다.
+      if (newCategories && newCategories.length > 0) {
+        const categoryPromises = newCategories.map(cat => {
+          const { nodeId, x, y } = cat;
+          return categoryService.create(building_name, floor_number, nodeId, x, y);
+        });
+        await Promise.all(categoryPromises);
+      }
 
       // 모든 작업이 성공하면 트랜잭션 커밋
       await client.query('COMMIT');

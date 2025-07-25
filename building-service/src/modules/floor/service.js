@@ -209,6 +209,7 @@ exports.parseNavigationNodes = (svgBuffer) => {
     lounge: "라운지",
     water_purifier: "정수기",
     fire_extinguisher: "소화기",
+    printer: "프린터"
   };
 
   // 3. 해당 그룹 내부에 있는 모든 circle과 reat 태그를 찾기
