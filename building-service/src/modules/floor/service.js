@@ -213,7 +213,7 @@ exports.parseNavigationNodes = (svgBuffer) => {
     water_purifier: "정수기",
     printer: "프린터",
     lounge: "라운지",
-    bank: "은행",
+    bank: "은행(atm)",
     fire_extinguisher: "소화기",
     gym: "헬스장",
     bookstore: "서점",
