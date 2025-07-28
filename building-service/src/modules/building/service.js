@@ -120,6 +120,41 @@ exports.update = (building_name, desc) => {
   });
 };
 
+// 건물 정보 조회 (삭제용)
+exports.getBuilding = (building_name) => {
+  const query = 'SELECT * FROM "Building" WHERE "Building_Name" = $1'
+
+  const values = [building_name]
+
+  return new Promise((resolve, reject) => {
+    con.query(query, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result.rows[0]); // 첫 번째 행 반환
+    });
+  });
+};
+
+// S3에서 이미지 삭제
+exports.deleteImageFromS3 = async (imageUrl) => {
+  try {
+    const bucketName = "wsu-svg";
+    // URL에서 key 추출: https://bucket.s3.region.amazonaws.com/key
+    const key = imageUrl.split('.com/')[1];
+    
+    const deleteCommand = new DeleteObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+    });
+
+    await s3Client.send(deleteCommand);
+    console.log(`S3 파일 삭제 성공: ${key}`);
+    return true;
+  } catch (err) {
+    console.error(`S3 파일 삭제 실패: ${err.message}`);
+    return false;
+  }
+};
+
 // 건물 삭제  걸린거 다 지워야하는데 ㅈㄴ 애매해! ㄹㅇ 개 애매해!
 exports.delete = (building_name) => {
   const deleteQuery = 'DELETE FROM "Building" WHERE "Building_Name" = $1'

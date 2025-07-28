@@ -196,23 +196,39 @@ exports.delete = async (req, res) => {
     const node_name = req.body.node_name;
 
     if (type === "building") {
-      const building_create_result = await buildingService.delete(node_name);
-      console.log("빌딩에 삭제완료")
+      // 1. 먼저 building의 이미지 URL들을 가져오기
+      const building = await buildingService.getBuilding(node_name);
+      
+      // 2. S3에서 이미지들 삭제
+      if (building && building.Image_Urls) {
+        const imageUrls = JSON.parse(building.Image_Urls);
+        if (imageUrls.length > 0) {
+          const deletePromises = imageUrls.map(url => 
+            buildingService.deleteImageFromS3(url)
+          );
+          await Promise.all(deletePromises);
+          console.log("S3에서 이미지들 삭제 완료");
+        }
+      }
+      
+      // 3. DB에서 building 삭제
+      const building_delete_result = await buildingService.delete(node_name);
+      console.log("빌딩 DB 삭제 완료");
+      
+      // 4. DB에서 node 삭제
       result = await Service.delete(node_name);
-      console.log("노드에 삭제완료")
+      console.log("노드 DB 삭제 완료");
     } else if (type == "node") {
       result = await Service.delete(node_name);
-      console.log("노드에 삭제완료")
-
+      console.log("노드 삭제 완료");
     }
     
     Service.initOutdoorGraph();
 
-    res.status(200).json("추가 완료!");
+    res.status(200).json("삭제 완료!");
   } catch (err) {
-    console.error("DB 오류:", err);
-
-    res.status(500).send("DB 오류");
+    console.error("삭제 오류:", err);
+    res.status(500).send("삭제 처리 중 오류");
   }
 }
 
