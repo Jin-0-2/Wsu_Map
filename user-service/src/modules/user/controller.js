@@ -174,14 +174,14 @@ try {
       return res.status(404).send("해당 id의 사용자가 없습니다.");
     }
 
+    if (result.rows[0].Is_location_public) {
+      const friend_list = await friendService.getMyFriend(id);
 
-    const friend_list = await friendService.getMyFriend(id);
-
-    const friendIds = friend_list.rows.map(f => f.Id);
-
-    // 내 위치 친구에게 전송
-    notifyFriendsLocationUpdate(friendIds, id, x, y);
-
+      const friendIds = friend_list.rows.map(f => f.Id);
+  
+      // 내 위치 친구에게 전송
+      notifyFriendsLocationUpdate(friendIds, id, x, y);
+    }
 
     res.status(200).send("현재 위치 업데이트 완료");
   } catch (err) {
@@ -190,6 +190,19 @@ try {
     res.status(500).send("현재 위치 업데이트 오류");
   } 
 };
+
+// 내 위치 공유 함 안함 할래 말래 할래 말래 할래 말래 애매하긴 해
+exports.update_share_location = async (req, res) => {
+  try {
+    const id = req.body.id;
+
+    const result = await userService.update_share_location(id);
+
+    res.status(200).send("내 위치 공유 함 안함 할래 말래 할래 말래 할래 말래 애매하긴 해 완료");
+  } catch (err) {
+    console.error("내 위치 공유 함 안함 할래 말래 할래 말래 할래 말래 애매하긴 해 오류:", err);
+  }
+}
 
 // 회원 삭제
 exports.delete = async (req, res) => {

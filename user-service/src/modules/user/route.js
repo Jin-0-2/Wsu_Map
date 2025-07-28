@@ -33,6 +33,9 @@ router.put("/update", controller.update)
 // 현재 위치 전송
 router.put("/update_location", controller.update_location);
 
+// 내 위치 공유 함 안함 할래 말래 할래 말래 할래 말래 애매하긴 해
+router.put("/update_share_location", controller.update_share_location);
+
 // 성공!
 // 회원정보 삭제
 router.delete("/delete", controller.delete)

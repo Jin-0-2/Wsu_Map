@@ -151,12 +151,26 @@ exports.update = (id, pw, phone, email) => {
 
 // 현재 위치 업데이트
 exports.update_location = async (id, x, y, timestamp) => {
-  const update_location_Qurey = `UPDATE "User" SET "Last_Location" = POINT($1, $2), "Last_Location_Time" =  to_timestamp($3 / 1000.0) WHERE "Id" = $4`
+  const update_location_Qurey = `UPDATE "User" SET "Last_Location" = POINT($1, $2), "Last_Location_Time" =  to_timestamp($3 / 1000.0) WHERE "Id" = $4 RETURNING "Is_location_public"`
 
   const values = [x, y, timestamp, id];
 
   return new Promise((resolve, reject) => {
     con.query(update_location_Qurey, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
+// 내 위치 공유 함 안함 할래 말래 할래 말래 할래 말래 애매하긴 해
+exports.update_share_location = async (id) => {
+  const update_share_location_Qurey = `UPDATE "User" SET "Is_location_public" = NOT "Is_location_public" WHERE "Id" = $1 RETURNING "Is_location_public"`
+
+  const values = [id]
+
+  return new Promise((resolve, reject) => {
+    con.query(update_share_location_Qurey, values, (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });
