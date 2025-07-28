@@ -133,40 +133,59 @@ exports.update_node_location = async (req, res) => {
 }
 
 // 건물/노드 생성
-exports.create = async (req, res) => {
-  try {
-    const type = req.body.type;
-    const node_name = req.body.node_name;
-    const x = req.body.x;
-    const y = req.body.y;
-    const desc = !req.body.desc ? null : req.body.desc;
-
-    console.log(type, node_name, x, y, desc);
-
-
-
-    let result = null;
-
-    if (type === "building") {
-      const building_create_result = await buildingService.create(node_name, x, y, desc);
-      console.log("빌딩에 추가완료")
-      result = await Service.create(node_name, x, y);
-      console.log("노드에 추가완료")
-    } else if (type == "node") {
-      result = await Service.create(node_name, x, y);
-      console.log("노드에 추가완료")
-
+exports.create = [
+  upload.any(),
+  async (req, res) => {
+    try {
+      const type = req.body.type;
+      const node_name = req.body.node_name;
+      const x = req.body.x;
+      const y = req.body.y;
+      const desc = !req.body.desc ? null : req.body.desc;
+  
+      console.log(type, node_name, x, y, desc);
+  
+      let result = null;
+  
+      if (type === "building") {
+        // images[0], images[1], images[2] 형태의 파일들을 배열로 변환
+        const images = [];
+        for (let i = 0; i < 10; i++) { // 최대 10개까지
+          const fileKey = `images[${i}]`;
+          if (req.files && req.files.find(file => file.fieldname === fileKey)) {
+            const file = req.files.find(file => file.fieldname === fileKey);
+            images.push(file);
+          }
+        }
+  
+        // 여러 이미지를 S3에 업로드
+        let imageUrls = [];
+        if (images.length > 0) {
+          const uploadPromises = images.map(image => 
+            buildingService.uploadImage(node_name, image)
+          );
+          imageUrls = await Promise.all(uploadPromises);
+        }
+  
+        const building_create_result = await buildingService.create(node_name, x, y, desc, imageUrls);
+        console.log("빌딩에 추가완료")
+        result = await Service.create(node_name, x, y);
+        console.log("노드에 추가완료")
+      } else if (type == "node") {
+        result = await Service.create(node_name, x, y);
+        console.log("노드에 추가완료")
+      }
+      
+      Service.initOutdoorGraph();
+  
+      res.status(200).json("추가 완료!");
+    } catch (err) {
+      console.error("DB 오류:", err);
+  
+      res.status(500).send("DB 오류");
     }
-    
-    Service.initOutdoorGraph();
-
-    res.status(200).json("추가 완료!");
-  } catch (err) {
-    console.error("DB 오류:", err);
-
-    res.status(500).send("DB 오류");
   }
-}
+] 
 
 // 건물/ 노드 삭제
 exports.delete = async (req, res) => {
