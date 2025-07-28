@@ -204,6 +204,7 @@ exports.delete = async (req, res) => {
       // 2. S3에서 이미지들 삭제
       if (building && building.Image_Urls) {
         const imageUrls = JSON.parse(building.Image_Urls);
+        console.log(imageUrls);
         if (imageUrls.length > 0) {
           const deletePromises = imageUrls.map(url => 
             buildingService.deleteImageFromS3(url)
