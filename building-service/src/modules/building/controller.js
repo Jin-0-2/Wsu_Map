@@ -55,27 +55,47 @@ exports.getBuilding_Location = async (req, res) => {
 
 // 건물 추가
 exports.create = [
-  upload.single('file'),
+  upload.any(), // 모든 필드를 받음
   async (req, res) => {
-  try {
-    const { building_name, x, y, desc } = req.body
-    // const file = req.file ? req.file.buffer : null; //파일이 없으면 null
+    try {
+      const { building_name, x, y, desc } = req.body;
+      
+      // images[0], images[1], images[2] 형태의 파일들을 배열로 변환
+      const images = [];
+      for (let i = 0; i < 10; i++) { // 최대 10개까지
+        const fileKey = `images[${i}]`;
+        if (req.files && req.files.find(file => file.fieldname === fileKey)) {
+          const file = req.files.find(file => file.fieldname === fileKey);
+          images.push(file);
+        }
+      }
 
-    if (!building_name || !x || !y || !desc) {
-      return res.status(400).send("모든 항목을 입력하세요.")
+      if (!building_name || !x || !y || !desc) {
+        return res.status(400).send("모든 항목을 입력하세요.")
+      }
+
+      // 여러 이미지를 S3에 업로드
+      let imageUrls = [];
+      if (images.length > 0) {
+        const uploadPromises = images.map(image => 
+          Service.uploadImage(building_name, image)
+        );
+        imageUrls = await Promise.all(uploadPromises);
+      }
+
+      console.log(imageUrls);
+
+      const result = await Service.create(building_name, x, y, desc, imageUrls);
+
+      res.status(201).json({
+        message: "건물추가가 완료되었습니다",
+      });
+    } catch (err) {
+      console.error("건물추가 처리 중 오류:", err);
+      res.status(500).send("건물추가 처리 중 오류");
     }
-
-    const result = await Service.create(building_name, x, y, desc);
-
-    res.status(201).json({
-      message: "건물추가가 완료되었습니다",
-    });
-  } catch (err) {
-    console.error("건물추가 처리 중 오류:", err);
-
-    res.status(500).send("건물추가 처리 중 오류");
   }
-}]; 
+]; 
 
 // 건물 수정
 exports.update = [

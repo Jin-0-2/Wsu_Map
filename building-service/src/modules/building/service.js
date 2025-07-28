@@ -1,6 +1,11 @@
 // src/modules/building/service.js
 
 const con = require("../../core/db")
+const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+
+const s3Client = new S3Client({
+  region: "ap-southeast-2",
+});
 
 // 건물 전체 조회
 exports.getAll = () => {
@@ -63,13 +68,35 @@ exports.parsePoint = (pointStr) => {
   return { x: parseFloat(match[1]), y: parseFloat(match[2]) };
 };
 
+// 빌딩 이미지 S3에 업로드
+exports.uploadImage = async (building_name, image) => {
+  if (image) {
+    const bucketName = "wsu-svg";
+    const timestamp = Date.now();
+    // buildings 폴더에 이미지 저장 (타임스탬프 추가)
+    const key = `buildings/${building_name}_${timestamp}.jpg`;
+
+    const command = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+      Body: image.buffer,
+      ContentType: 'image/jpeg',
+    });
+
+    await s3Client.send(command);
+
+    return `https://${bucketName}.s3.ap-southeast-2.amazonaws.com/${key}`;
+  }
+  return null;
+};
+
 // 건물 추가
-exports.create = (building_name, x, y, desc) => {
+exports.create = (building_name, x, y, desc, imageUrls) => {
   const insertQuery = `
-    INSERT INTO "Building" ("Building_Name", "Location", "Description")
-    VALUES ($1, point($2, $3), $4) 
+    INSERT INTO "Building" ("Building_Name", "Location", "Description", "Image")
+    VALUES ($1, point($2, $3), $4, $5) 
   `
-  const values = [building_name, x, y, desc]
+  const values = [building_name, x, y, desc, imageUrls]
 
   return new Promise((resolve, reject) => {
     con.query(insertQuery, values, (err, result) => {

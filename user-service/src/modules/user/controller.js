@@ -52,7 +52,6 @@ exports.getUser = async (req, res) => {
   }
 }
 
-
 // 회원 가입
 exports.register = async (req, res) => {
   try {
