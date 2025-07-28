@@ -206,10 +206,18 @@ exports.parseNavigationNodes = (svgBuffer) => {
   });
 
   const categoryNameMap = {
-    lounge: "라운지",
+    cafe: "카페",
+    restaurant: "식당",
+    convenience: "편의점",
+    vending: "자판기",
     water_purifier: "정수기",
+    printer: "프린터",
+    lounge: "라운지",
+    bank: "은행",
     fire_extinguisher: "소화기",
-    printer: "프린터"
+    gym: "헬스장",
+    bookstore: "서점",
+    post: "우체국",
   };
 
   // 3. 해당 그룹 내부에 있는 모든 circle과 reat 태그를 찾기
