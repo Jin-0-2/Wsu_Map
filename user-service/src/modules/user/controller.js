@@ -173,6 +173,7 @@ try {
     if (result.rowCount === 0) {
       return res.status(404).send("해당 id의 사용자가 없습니다.");
     }
+    console.log("사용자 위치 공유 여부:" , result.rows[0].Is_location_public);
 
     if (result.rows[0].Is_location_public) {
       const friend_list = await friendService.getMyFriend(id);
