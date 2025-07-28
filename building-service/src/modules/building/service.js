@@ -122,7 +122,7 @@ exports.update = (building_name, desc) => {
 
 // 건물 정보 조회 (삭제용)
 exports.getBuilding = (building_name) => {
-  const query = 'SELECT * FROM "Building" WHERE "Building_Name" = $1'
+  const query = 'SELECT "Image" FROM "Building" WHERE "Building_Name" = $1'
 
   const values = [building_name]
 

@@ -198,6 +198,8 @@ exports.delete = async (req, res) => {
     if (type === "building") {
       // 1. 먼저 building의 이미지 URL들을 가져오기
       const building = await buildingService.getBuilding(node_name);
+
+      console.log(building);
       
       // 2. S3에서 이미지들 삭제
       if (building && building.Image_Urls) {
