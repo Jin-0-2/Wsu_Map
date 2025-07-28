@@ -2,6 +2,8 @@
 
 const Service = require("./service")
 const buildingService = require("../building/service")
+const multer = require('multer');
+const upload = multer();
 
 // 길찾기 경로 반환
 exports.getPath = async (req, res) => {
