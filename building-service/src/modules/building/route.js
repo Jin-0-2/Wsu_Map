@@ -26,4 +26,7 @@ router.put("/:name", controller.update)
 // 삭제
 router.delete("/:name", controller.delete)
 
+// 빌딩 이미지 삭제
+router.delete("/:name/image", controller.deleteImage)
+
 module.exports = router
