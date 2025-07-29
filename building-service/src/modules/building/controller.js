@@ -121,6 +121,8 @@ exports.update = [
       }
     }
 
+    console.log("새로운 이미지들:",images);
+
     // 새로운 이미지가 있으면 S3에 업로드
     let newImageUrls = [];
     if (images.length > 0) {
