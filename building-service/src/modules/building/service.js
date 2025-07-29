@@ -193,8 +193,12 @@ exports.deleteImage = async (building_name, image_url) => {
   const existingBuilding = await this.getBuilding(building_name);
   const existingImageUrls = existingBuilding.Image || [];
 
+  console.log("기존 이미지들:",existingImageUrls);
+
   // 2. 삭제할 이미지를 제외한 새 배열 생성
   const finalImageUrls = existingImageUrls.filter(url => url !== image_url);
+
+  console.log("삭제 후 이미지들:",finalImageUrls);
 
   // 3. S3에서 이미지 삭제
   await this.deleteImageFromS3(image_url);
