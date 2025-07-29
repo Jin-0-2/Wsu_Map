@@ -188,6 +188,9 @@ async function notifyLocationShareStatusChange(userId, isLocationPublic) {
       message: `친구의 위치 공유 상태가 변경되었습니다.`,
       timestamp: new Date().toISOString()
     };
+
+    // 나에게도 전송
+    sendToUser(userId, statusMessage);
     
     friendIds.forEach(friendId => {
       sendToUser(friendId, statusMessage);
