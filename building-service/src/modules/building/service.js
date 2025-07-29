@@ -149,6 +149,7 @@ exports.deleteImageFromS3 = async (imageUrl) => {
     const bucketName = "wsu-svg";
     // URL에서 key 추출: https://bucket.s3.region.amazonaws.com/key
     const key = imageUrl.split('.com/')[1];
+    console.log("S3 파일 삭제:",key);
     
     const deleteCommand = new DeleteObjectCommand({
       Bucket: bucketName,
@@ -201,7 +202,10 @@ exports.deleteImage = async (building_name, image_url) => {
   console.log("삭제 후 이미지들:",finalImageUrls);
 
   // 3. S3에서 이미지 삭제
-  await this.deleteImageFromS3(image_url);
+  // image_url이 배열임. 각각 S3에서 삭제
+  for (const url of image_url) {
+    await this.deleteImageFromS3(url);
+  }
 
   // 4. DB 업데이트
   const sql = `UPDATE "Building" SET "Image" = $1 WHERE "Building_Name" = $2`;
