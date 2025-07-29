@@ -1,6 +1,7 @@
 // src/modules/friends/controller.js
 
 const Service = require("./service")
+const userService = require("../user/service")
 const { notifyFriendRequest } = require('../../../websocket-server')
 
 // 친구 목록 전체 조회
@@ -40,7 +41,13 @@ exports.add = async (req, res) => {
     const add_id = req.body.add_id;
 
     if (my_id === add_id) {
-      return new Error("자기 자신에게 친구 요청은 불가능합니다.");
+      return res.status(400).send("자기 자신에게 친구 요청은 불가능합니다.");
+    }
+
+    // 친구 추가할 사용자가 실제로 존재하는지 확인
+    const userExists = await userService.getUser(add_id);
+    if (!userExists || userExists.rows.length === 0) {
+      return res.status(404).send("존재하지 않는 사용자입니다.");
     }
 
     const result = await Service.add(my_id, add_id);
