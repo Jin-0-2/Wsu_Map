@@ -194,6 +194,8 @@ exports.deleteImage = async (building_name, image_url) => {
   const existingBuilding = await this.getBuilding(building_name);
   const existingImageUrls = existingBuilding.Image || [];
 
+  console.log("삭제할 이미지:",image_url);
+
   console.log("기존 이미지들:",existingImageUrls);
 
   // 2. 삭제할 이미지를 제외한 새 배열 생성
