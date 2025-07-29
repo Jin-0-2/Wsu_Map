@@ -107,10 +107,19 @@ exports.create = (building_name, x, y, desc, imageUrls) => {
 };
 
 // 건물 정보 수정(동적 쿼리)
-exports.update = (building_name, desc) => {
-  const sql = `UPDATE "Building" SET "Description" = $1 WHERE "Building_Name" = $2`;
+exports.update = async (building_name, desc, newImageUrls) => {
+  // 1. 기존 이미지들 가져오기
+  const existingBuilding = await this.getBuilding(building_name);
+  const existingImageUrls = existingBuilding.Image || [];
 
-  const values = [desc, building_name]
+  // 2. 새로운 이미지가 있으면 기존 것에 추가, 없으면 기존 것 유지
+  const finalImageUrls = newImageUrls.length > 0 
+    ? [...existingImageUrls, ...newImageUrls] 
+    : existingImageUrls;
+
+  const sql = `UPDATE "Building" SET "Description" = $1, "Image" = $2 WHERE "Building_Name" = $3`;
+
+  const values = [desc, finalImageUrls, building_name]
 
   return new Promise((resolve, reject) => {
     con.query(sql, values, (err, result) => {
@@ -175,4 +184,29 @@ exports.parsePoint = (pointStr) => {
   const match = pointStr.match(/\((.*),(.*)\)/);
   if (!match) return null;
   return { x: parseFloat(match[1]), y: parseFloat(match[2]) };
+};
+
+
+// 건물 이미지 삭제
+exports.deleteImage = async (building_name, image_url) => {
+  // 1. 기존 이미지들 가져오기
+  const existingBuilding = await this.getBuilding(building_name);
+  const existingImageUrls = existingBuilding.Image || [];
+
+  // 2. 삭제할 이미지를 제외한 새 배열 생성
+  const finalImageUrls = existingImageUrls.filter(url => url !== image_url);
+
+  // 3. S3에서 이미지 삭제
+  await this.deleteImageFromS3(image_url);
+
+  // 4. DB 업데이트
+  const sql = `UPDATE "Building" SET "Image" = $1 WHERE "Building_Name" = $2`;
+  const values = [finalImageUrls, building_name];
+
+  return new Promise((resolve, reject) => {
+    con.query(sql, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
 };

@@ -101,7 +101,7 @@ exports.create = [
 
 // 건물 수정
 exports.update = [
-  upload.single('file'),
+  upload.any(),
   async (req, res) => {
   try {
     const building_name = req.params.name;
@@ -111,7 +111,26 @@ exports.update = [
       return res.status(400).send("수정할 항목이 없습니다.")
     }
 
-    const result = await Service.update(building_name, desc);
+    // 새로운 이미지들 처리
+    const images = [];
+    for (let i = 0; i < 10; i++) { // 최대 10개까지
+      const fileKey = `images[${i}]`;
+      if (req.files && req.files.find(file => file.fieldname === fileKey)) {
+        const file = req.files.find(file => file.fieldname === fileKey);
+        images.push(file);
+      }
+    }
+
+    // 새로운 이미지가 있으면 S3에 업로드
+    let newImageUrls = [];
+    if (images.length > 0) {
+      const uploadPromises = images.map(image => 
+        Service.uploadImage(building_name, image)
+      );
+      newImageUrls = await Promise.all(uploadPromises);
+    }
+
+    const result = await Service.update(building_name, desc, newImageUrls);
 
     if (result.rowCount === 0) {
       return res.status(404).send("해당 이름의 건물이 없습니다.");
@@ -143,3 +162,20 @@ exports.delete = async (req, res) => {
     res.status(500).send("건물 삭제 처리 중 오류");
   }
 };
+
+
+exports.deleteImage = async (req, res) => {
+  try {
+    const building_name = req.params.name;
+    // image_url이 스트링 배열로 들어옴 (최소 1개 이상, 여러 개 가능, 예: '["url1", "url2"]' 또는 '["url1"]')
+    let image_urls = req.body.image_url;
+
+    const result = await Service.deleteImage(building_name, image_url);
+
+    res.status(200).send("건물 이미지 삭제 성공");
+  } catch (err) {
+    console.error("건물 이미지 삭제 처리 중 오류:", err);
+
+    res.status(500).send("건물 이미지 삭제 처리 중 오류");
+  }
+}
