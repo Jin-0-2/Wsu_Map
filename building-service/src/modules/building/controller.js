@@ -170,7 +170,7 @@ exports.deleteImage = async (req, res) => {
     // image_url이 스트링 배열로 들어옴 (최소 1개 이상, 여러 개 가능, 예: '["url1", "url2"]' 또는 '["url1"]')
     let image_urls = req.body.image_url;
 
-    const result = await Service.deleteImage(building_name, image_url);
+    const result = await Service.deleteImage(building_name, image_urls);
 
     res.status(200).send("건물 이미지 삭제 성공");
   } catch (err) {
