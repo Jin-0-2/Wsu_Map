@@ -1,7 +1,7 @@
 // src/modules/user/controller.js
 
 const userService = require("./service")
-const { disconnectUserSocket, isUserConnected, notifyFriendsLocationUpdate } = require('../../../websocket-server')
+const { disconnectUserSocket, isUserConnected, notifyFriendsLocationUpdate, notifyLocationShareStatusChange } = require('../../../websocket-server')
 const friendService = require("../friends/service")
 
 
@@ -198,10 +198,22 @@ exports.update_share_location = async (req, res) => {
     const id = req.body.id;
 
     const result = await userService.update_share_location(id);
+    
+    // 위치 공유 상태가 변경되었으므로 친구들에게 웹소켓 알림
+    const isLocationPublic = result.rows[0].Is_location_public;
+    
+    try {
+      await notifyLocationShareStatusChange(id, isLocationPublic);
+      console.log(`사용자 ${id}의 위치 공유 상태 변경 알림 전송 완료 (상태: ${isLocationPublic})`);
+    } catch (notifyErr) {
+      console.error('위치 공유 상태 변경 알림 전송 실패:', notifyErr);
+      // 알림 실패해도 위치 공유 상태 변경은 성공으로 처리
+    }
 
     res.status(200).send("내 위치 공유 함 안함 할래 말래 할래 말래 할래 말래 애매하긴 해 완료");
   } catch (err) {
     console.error("내 위치 공유 함 안함 할래 말래 할래 말래 할래 말래 애매하긴 해 오류:", err);
+    res.status(500).send("위치 공유 상태 변경 실패");
   }
 }
 

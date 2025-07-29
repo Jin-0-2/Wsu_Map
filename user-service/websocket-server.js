@@ -143,7 +143,6 @@ function isUserConnected(userId) {
   return connectedUsers.has(userId);
 }
 
-
 // 친구 알림 함수 예시 (REST API에서 호출될 함수임)
 function notifyFriendRequest(fromUserId, fromUserName, toUserId) {
   sendToUser(toUserId, {
@@ -175,6 +174,32 @@ function notifyFriendsLocationUpdate(friendIds, userId, x, y) {
   });
 }
 
+// 친구들에게 위치 공유 상태 변경을 알려주는 함수
+async function notifyLocationShareStatusChange(userId, isLocationPublic) {
+  try {
+    // 사용자의 친구 목록 조회
+    const myFriends = await firendService.getMyFriend(userId);
+    const friendIds = myFriends.rows.map(f => f.Id);
+    
+    const statusMessage = {
+      type: 'friend_location_share_status_change',
+      userId,
+      isLocationPublic,
+      message: `친구의 위치 공유 상태가 변경되었습니다.`,
+      timestamp: new Date().toISOString()
+    };
+    
+    friendIds.forEach(friendId => {
+      sendToUser(friendId, statusMessage);
+      console.log(`친구 ${friendId}에게 위치 공유 상태 변경 알림 전송 완료`);
+    });
+    
+    console.log(`친구 ${friendIds.length}명에게 위치 공유 상태 변경 알림 전송 완료`);
+  } catch (err) {
+    console.error('위치 공유 상태 변경 알림 전송 실패:', err);
+  }
+}
+
 // 테스트 및 REST 연동용 API 엔드포인트 등 필요한 부분만 남겨도 됨
 app.get('/friend/ws/status', (req, res) => {
   res.json({
@@ -196,5 +221,6 @@ module.exports = {
   notifyLogoutToFriends,
   disconnectUserSocket,
   isUserConnected,
-  notifyFriendsLocationUpdate, // 추가
+  notifyFriendsLocationUpdate,
+  notifyLocationShareStatusChange, // 위치 공유 상태 변경 알림
 }

@@ -80,7 +80,7 @@ exports.add = (my_id, add_id) => {
 // 내 친구 목록 조회
 exports.getMyFriend = async (id) => {
   const select_query = `
-  SELECT u."Id", u."Name", u."Phone", u."Is_Login", u."Last_Location"
+  SELECT u."Id", u."Name", u."Phone", u."Is_Login", u."Last_Location", u."Is_location_public"
   FROM "friendship" f
   JOIN "User" u ON u."Id" = f."friend_id"
   WHERE f."user_id" = $1
