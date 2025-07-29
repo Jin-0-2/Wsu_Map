@@ -204,6 +204,7 @@ exports.deleteImage = async (building_name, image_url) => {
   // 3. S3에서 이미지 삭제
   // image_url이 배열임. 각각 S3에서 삭제
   for (const url of image_url) {
+    console.log("S3 파일 삭제:",url);
     await this.deleteImageFromS3(url);
   }
 
