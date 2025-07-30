@@ -137,7 +137,7 @@ exports.update = (id, title, content, category) => {
   const query = `
     UPDATE "Inquiry" 
     SET "Title" = $1, "Content" = $2, "Category" = $3, "Updated_At" = NOW() 
-    WHERE "Id" = $4 
+    WHERE "User_Id" = $4 
     RETURNING *
   `;
   const values = [title, content, category, id];
