@@ -10,9 +10,8 @@ const s3Client = new S3Client({
 // 문의하기 전체 목록 조회
 exports.getAll = () => {
   const query = `
-    SELECT i.*, u."Name" as user_name 
+    SELECT i.*
     FROM "Inquiry" i 
-    LEFT JOIN "User" u ON i."User_Id" = u."Id" 
     ORDER BY i."Created_At" DESC
   `;
 
