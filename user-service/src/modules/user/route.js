@@ -8,6 +8,10 @@ const controller = require("./controller")
 // 회원 전체 조회
 router.get("/", controller.getAll)
 
+
+// 친구 신청용 목록 조회
+router.get("/friend_request_list", controller.friend_request_list)
+
 // 로그인 중인 회원만 조회
 router.get("/islogin", controller.getislogin)
 

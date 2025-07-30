@@ -19,6 +19,19 @@ exports.getAll = async (req, res) => {
   }
 };
 
+// 친구 신청용 목록 조회
+exports.friend_request_list = async (req, res) => {
+  try {
+
+    const result = await userService.friend_request_list(); 
+
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("DB 오류:", err);
+    
+    res.status(500).send("DB 오류");
+  }
+};
 
 // 로그인 중인 회원만 조회
 exports.getislogin = async (req, res) => {

@@ -14,6 +14,18 @@ exports.getAll = () => {
   });
 }
 
+// 친구 신청용 목록 조회
+exports.friend_request_list = () => {
+  const query = 'SELECT "Id", "Name" FROM "User"'
+
+  return new Promise((resolve, reject) => {
+    con.query(query, (err, result) => {
+      if (err) return reject(err);    
+      resolve(result);
+    });
+  });
+}
+
 // 로그인 중인 회원만 조회
 exports.getislogin = () => {
   const query = `SELECT "Id", "Name", "Last_Location" FROM "User" WHERE "Is_Login" = true`
