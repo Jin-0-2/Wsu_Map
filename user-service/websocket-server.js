@@ -26,7 +26,7 @@ const connectedUsers = new Map();
 wss.on('connection', (ws, req) => {
   let userId = null;
 
-  ws.on('message', (message) => {
+  ws.on('message', async (message) => {
     try {
       const data = JSON.parse(message);
       switch (data.type) {
@@ -41,6 +41,27 @@ wss.on('connection', (ws, req) => {
             message: '웹소켓 연결 성공',
             timestamp: new Date().toISOString()
           }));
+          
+          // 웹소켓 연결 성공 시 친구들에게 로그인 알림 전송
+          try {
+            const myFriends = await firendService.getMyFriend(userId);
+            const friendIds = myFriends.rows.map(f => f.Id);
+            
+            friendIds.forEach(friendId => {
+              sendToUser(friendId, {
+                type: 'friend_logged_in',
+                userId: userId,
+                is_login: true,
+                message: `${userId}님이 로그인하셨습니다.`,
+                timestamp: new Date().toISOString()
+              });
+            });
+            
+            console.log(`친구 ${friendIds.length}명에게 로그인 알림 전송 완료`);
+          } catch (notifyErr) {
+            console.error('로그인 알림 전송 실패:', notifyErr);
+          }
+          
           broadcastOnlineUsers();
           break;
         case 'heartbeat':
@@ -226,4 +247,5 @@ module.exports = {
   isUserConnected,
   notifyFriendsLocationUpdate,
   notifyLocationShareStatusChange, // 위치 공유 상태 변경 알림
+  sendToUser, // 개별 사용자에게 메시지 전송
 }
