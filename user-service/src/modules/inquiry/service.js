@@ -30,7 +30,7 @@ exports.getById = (id) => {
     SELECT i.*, u."Name" as user_name 
     FROM "Inquiry" i 
     LEFT JOIN "User" u ON i."User_Id" = u."Id" 
-    WHERE i."Id" = $1
+    WHERE i."User_Id" = $1
   `;
   const values = [id];
 
