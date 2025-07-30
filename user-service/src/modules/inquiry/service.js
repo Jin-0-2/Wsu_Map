@@ -152,9 +152,9 @@ exports.update = (id, title, content, category) => {
 };
 
 // 문의하기 삭제
-exports.delete = (id) => {
-  const query = 'DELETE FROM "Inquiry" WHERE "Id" = $1 RETURNING *';
-  const values = [id];
+exports.delete = (id, inquiry_code) => {
+  const query = 'DELETE FROM "Inquiry" WHERE "Id" = $1 AND "Inquiry_Code" = $2 RETURNING *';
+  const values = [id, inquiry_code];
 
   return new Promise((resolve, reject) => {
     con.query(query, values, (err, result) => {
@@ -219,3 +219,21 @@ exports.getByStatus = (status) => {
     });
   });
 }; 
+
+// 답글 달기
+exports.answer = (inquiry_code, answer) => {
+  const query = `
+    UPDATE "Inquiry" 
+    SET "Status" = 'answered', "Answer" = $1, "Answer_At" = (NOW() AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Seoul') 
+    WHERE "Inquiry_Code" = $2 
+    RETURNING *
+  `;
+  const values = [answer, inquiry_code];
+
+  return new Promise((resolve, reject) => {
+    con.query(query, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result.rows[0]);
+    });
+  });
+};

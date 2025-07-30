@@ -4,7 +4,7 @@ const inquiryService = require('./service');
 const multer = require('multer');
 const upload = multer();
 
-// 문의하기 목록 조회
+// 문의하기 목록 조회(관리자용)
 exports.getInquiries = async (req, res) => {
   try {
     const inquiries = await inquiryService.getAll();
@@ -15,7 +15,21 @@ exports.getInquiries = async (req, res) => {
   }
 };
 
-// 문의하기 상세 조회
+// 답글 달기(관리자용)
+exports.answerInquiry = async (req, res) => {
+  try {
+    const { inquiry_code, answer } = req.body;
+
+    const result = await inquiryService.answer(inquiry_code, answer);
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("답글 달기 오류:", err);
+    res.status(500).send("답글 달기 실패");
+  }
+};
+
+// 문의하기 상세 조회(클라이언트용 - 내 문의 보기)
 exports.getInquiry = async (req, res) => {
   try {
     const { id } = req.params;
@@ -32,7 +46,7 @@ exports.getInquiry = async (req, res) => {
   }
 };
 
-// 문의하기 작성
+// 문의하기 작성(클라이언트용 - 이미지 파일 업로드 포함)
 exports.createInquiry = [
   upload.single('image'),
   async (req, res) => {
@@ -46,6 +60,8 @@ exports.createInquiry = [
 
       // 문의 코드 생성
       const inquiry_code = inquiryService.createInquiryCode(category);
+
+      console.log(inquiry_code);
       
       let fileUrl = null;
       if (req.file) {
@@ -62,7 +78,7 @@ exports.createInquiry = [
   }
 ];
 
-// 문의하기 수정
+// 문의하기 수정(안쓸듯)
 exports.updateInquiry = async (req, res) => {
   try {
     const { id } = req.params;
@@ -81,11 +97,11 @@ exports.updateInquiry = async (req, res) => {
   }
 };
 
-// 문의하기 삭제
+// 문의하기 삭제(클라이언트용 - 내 문의 삭제)
 exports.deleteInquiry = async (req, res) => {
   try {
-    const { id } = req.params;
-    const result = await inquiryService.delete(id);
+    const { id, inquiry_code } = req.params;
+    const result = await inquiryService.delete(id, inquiry_code);
     
     if (!result) {
       return res.status(404).send("문의를 찾을 수 없습니다.");
@@ -98,7 +114,7 @@ exports.deleteInquiry = async (req, res) => {
   }
 };
 
-// 내 문의하기 목록 조회
+// 내 문의하기 목록 조회(클라이언트용 - 내 문의 보기)
 exports.getMyInquiries = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -109,3 +125,4 @@ exports.getMyInquiries = async (req, res) => {
     res.status(500).send("내 문의하기 목록 조회 실패");
   }
 }; 
+
