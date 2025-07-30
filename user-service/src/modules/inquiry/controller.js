@@ -65,7 +65,7 @@ exports.createInquiry = [
       
       let fileUrl = null;
       if (req.file) {
-        fileUrl = await inquiryService.uploadFile(req.file);
+        fileUrl = await inquiryService.uploadFile(inquiry_code, req.file);
       }
       
       const result = await inquiryService.create(id, title, content, category, inquiry_code, fileUrl);
