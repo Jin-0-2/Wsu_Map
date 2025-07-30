@@ -4,8 +4,6 @@ const express = require('express');
 const router = express.Router();
 const inquiryController = require('./controller');
 
-// 카테고리 목록 조회
-router.get('/categories', inquiryController.getCategories);
 
 // 문의하기 목록 조회 (관리자용)
 router.get('/', inquiryController.getInquiries);
