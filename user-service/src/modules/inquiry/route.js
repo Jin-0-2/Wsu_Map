@@ -14,10 +14,10 @@ router.put('/answer', inquiryController.answerInquiry);
 // 문의하기 작성 (클라이언트용 - 이미지 파일 업로드 포함)
 router.post('/:id', inquiryController.createInquiry);
 
-// 문의하기 상세 조회 (클라이언트용 - 내 문의 보기)
+// 내 문의 조회 (클라이언트용)
 router.get('/:id', inquiryController.getInquiry);
 
-// 문의하기 삭제(클라이언트용 - 내 문의 삭제)
+// 내 문의 삭제(클라이언트용)
 router.delete('/:id', inquiryController.deleteInquiry);
 
 

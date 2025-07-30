@@ -34,11 +34,13 @@ exports.answerInquiry = async (req, res) => {
   }
 };
 
-// 문의하기 상세 조회(클라이언트용 - 내 문의 보기)
+// 내 문의 조회(클라이언트용)
 exports.getInquiry = async (req, res) => {
   try {
     const { id } = req.params;
     const inquiry = await inquiryService.getById(id);
+
+    console.log(inquiry);
     
     if (!inquiry) {
       return res.status(404).send("문의를 찾을 수 없습니다.");
@@ -84,10 +86,12 @@ exports.createInquiry = [
 ];
 
 
-// 문의하기 삭제(클라이언트용 - 내 문의 삭제)
+// 내 문의 삭제(클라이언트용)
 exports.deleteInquiry = async (req, res) => {
   try {
-    const { id, inquiry_code } = req.params;
+    const { id } = req.params;
+    const { inquiry_code } = req.body;
+    
     const result = await inquiryService.delete(id, inquiry_code);
     
     if (!result) {
@@ -100,16 +104,3 @@ exports.deleteInquiry = async (req, res) => {
     res.status(500).send("문의하기 삭제 실패");
   }
 };
-
-// 내 문의하기 목록 조회(클라이언트용 - 내 문의 보기)
-exports.getMyInquiries = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const inquiries = await inquiryService.getByUserId(userId);
-    res.status(200).json(inquiries);
-  } catch (err) {
-    console.error("내 문의하기 목록 조회 오류:", err);
-    res.status(500).send("내 문의하기 목록 조회 실패");
-  }
-}; 
-

@@ -23,34 +23,14 @@ exports.getAll = () => {
   });
 };
 
-// 문의하기 ID로 조회
+// 내 문의 조회
 exports.getById = (id) => {
   const query = `
-    SELECT i.*, u."Name" as user_name 
+    SELECT i.*
     FROM "Inquiry" i 
-    LEFT JOIN "User" u ON i."User_Id" = u."Id" 
     WHERE i."User_Id" = $1
   `;
   const values = [id];
-
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result.rows[0]);
-    });
-  });
-};
-
-// 사용자별 문의하기 목록 조회
-exports.getByUserId = (userId) => {
-  const query = `
-    SELECT i.*, u."Name" as user_name 
-    FROM "Inquiry" i 
-    LEFT JOIN "User" u ON i."User_Id" = u."Id" 
-    WHERE i."User_Id" = $1 
-    ORDER BY i."Created_At" DESC
-  `;
-  const values = [userId];
 
   return new Promise((resolve, reject) => {
     con.query(query, values, (err, result) => {
@@ -146,44 +126,6 @@ exports.delete = (id, inquiry_code) => {
   });
 };
 
-
-// 카테고리별 문의하기 조회
-exports.getByCategory = (category) => {
-  const query = `
-    SELECT i.*, u."Name" as user_name 
-    FROM "Inquiry" i 
-    LEFT JOIN "User" u ON i."User_Id" = u."Id" 
-    WHERE i."Category" = $1 
-    ORDER BY i."Created_At" DESC
-  `;
-  const values = [category];
-
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result.rows);
-    });
-  });
-};
-
-// 상태별 문의하기 조회
-exports.getByStatus = (status) => {
-  const query = `
-    SELECT i.*, u."Name" as user_name 
-    FROM "Inquiry" i 
-    LEFT JOIN "User" u ON i."User_Id" = u."Id" 
-    WHERE i."Status" = $1 
-    ORDER BY i."Created_At" DESC
-  `;
-  const values = [status];
-
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result.rows);
-    });
-  });
-}; 
 
 // 답글 달기
 exports.answer = (inquiry_code, answer) => {
