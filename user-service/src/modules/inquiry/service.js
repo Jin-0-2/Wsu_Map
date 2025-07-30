@@ -132,23 +132,6 @@ exports.createInquiryCode = (category) => {
   return `${prefix}-${yymmdd}${random}`;
 }
 
-// 문의하기 수정
-exports.update = (id, title, content, category) => {
-  const query = `
-    UPDATE "Inquiry" 
-    SET "Title" = $1, "Content" = $2, "Category" = $3, "Updated_At" = NOW() 
-    WHERE "User_Id" = $4 
-    RETURNING *
-  `;
-  const values = [title, content, category, id];
-
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result.rows[0]);
-    });
-  });
-};
 
 // 문의하기 삭제
 exports.delete = (id, inquiry_code) => {
@@ -163,23 +146,6 @@ exports.delete = (id, inquiry_code) => {
   });
 };
 
-// 문의하기 상태 업데이트 (관리자용)
-exports.updateStatus = (id, status, adminResponse = null) => {
-  const query = `
-    UPDATE "Inquiry" 
-    SET "Status" = $1, "Admin_Response" = $2, "Updated_At" = NOW() 
-    WHERE "User_Id" = $3 
-    RETURNING *
-  `;
-  const values = [status, adminResponse, id];
-
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result.rows[0]);
-    });
-  });
-};
 
 // 카테고리별 문의하기 조회
 exports.getByCategory = (category) => {

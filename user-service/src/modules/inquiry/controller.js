@@ -81,24 +81,6 @@ exports.createInquiry = [
   }
 ];
 
-// 문의하기 수정(안쓸듯)
-exports.updateInquiry = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, content, category } = req.body;
-    
-    const result = await inquiryService.update(id, title, content, category);
-    
-    if (!result) {
-      return res.status(404).send("문의를 찾을 수 없습니다.");
-    }
-    
-    res.status(200).json(result);
-  } catch (err) {
-    console.error("문의하기 수정 오류:", err);
-    res.status(500).send("문의하기 수정 실패");
-  }
-};
 
 // 문의하기 삭제(클라이언트용 - 내 문의 삭제)
 exports.deleteInquiry = async (req, res) => {

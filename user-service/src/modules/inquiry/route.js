@@ -21,8 +21,5 @@ router.get('/:id', inquiryController.getInquiry);
 router.delete('/:id', inquiryController.deleteInquiry);
 
 
-// 안쓸듯
-// 문의하기 수정
-router.put('/:id', inquiryController.updateInquiry);
 
 module.exports = router; 
