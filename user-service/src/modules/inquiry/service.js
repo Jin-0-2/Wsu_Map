@@ -152,7 +152,7 @@ exports.update = (id, title, content, category) => {
 
 // 문의하기 삭제
 exports.delete = (id, inquiry_code) => {
-  const query = 'DELETE FROM "Inquiry" WHERE "Id" = $1 AND "Inquiry_Code" = $2 RETURNING *';
+  const query = 'DELETE FROM "Inquiry" WHERE "User_Id" = $1 AND "Inquiry_Code" = $2 RETURNING *';
   const values = [id, inquiry_code];
 
   return new Promise((resolve, reject) => {
@@ -168,7 +168,7 @@ exports.updateStatus = (id, status, adminResponse = null) => {
   const query = `
     UPDATE "Inquiry" 
     SET "Status" = $1, "Admin_Response" = $2, "Updated_At" = NOW() 
-    WHERE "Id" = $3 
+    WHERE "User_Id" = $3 
     RETURNING *
   `;
   const values = [status, adminResponse, id];
