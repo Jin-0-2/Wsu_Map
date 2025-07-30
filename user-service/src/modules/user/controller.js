@@ -25,6 +25,8 @@ exports.friend_request_list = async (req, res) => {
 
     const result = await userService.friend_request_list(); 
 
+    console.log(result.rows);
+
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("DB 오류:", err);

@@ -10,6 +10,10 @@ const AWS_IP = `http://54.252.215.95:`
 
 app.use(express.json());
 app.use(requestLogger);
+
+// 정적 파일 제공
+app.use('/uploads', express.static('uploads'));
+
 app.use("/", userRouter);
 
 const PORT = 3001;

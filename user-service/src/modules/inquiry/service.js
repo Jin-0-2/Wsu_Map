@@ -79,7 +79,7 @@ exports.create = (userId, title, content, category, inquiry_code, fileUrl = null
 };
 
 // 사진 업로드
-exports.uploadFile = async (inquiry_code, file) => {
+exports.uploadFile = async (file) => {
   if (file) {
     const bucketName = "wsu-svg"; // 실제 S3 버킷 이름으로 변경하세요.
     // 파일 이름을 고유하게 생성합니다 (예: 도면/w19_1.svg)
