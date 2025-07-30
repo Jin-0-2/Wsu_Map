@@ -9,7 +9,7 @@ const inquiryController = require('./controller');
 router.get('/', inquiryController.getInquiries);
 
 // 답글 달기(관리자용)
-router.post('/answer', inquiryController.answerInquiry); 
+router.put('/answer', inquiryController.answerInquiry); 
 
 // 문의하기 작성 (클라이언트용 - 이미지 파일 업로드 포함)
 router.post('/:id', inquiryController.createInquiry);
