@@ -23,6 +23,8 @@ exports.answerInquiry = async (req, res) => {
   try {
     const { inquiry_code, answer } = req.body;
 
+    console.log(inquiry_code, answer);
+
     const result = await inquiryService.answer(inquiry_code, answer);
 
     res.status(200).json(result);

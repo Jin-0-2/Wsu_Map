@@ -189,7 +189,7 @@ exports.getByStatus = (status) => {
 exports.answer = (inquiry_code, answer) => {
   const query = `
     UPDATE "Inquiry" 
-    SET "Status" = 'answered', "Answer" = $1, "Answer_At" = (NOW() AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Seoul') 
+    SET "Status" = 'answered', "Answer" = $1, "Answered_At" = (NOW() AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Seoul') 
     WHERE "Inquiry_Code" = $2 
     RETURNING *
   `;
