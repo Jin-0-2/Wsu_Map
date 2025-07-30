@@ -64,7 +64,7 @@ exports.getByUserId = (userId) => {
 // 문의하기 작성
 exports.create = (userId, title, content, category, inquiry_code, fileUrl = null) => {
   const query = `
-    INSERT INTO "Inquiry" ("User_Id", "Category", "Inquiry_Code", "Title", "Content", "Image_Path", "Created_At", "Status", "Answer", "Answered_At") 
+    INSERT INTO "Inquiry" ("User_Id", "Category", "Inquiry_Code", "Title", "Content", "Image_Path", "Created_At", "Status") 
     VALUES ($1, $2, $3, $4, $5, $6, (NOW() AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Seoul'), 'pending') 
     RETURNING *
   `;
