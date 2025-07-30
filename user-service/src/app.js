@@ -12,7 +12,6 @@ app.use(express.json());
 app.use(requestLogger);
 app.use("/", userRouter);
 
-
 const PORT = 3001;
 
 app.listen(PORT, '0.0.0.0', () => {

@@ -1,6 +1,8 @@
 // src/modules/inquiry/controller.js
 
 const inquiryService = require('./service');
+const multer = require('multer');
+const upload = multer();
 
 // 문의하기 목록 조회
 exports.getInquiries = async (req, res) => {
@@ -31,21 +33,34 @@ exports.getInquiry = async (req, res) => {
 };
 
 // 문의하기 작성
-exports.createInquiry = async (req, res) => {
-  try {
-    const { userId, title, content, category } = req.body;
-    
-    if (!userId || !title || !content) {
-      return res.status(400).send("필수 정보가 누락되었습니다.");
+exports.createInquiry = [
+  upload.single('image'),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { category, title, content } = req.body;
+      
+      if (!id || !title || !content) {
+        return res.status(400).send("필수 정보가 누락되었습니다.");
+      }
+
+      // 문의 코드 생성
+      const inquiry_code = inquiryService.createInquiryCode(category);
+      
+      let fileUrl = null;
+      if (req.file) {
+        fileUrl = await inquiryService.uploadFile(file);
+      }
+      
+      const result = await inquiryService.create(id, title, content, category, inquiry_code, fileUrl);
+      
+      res.status(201).json(result);
+    } catch (err) {
+      console.error("문의하기 작성 오류:", err);
+      res.status(500).send("문의하기 작성 실패");
     }
-    
-    const result = await inquiryService.create(userId, title, content, category);
-    res.status(201).json(result);
-  } catch (err) {
-    console.error("문의하기 작성 오류:", err);
-    res.status(500).send("문의하기 작성 실패");
   }
-};
+];
 
 // 문의하기 수정
 exports.updateInquiry = async (req, res) => {
