@@ -77,8 +77,6 @@ exports.getCategoryForManager = async (req, res) => {
 
     const result = await Service.getCategoryForManager(building_name, floor_number);
 
-    console.log(result.rows);
-
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("DB 오류:", err);

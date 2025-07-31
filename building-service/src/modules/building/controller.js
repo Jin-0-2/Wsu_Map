@@ -9,8 +9,6 @@ exports.getAll = async (req, res) => {
   try {
     const result = await Service.getAll();
 
-    console.log(result.rows);
-
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("DB 오류:", err);
@@ -85,8 +83,6 @@ exports.create = [
         imageUrls = await Promise.all(uploadPromises);
       }
 
-      console.log(imageUrls);
-
       const result = await Service.create(building_name, x, y, desc, imageUrls);
 
       res.status(201).json({
@@ -120,8 +116,6 @@ exports.update = [
         images.push(file);
       }
     }
-
-    console.log("새로운 이미지들:",images);
 
     // 새로운 이미지가 있으면 S3에 업로드
     let newImageUrls = [];
@@ -171,8 +165,6 @@ exports.deleteImage = async (req, res) => {
     const building_name = req.params.name;
     // image_url이 스트링 배열로 들어옴 (최소 1개 이상, 여러 개 가능, 예: '["url1", "url2"]' 또는 '["url1"]')
     let image_urls = req.body.image_urls;
-
-    console.log("건물 이미지 삭제:",image_urls);
 
     const result = await Service.deleteImage(building_name, image_urls);
 

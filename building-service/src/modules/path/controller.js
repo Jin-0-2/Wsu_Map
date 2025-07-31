@@ -66,9 +66,6 @@ exports.getPath = async (req, res) => {
       return res.status(400).json({ error: "입력값이 올바르지 않습니다." });
     }
 
-    console.log(finaly_result)
-    console.log(JSON.stringify(finaly_result, null, 2)); // 순환참조 없을 때만!
-
     res.status(200).json(finaly_result);
   } catch (err) {
     console.error("DB 오류:", err);
@@ -122,8 +119,6 @@ exports.update_node_location = async (req, res) => {
 
     const result = await Service.update_node_location(node_name, x, y);
 
-    console.log(result.rowCount);
-    
     Service.initOutdoorGraph();
 
     res.status(200).json("변경 완료!");
@@ -144,8 +139,6 @@ exports.create = [
       const x = req.body.x;
       const y = req.body.y;
       const desc = !req.body.desc ? null : req.body.desc;
-  
-      console.log(type, node_name, x, y, desc);
   
       let result = null;
   
@@ -199,12 +192,10 @@ exports.delete = async (req, res) => {
       // 1. 먼저 building의 이미지 URL들을 가져오기
       const building = await buildingService.getBuilding(node_name);
 
-      console.log(building);
       
       // 2. S3에서 이미지들 삭제
       if (building && building.Image) {
-        const imageUrls = building.Image; // JSON.parse() 제거
-        console.log(imageUrls);
+        const imageUrls = building.Image; 
         if (imageUrls.length > 0) {
           const deletePromises = imageUrls.map(url => 
             buildingService.deleteImageFromS3(url)

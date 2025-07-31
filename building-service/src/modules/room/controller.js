@@ -118,11 +118,7 @@ exports.update = async (req, res) => {
     const user_phone = req.body.user_phone ?? null;
     const user_email = req.body.user_email ?? null;
 
-    console.log(building_name, floor_number, room_name, room_desc, room_user, user_phone, user_email);
-
     const result = await Service.update(building_name, floor_number, room_name, room_desc, room_user, user_phone, user_email);
-
-    console.log(result);
 
     res.status(200).json({message : "수정 성공"});
   } catch (err) {
@@ -168,7 +164,6 @@ exports.connect = async (req, res) => {
     await pathService.initIndoorGraph();
 
     res.status(200).json("성공");
-    console.log("성공!");
   } catch (err) {
     console.error("실내 노드 연결 중 오류:", err);
 
@@ -220,8 +215,6 @@ exports.stairs = async (req, res) => {
       return parseInt(floorA) - parseInt(floorB);
     });
 
-    console.log(result);
-
     const currentFloor = parseInt(floor);
     const isToId = id && id.startsWith('to');
 
@@ -245,8 +238,6 @@ exports.stairs = async (req, res) => {
       }
     });
 
-    console.log(filtered);
-    
     res.status(200).json({
       stairs: filtered,
     });

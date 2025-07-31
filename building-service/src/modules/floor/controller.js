@@ -42,9 +42,6 @@ exports.getFloorNames = async (req, res) => {
 
     const result = await Service.getFloorNames(building_name);
 
-    console.log(result.rows);
-    
-
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("DB 오류:", err);
@@ -68,9 +65,6 @@ exports.getFloorNumber = async (req, res) => {
     }
 
     const file = result.rows[0].File;
-
-    console.log({      File : file,
-      nodes});
 
     res.status(200).json({
       File : file,
@@ -107,8 +101,6 @@ exports.create = [
         fileUrl = await Service.uploadFile(building_name, floor_number, file);
       }
 
-      console.log(parsedNodes);
-      console.log(categories);
 
       // 1. 먼저 Floor 정보를 DB에 생성하고, 생성된 floor의 정보를 받아옵니다.
       // (반드시 새로 생성된 Floor의 ID를 반환하도록 floorService.create를 수정해야 합니다)
