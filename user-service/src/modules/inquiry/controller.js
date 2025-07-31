@@ -9,8 +9,6 @@ exports.getInquiries = async (req, res) => {
   try {
     const inquiries = await inquiryService.getAll();
 
-    console.log(inquiries);
-
     res.status(200).json(inquiries);
   } catch (err) {
     console.error("문의하기 목록 조회 오류:", err);
@@ -22,8 +20,6 @@ exports.getInquiries = async (req, res) => {
 exports.answerInquiry = async (req, res) => {
   try {
     const { inquiry_code, answer } = req.body;
-
-    console.log(inquiry_code, answer);
 
     const result = await inquiryService.answer(inquiry_code, answer);
 
@@ -40,8 +36,6 @@ exports.getInquiry = async (req, res) => {
     const { id } = req.params;
     const inquiry = await inquiryService.getById(id);
 
-    console.log(inquiry);
-    
     if (!inquiry) {
       return res.status(404).send("문의를 찾을 수 없습니다.");
     }
@@ -68,7 +62,6 @@ exports.createInquiry = [
       // 문의 코드 생성
       const inquiry_code = inquiryService.createInquiryCode(category);
 
-      console.log(inquiry_code);
       
       let fileUrl = null;
       if (req.file) {

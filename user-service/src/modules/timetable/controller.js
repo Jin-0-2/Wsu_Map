@@ -100,8 +100,6 @@ exports.delete = async (req, res) => {
     const title = req.body.title;
     const day_of_week = req.body.day_of_week;
 
-    console.log(id, title, day_of_week)
-    
     const result = await Service.delete(id, title, day_of_week);
     
     res.status(200).json({

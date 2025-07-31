@@ -61,8 +61,6 @@ exports.delete = (id, title, day_of_week) => {
     `
 
     const values = [id, title, day_of_week]
-    console.log(query);
-    console.log(values);
 
 
     return new Promise((resolve, reject) => {

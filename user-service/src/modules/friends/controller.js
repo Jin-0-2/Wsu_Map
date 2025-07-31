@@ -26,8 +26,6 @@ exports.getMyFriend = async (req, res) => {
 
     const result = await Service.getMyFriend(id);
 
-    console.log(result.rows);
-
     res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
@@ -75,8 +73,6 @@ exports.my_req_list = async (req, res) => {
 
     const result = await Service.my_req_list(id);
 
-    console.log(result.rows)
-
     res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
@@ -90,8 +86,6 @@ exports.request_list = async (req, res) => {
     const id = req.params.id;
 
     const result = await Service.request_list(id);
-
-    console.log(result.rows)
 
     res.status(200).json(result.rows);
   } catch (err) {
