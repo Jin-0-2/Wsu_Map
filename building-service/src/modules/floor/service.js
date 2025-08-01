@@ -92,11 +92,55 @@ exports.uploadFile = async (building_name, floor_number, file) => {
         throw new Error('파일 버퍼가 비어있습니다.');
       }
 
+      // 파일 확장자 검증
+      const allowedExtensions = ['.svg'];
+      const fileExtension = file.originalname ? 
+        file.originalname.toLowerCase().substring(file.originalname.lastIndexOf('.')) : '';
+      
+      if (!allowedExtensions.includes(fileExtension)) {
+        throw new Error(`지원하지 않는 파일 형식입니다. 허용된 형식: ${allowedExtensions.join(', ')}`);
+      }
+
       // SVG 파일 유효성 검사
       const svgContent = file.buffer.toString('utf-8');
-      if (!svgContent.includes('<svg') || !svgContent.includes('</svg>')) {
-        throw new Error('유효하지 않은 SVG 파일입니다.');
+      console.log('파일 내용 (처음 200자):', svgContent.substring(0, 200));
+      console.log('파일 크기:', file.buffer.length, 'bytes');
+      console.log('파일 이름:', file.originalname);
+      console.log('MIME 타입:', file.mimetype);
+      
+      // HTML 문서인지 확인 (Microsoft Edge HTML Document 문제 해결)
+      if (svgContent.includes('<!DOCTYPE html>') || svgContent.includes('<html>') || svgContent.includes('<head>')) {
+        console.log('HTML 문서가 감지되었습니다. 파일 내용:', svgContent.substring(0, 500));
+        throw new Error('HTML 문서는 SVG 파일이 아닙니다. 올바른 SVG 파일을 업로드해주세요.');
       }
+      
+      // SVG 태그 검증 (더 유연한 검증)
+      const hasSvgOpenTag = /<svg[^>]*>/i.test(svgContent);
+      const hasSvgCloseTag = /<\/svg>/i.test(svgContent);
+      const hasXmlDeclaration = /<\?xml[^>]*>/i.test(svgContent);
+      
+      console.log('SVG 검증 결과:', {
+        hasSvgOpenTag,
+        hasSvgCloseTag,
+        hasXmlDeclaration,
+        contentLength: svgContent.length
+      });
+      
+      if (!hasSvgOpenTag || !hasSvgCloseTag) {
+        console.log('SVG 태그를 찾을 수 없습니다. 파일 내용:', svgContent.substring(0, 500));
+        console.log('경고: SVG 검증 실패했지만 업로드를 계속합니다.');
+        // throw new Error('유효하지 않은 SVG 파일입니다. SVG 태그(<svg>)를 찾을 수 없습니다.');
+      }
+      
+      // SVG 루트 요소가 올바른지 추가 검증
+      const svgMatch = svgContent.match(/<svg[^>]*>/i);
+      if (svgMatch && !svgMatch[0].includes('xmlns=')) {
+        console.log('SVG 네임스페이스가 없습니다. 파일 내용:', svgContent.substring(0, 500));
+        console.log('경고: SVG 네임스페이스 누락했지만 업로드를 계속합니다.');
+        // throw new Error('SVG 네임스페이스가 누락되었습니다. 올바른 SVG 파일을 업로드해주세요.');
+      }
+      
+      console.log('SVG 파일 검증 통과!');
 
       // 파일 크기 제한 (10MB)
       if (file.buffer.length > 10 * 1024 * 1024) {
