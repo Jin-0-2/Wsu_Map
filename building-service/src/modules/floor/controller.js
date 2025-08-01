@@ -83,7 +83,7 @@ exports.create = [
   async (req, res) => {
     try {
       const { building_name, floor_number } = req.body
-      const file = req.file ? req.file.buffer : null; //파일이 없으면 null
+      const file = req.file; // 전체 file 객체를 전달
 
       if (!floor_number || !building_name) {
         return res.status(400).send("floor_number와 building_name을 모두 입력하세요.");
@@ -151,7 +151,7 @@ exports.update = [
       await client.query('BEGIN')
 
       const { building_name, floor_number } = req.body;
-      const file = req.file ? req.file.buffer : null;
+      const file = req.file; // 전체 file 객체를 전달
 
       if (!floor_number || !building_name) {
         await client.query('ROLLBACK');

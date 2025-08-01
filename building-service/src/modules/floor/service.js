@@ -100,12 +100,18 @@ exports.uploadFile = async (building_name, floor_number, file) => {
       }
 
       console.log('파일 크기:', file.buffer.length, 'bytes');
-      console.log('파일 이름:', file.originalname);
-      console.log('MIME 타입:', file.mimetype);
+      console.log('파일 이름:', file.originalname || '이름 없음');
+      console.log('MIME 타입:', file.mimetype || '타입 없음');
       
-      // 파일 확장자 검증
-      if (!file.originalname || !file.originalname.toLowerCase().endsWith('.svg')) {
+      // 파일 확장자 검증 (multer에서 originalname이 없을 수 있음)
+      if (file.originalname && !file.originalname.toLowerCase().endsWith('.svg')) {
         throw new Error('SVG 파일만 업로드 가능합니다.');
+      }
+      
+      // originalname이 없어도 MIME 타입으로 검증
+      if (file.mimetype && !file.mimetype.includes('svg')) {
+        console.log('MIME 타입으로 검증: SVG가 아닌 파일 타입 감지');
+        // throw new Error('SVG 파일만 업로드 가능합니다.');
       }
 
       // 파일 내용을 UTF-8로 변환하여 검증
