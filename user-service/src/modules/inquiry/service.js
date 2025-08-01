@@ -132,6 +132,8 @@ exports.deleteImageFromS3 = (fileUrl) => {
   const bucketName = "wsu-svg";
   const key = fileUrl.split('/').pop();
 
+  console.log(key);
+
   const command = new DeleteObjectCommand({
     Bucket: bucketName,
     Key: key,

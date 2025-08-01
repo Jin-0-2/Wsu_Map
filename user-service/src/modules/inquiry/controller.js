@@ -94,10 +94,13 @@ exports.deleteInquiry = async (req, res) => {
     // S3에서 문의 사진 삭제
     const fileUrl = await inquiryService.getByInquiryCode(inquiry_code);
 
+    console.log(fileUrl);
+
     if (fileUrl) {
-      await inquiryService.deleteImageFromS3(fileUrl);
+      await inquiryService.deleteImageFromS3(fileUrl.Image_Path);
     }
     
+    // DB에서 문의 내역 삭제
     const result = await inquiryService.delete(id, inquiry_code);
     
     if (!result) {
