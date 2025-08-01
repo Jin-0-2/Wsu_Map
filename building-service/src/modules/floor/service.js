@@ -102,14 +102,28 @@ exports.uploadFile = async (building_name, floor_number, file) => {
       console.log('파일 크기:', file.buffer.length, 'bytes');
       console.log('파일 이름:', file.originalname);
       console.log('MIME 타입:', file.mimetype);
+      
+      // 파일 확장자 검증
+      if (!file.originalname || !file.originalname.toLowerCase().endsWith('.svg')) {
+        throw new Error('SVG 파일만 업로드 가능합니다.');
+      }
+
+      // 파일 내용을 UTF-8로 변환하여 검증
+      const svgContent = file.buffer.toString('utf-8');
+      console.log('파일 내용 (처음 200자):', svgContent.substring(0, 200));
+      
+      // SVG 태그 검증
+      if (!svgContent.includes('<svg') || !svgContent.includes('</svg>')) {
+        throw new Error('유효하지 않은 SVG 파일입니다.');
+      }
 
       // 2. S3 업로드 명령을 준비합니다.
       const command = new PutObjectCommand({
         Bucket: bucketName,
         Key: key,
-        Body: file.buffer, // 파일의 버퍼 데이터
+        Body: Buffer.from(svgContent, 'utf-8'), // 정제된 내용을 UTF-8로 다시 변환
         ContentType: 'image/svg+xml', // SVG 파일의 Content-Type 설정
-        ContentLength: file.buffer.length, // 명시적으로 Content-Length 설정
+        ContentLength: Buffer.from(svgContent, 'utf-8').length, // 정확한 길이 설정
         CacheControl: 'public, max-age=31536000', // 캐시 설정
         // 체크섬 검증 비활성화
         ChecksumAlgorithm: undefined,
@@ -118,6 +132,8 @@ exports.uploadFile = async (building_name, floor_number, file) => {
       // 3. S3로 파일을 전송합니다.
       await s3Client.send(command);
       console.log(`S3 업로드 성공: ${key}`);
+      console.log(`업로드된 파일 크기: ${Buffer.from(svgContent, 'utf-8').length} bytes`);
+      console.log(`업로드된 파일 URL: https://${bucketName}.s3.ap-southeast-2.amazonaws.com/${key}`);
 
       // 4. DB에 저장할 객체 URL을 생성합니다.
       return `https://${bucketName}.s3.ap-southeast-2.amazonaws.com/${key}`;
