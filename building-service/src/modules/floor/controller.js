@@ -167,7 +167,15 @@ exports.update = [
       await roomService.deleteAllNodeLinks(building_name, floor_number, { client });
 
       // 2. 새로운 파일 파싱 및 업로드
-      const { nodes: newParsedNodes, categories: newCategories } = await Service.parseNavigationNodes(file);
+      const parseResult = await Service.parseNavigationNodes(file.buffer);
+      console.log('파싱 결과:', parseResult);
+      
+      const newParsedNodes = parseResult.nodes || [];
+      const newCategories = parseResult.categories || [];
+      
+      console.log('노드 개수:', newParsedNodes.length);
+      console.log('카테고리 개수:', newCategories.length);
+      
       const newFileUrl = await Service.uploadFile(building_name, floor_number, file);
       // const newFloor = await Service.updateFloorFile(building_name, floor_number, newFileUrl);
 
