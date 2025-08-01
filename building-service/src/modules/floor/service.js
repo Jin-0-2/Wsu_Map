@@ -4,13 +4,21 @@ const con = require("../../core/db")
 const cheerio = require('cheerio')
 
 const { S3Client, PutObjectCommand, DeleteObjectCommand  } = require("@aws-sdk/client-s3");
+const { fromNodeProvider } = require("@aws-sdk/credential-providers");
 
 const s3Client = new S3Client({
   region: "ap-southeast-2", // 예: 서울 리전
   // 체크섬 검증 비활성화 (XAmzContentSHA256Mismatch 오류 해결)
   disableHostPrefix: true,
-  // 요청 타임아웃 설정
   maxAttempts: 3, // 재시도 횟수
+  // 추가 설정으로 체크섬 문제 해결
+  requestHandler: {
+    httpOptions: {
+      timeout: 30000, // 30초 타임아웃
+    }
+  },
+  // 체크섬 미들웨어 비활성화
+  disableBodySigning: true,
 });
 
 // 층 전체 조회
@@ -86,19 +94,38 @@ exports.uploadFile = async (building_name, floor_number, file) => {
     // 파일 이름을 고유하게 생성합니다 (예: 도면/w19_1.svg)
     const key = `${building_name}_${floor_number}.svg`;
 
-    // 2. S3 업로드 명령을 준비합니다.
-    const command = new PutObjectCommand({
-      Bucket: bucketName,
-      Key: key,
-      Body: file.buffer, // 파일의 버퍼 데이터
-      ContentType: 'image/svg+xml', // SVG 파일의 Content-Type 설정 (매우 중요!)
-    });
+    try {
+      // 파일 버퍼 검증
+      if (!file.buffer || file.buffer.length === 0) {
+        throw new Error('파일 버퍼가 비어있습니다.');
+      }
 
-    // 3. S3로 파일을 전송합니다.
-    await s3Client.send(command);
+      console.log('파일 크기:', file.buffer.length, 'bytes');
+      console.log('파일 이름:', file.originalname);
+      console.log('MIME 타입:', file.mimetype);
 
-    // 4. DB에 저장할 객체 URL을 생성합니다.
-    return `https://${bucketName}.s3.ap-southeast-2.amazonaws.com/${key}`;
+      // 2. S3 업로드 명령을 준비합니다.
+      const command = new PutObjectCommand({
+        Bucket: bucketName,
+        Key: key,
+        Body: file.buffer, // 파일의 버퍼 데이터
+        ContentType: 'image/svg+xml', // SVG 파일의 Content-Type 설정
+        ContentLength: file.buffer.length, // 명시적으로 Content-Length 설정
+        CacheControl: 'public, max-age=31536000', // 캐시 설정
+        // 체크섬 검증 비활성화
+        ChecksumAlgorithm: undefined,
+      });
+
+      // 3. S3로 파일을 전송합니다.
+      await s3Client.send(command);
+      console.log(`S3 업로드 성공: ${key}`);
+
+      // 4. DB에 저장할 객체 URL을 생성합니다.
+      return `https://${bucketName}.s3.ap-southeast-2.amazonaws.com/${key}`;
+    } catch (error) {
+      console.error('S3 업로드 오류:', error);
+      throw new Error(`파일 업로드 실패: ${error.message}`);
+    }
   }
 }
 
