@@ -102,6 +102,8 @@ exports.login = async (req, res) => {
       return res.status(401).send("아이디 또는 비밀번호가 일치하지 않습니다.");
     }
 
+    console.log(result);
+
     res.status(200).json(result);
   } catch (err) {
     console.error("로그인 처리 중 오류:", err);
