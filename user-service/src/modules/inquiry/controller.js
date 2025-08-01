@@ -84,6 +84,19 @@ exports.deleteInquiry = async (req, res) => {
   try {
     const { id } = req.params;
     const { inquiry_code } = req.body;
+
+    if (!id) {
+      return res.status(400).send("ID가 누락되었습니다.");
+    } else if (!inquiry_code) {
+      return res.status(400).send("문의 코드가 누락되었습니다.");
+    }
+
+    // S3에서 문의 사진 삭제
+    const fileUrl = await inquiryService.getByInquiryCode(inquiry_code);
+
+    if (fileUrl) {
+      await inquiryService.deleteImageFromS3(fileUrl);
+    }
     
     const result = await inquiryService.delete(id, inquiry_code);
     

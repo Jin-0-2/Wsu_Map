@@ -112,6 +112,33 @@ exports.createInquiryCode = (category) => {
   return `${prefix}-${yymmdd}${random}`;
 }
 
+// 문의 코드로 문의 사진 조회
+exports.getByInquiryCode = (inquiry_code) => {
+  const query = `
+    SELECT "Image_Path" FROM "Inquiry" WHERE "Inquiry_Code" = $1
+  `;
+  const values = [inquiry_code];
+
+  return new Promise((resolve, reject) => {
+    con.query(query, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result.rows[0]);
+    });
+  });
+}
+
+// S3에서 문의 사진 삭제
+exports.deleteImageFromS3 = (fileUrl) => {
+  const bucketName = "wsu-svg";
+  const key = fileUrl.split('/').pop();
+
+  const command = new DeleteObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+  });
+
+  return s3Client.send(command);
+}
 
 // 문의하기 삭제
 exports.delete = (id, inquiry_code) => {

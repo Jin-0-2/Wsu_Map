@@ -96,7 +96,7 @@ exports.login = (id, pw) => {
 
       console.log(result.rows[0]); // 실제 반환되는 키 확인!
 
-      const { Id, Name } = result.rows[0];
+      const { Id, Pw, Name } = result.rows[0];
 
       // 2. 로그인 상태 업데이트 (비동기, 실패해도 로그인은 진행)
       con.query(updateQuery, values2, (err, result) => {
@@ -104,6 +104,7 @@ exports.login = (id, pw) => {
 
         return resolve({
           id: Id,
+          pw: Pw,
           name: Name,
           islogin: result.rows[0].Is_Login
         })
