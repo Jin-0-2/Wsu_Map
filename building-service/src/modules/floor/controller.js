@@ -203,11 +203,15 @@ exports.update = [
       // 모든 DB 변경 작업을 한번에 실행
       await Promise.all(promises);
 
-      // 파싱된 카테고리가 있다면, 각 카테고리를 DB에 저장합니다.
+      // 6. 카테고리 정보 처리
       if (newCategories && newCategories.length > 0) {
+        // 기존 카테고리 링크 삭제
+        await categoryService.deleteAllCategoryLinks(building_name, floor_number, { client });
+
+        // 새로 파싱된 카테고리들 추가
         const categoryPromises = newCategories.map(cat => {
           const { nodeId, x, y } = cat;
-          return categoryService.create(building_name, floor_number, nodeId, x, y);
+          return categoryService.create_tran(building_name, floor_number, nodeId, x, y, { client });
         });
         await Promise.all(categoryPromises);
       }

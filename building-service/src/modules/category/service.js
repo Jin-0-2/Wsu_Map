@@ -167,3 +167,35 @@ exports.delete = (building_name, floor_number, category_name, x, y) => {
     });
   });
 };
+
+// 트랜잭션 지원 메서드들
+
+// 카테고리 생성 (트랜잭션용)
+exports.create_tran = (building_name, floor_number, category_name, x, y, { client }) => {
+  const f_idQuery = `SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2;`;
+  const insert_Categories_Query = `INSERT INTO "Categories" ("Category_Name", "Building_Name") VALUES ($1, $2) ON CONFLICT DO NOTHING;`;
+  const insert_Floor_C_Query = `INSERT INTO "Floor_C" ("Floor_Id", "Category_Name", "Category_Location") VALUES ($1, $2, point($3, $4));`;
+  
+  const values1 = [building_name, floor_number];
+  const values2 = [category_name, building_name];
+
+  return client.query(f_idQuery, values1)
+    .then(result => {
+      const floor_id = result.rows[0].Floor_Id;
+      const values3 = [floor_id, category_name, x, y];
+      
+      return client.query(insert_Categories_Query, values2)
+        .then(() => client.query(insert_Floor_C_Query, values3));
+    });
+};
+
+// 층의 모든 카테고리 링크 삭제 (트랜잭션용)
+exports.deleteAllCategoryLinks = (building_name, floor_number, { client }) => {
+  const query = `
+    DELETE FROM "Floor_C" 
+    WHERE "Floor_Id" = (SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2)
+  `;
+  const values = [building_name, floor_number];
+  
+  return client.query(query, values);
+};
