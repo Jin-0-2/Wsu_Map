@@ -4,7 +4,6 @@ const con = require("../../core/db")
 const cheerio = require('cheerio')
 
 const { S3Client, PutObjectCommand, DeleteObjectCommand  } = require("@aws-sdk/client-s3");
-const { fromNodeProvider } = require("@aws-sdk/credential-providers");
 
 const s3Client = new S3Client({
   region: "ap-southeast-2", // 예: 서울 리전
