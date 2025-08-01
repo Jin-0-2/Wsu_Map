@@ -128,9 +128,9 @@ exports.getByInquiryCode = (inquiry_code) => {
 }
 
 // S3에서 문의 사진 삭제
-exports.deleteImageFromS3 = (fileUrl) => {
+exports.deleteImageFromS3 = (imageUrl) => {
   const bucketName = "wsu-svg";
-  const key = fileUrl.split('/').pop();
+  const key = imageUrl.split('.com/')[1];
 
   console.log(key);
 
