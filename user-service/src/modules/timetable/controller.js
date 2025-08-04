@@ -1,6 +1,9 @@
 // src/modules/user/controller.js
 
 const Service = require("./service")
+const multer = require('multer');
+const upload = multer();
+const { getBuildingMappings } = require('../../config/building-mappings');
 
 // 내 시간표 불러오기
 exports.getAll = async (req, res) => {
@@ -63,6 +66,74 @@ exports.add = async (req, res) => {
   }
 };
 
+// 시간표 추가 at Excel
+exports.addExcel = [
+  upload.single('excelFile'),
+  async (req, res) => {
+    try {
+      const id = req.params.id;
+      const file = req.file;
+
+      if (!file) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "엑셀 파일이 업로드되지 않았습니다." 
+        });
+      }
+
+      // 파일 확장자 검증
+      const allowedExtensions = ['.xlsx', '.xls'];
+      const fileExtension = file.originalname.toLowerCase().substring(file.originalname.lastIndexOf('.'));
+      
+      if (!allowedExtensions.includes(fileExtension)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "엑셀 파일(.xlsx, .xls)만 업로드 가능합니다." 
+        });
+      }
+
+      console.log('엑셀 파일 업로드 성공:', {
+        originalName: file.originalname,
+        size: file.size,
+        mimetype: file.mimetype
+      });
+
+      // 엑셀 파일 파싱
+      const parsedData = await Service.parseExcelFile(file.buffer);
+      
+      if (!parsedData || parsedData.length === 0) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "엑셀 파일에서 시간표 데이터를 찾을 수 없습니다." 
+        });
+      }
+
+      // DB에 일괄 저장
+      const insertResults = await Service.bulkInsertTimetable(id, parsedData);
+      
+      const successCount = insertResults.filter(result => result.success).length;
+      const failCount = insertResults.filter(result => !result.success).length;
+      
+      res.status(200).json({ 
+        success: true, 
+        message: "엑셀 파일이 성공적으로 처리되었습니다.",
+        fileName: file.originalname,
+        totalProcessed: parsedData.length,
+        successCount,
+        failCount,
+        details: insertResults
+      });
+
+    } catch (err) {
+      console.error("엑셀 파일 처리 오류:", err);
+      res.status(500).json({ 
+        success: false, 
+        message: "엑셀 파일 처리 중 오류가 발생했습니다." 
+      });
+    }
+  }
+];
+
 // 시간표 수정
 exports.update = async (req, res) => {
   try {
@@ -108,5 +179,22 @@ exports.delete = async (req, res) => {
   } catch (err) {
     console.error("DB 오류:", err);
     res.status(500).send("DB 오류");
+  }
+};
+
+// 건물명 매핑 조회
+exports.getBuildingMappings = async (req, res) => {
+  try {
+    const mappings = getBuildingMappings();
+    res.status(200).json({
+      success: true,
+      mappings
+    });
+  } catch (err) {
+    console.error("건물명 매핑 조회 오류:", err);
+    res.status(500).json({ 
+      success: false, 
+      message: "건물명 매핑 조회 중 오류가 발생했습니다." 
+    });
   }
 };

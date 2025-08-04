@@ -108,25 +108,32 @@ exports.create = (building_name, x, y, desc, imageUrls) => {
 
 // 건물 정보 수정(동적 쿼리)
 exports.update = async (building_name, desc, newImageUrls) => {
-  // 1. 기존 이미지들 가져오기
-  const existingBuilding = await this.getBuilding(building_name);
-  const existingImageUrls = existingBuilding.Image || [];
+  try {
+    // 1. 기존 이미지들 가져오기
+    const existingBuilding = await this.getBuilding(building_name);
+    
+    // 기존 이미지가 없으면 빈 배열로 시작
+    const existingImageUrls = existingBuilding?.Image || [];
 
-  // 2. 새로운 이미지가 있으면 기존 것에 추가, 없으면 기존 것 유지
-  const finalImageUrls = newImageUrls.length > 0 
-    ? [...existingImageUrls, ...newImageUrls] 
-    : existingImageUrls;
+    // 2. 새로운 이미지가 있으면 기존 것에 추가, 없으면 기존 것 유지
+    const finalImageUrls = newImageUrls.length > 0 
+      ? [...existingImageUrls, ...newImageUrls] 
+      : existingImageUrls;
 
-  const sql = `UPDATE "Building" SET "Description" = $1, "Image" = $2 WHERE "Building_Name" = $3`;
+    const sql = `UPDATE "Building" SET "Description" = $1, "Image" = $2 WHERE "Building_Name" = $3`;
 
-  const values = [desc, finalImageUrls, building_name]
+    const values = [desc, finalImageUrls, building_name]
 
-  return new Promise((resolve, reject) => {
-    con.query(sql, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
+    return new Promise((resolve, reject) => {
+      con.query(sql, values, (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
     });
-  });
+  } catch (error) {
+    console.error(`건물 정보 수정 중 오류: ${error.message}`);
+    throw error;
+  }
 };
 
 // 건물 정보 조회 (삭제용)
@@ -190,34 +197,40 @@ exports.parsePoint = (pointStr) => {
 
 // 건물 이미지 삭제
 exports.deleteImage = async (building_name, image_url) => {
-  // 1. 기존 이미지들 가져오기
-  const existingBuilding = await this.getBuilding(building_name);
-  const existingImageUrls = existingBuilding.Image || [];
+  try {
+    // 1. 기존 이미지들 가져오기
+    const existingBuilding = await this.getBuilding(building_name);
+    
+    // 기존 이미지가 없으면 빈 배열로 시작
+    const existingImageUrls = existingBuilding?.Image || [];
 
-  console.log("삭제할 이미지:",image_url);
+    console.log("삭제할 이미지:",image_url);
+    console.log("기존 이미지들:",existingImageUrls);
 
-  console.log("기존 이미지들:",existingImageUrls);
+    // 2. 삭제할 이미지들을 제외한 새 배열 생성
+    const finalImageUrls = existingImageUrls.filter(url => !image_url.includes(url));
 
-  // 2. 삭제할 이미지들을 제외한 새 배열 생성
-  const finalImageUrls = existingImageUrls.filter(url => !image_url.includes(url));
+    console.log("삭제 후 이미지들:",finalImageUrls);
 
-  console.log("삭제 후 이미지들:",finalImageUrls);
+    // 3. S3에서 이미지 삭제
+    // image_url 배열의 각 요소를 S3에서 삭제
+    for (const url of image_url) {
+      console.log("S3 파일 삭제:", url);
+      await this.deleteImageFromS3(url);
+    }
 
-  // 3. S3에서 이미지 삭제
-  // image_url 배열의 각 요소를 S3에서 삭제
-  for (const url of image_url) {
-    console.log("S3 파일 삭제:", url);
-    await this.deleteImageFromS3(url);
-  }
+    // 4. DB 업데이트
+    const sql = `UPDATE "Building" SET "Image" = $1 WHERE "Building_Name" = $2`;
+    const values = [finalImageUrls, building_name];
 
-  // 4. DB 업데이트
-  const sql = `UPDATE "Building" SET "Image" = $1 WHERE "Building_Name" = $2`;
-  const values = [finalImageUrls, building_name];
-
-  return new Promise((resolve, reject) => {
-    con.query(sql, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
+    return new Promise((resolve, reject) => {
+      con.query(sql, values, (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
     });
-  });
+  } catch (error) {
+    console.error(`건물 이미지 삭제 중 오류: ${error.message}`);
+    throw error;
+  }
 };

@@ -1,6 +1,8 @@
 // src/modules/table/service.js
 
 const con = require("../../core/db")
+const XLSX = require('xlsx');
+const { buildingMappings } = require('../../config/building-mappings');
 
 exports.getAll = (id) => {
     const select_query = `
@@ -70,3 +72,185 @@ exports.delete = (id, title, day_of_week) => {
         });
     });
 }
+
+// 엑셀 파일 파싱 (우송대학교 수강내역 형식)
+exports.parseExcelFile = async (buffer) => {
+  try {
+    // 엑셀 파일 읽기
+    const workbook = XLSX.read(buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0]; // 첫 번째 시트 사용
+    const worksheet = workbook.Sheets[sheetName];
+    
+    // JSON으로 변환
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    
+    console.log('엑셀 데이터 파싱 결과:', jsonData);
+    
+    // 5번째 행부터 실제 데이터 시작 (0-based index로 4)
+    const dataRows = jsonData.slice(4);
+    
+    // 시간표 데이터 추출 및 정제
+    const timetableData = [];
+    
+    dataRows.forEach(row => {
+      if (row.length > 0 && row.some(cell => cell !== null && cell !== undefined)) {
+        // 우송대 수강내역 엑셀 구조에 맞게 매핑
+        const courseName = row[4] || ''; // 과목명 (5번째 컬럼)
+        const professor = row[7] || ''; // 강의교수 (8번째 컬럼)
+        const timetableInfo = row[8] || ''; // 시간표 (9번째 컬럼)
+        
+        // 시간표 정보 파싱
+        const parsedSchedules = this.parseTimetableString(timetableInfo);
+        
+        // 각 시간표 정보를 개별 항목으로 생성
+        parsedSchedules.forEach(schedule => {
+          timetableData.push({
+            title: courseName,
+            day_of_week: schedule.day,
+            start_time: schedule.startTime,
+            end_time: schedule.endTime,
+            building_name: schedule.building,
+            floor_number: schedule.floor || '',
+            room_name: schedule.room,
+            professor: professor,
+            color: this.getRandomColor(), // 랜덤 색상
+            memo: ''
+          });
+        });
+      }
+    });
+    
+    console.log('파싱된 시간표 데이터:', timetableData);
+    return timetableData;
+  } catch (error) {
+    console.error('엑셀 파싱 오류:', error);
+    throw new Error('엑셀 파일 파싱에 실패했습니다.');
+  }
+};
+
+// 시간표 문자열 파싱 (예: "2024,0902~2024,1222 목 13:00~15:00 우송교양관 205")
+exports.parseTimetableString = (timetableStr) => {
+  const schedules = [];
+  
+  if (!timetableStr || typeof timetableStr !== 'string') {
+    return schedules;
+  }
+  
+  try {
+    // 여러 시간표가 있을 수 있으므로 분리 (예: "목 13:00~15:00 우송교양관 205, 금 16:00~18:00 식품건축관 105")
+    const timeBlocks = timetableStr.split(',').map(block => block.trim());
+    
+    timeBlocks.forEach(block => {
+      // 날짜 범위 제거 (예: "2024,0902~2024,1222" 부분)
+      const timeInfo = block.replace(/\d{4},\d{4}~\d{4},\d{4}/g, '').trim();
+      
+      // 요일, 시간, 건물명, 강의실 추출
+      const dayMatch = timeInfo.match(/(월|화|수|목|금|토|일)/);
+      const timeMatch = timeInfo.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})/);
+      const buildingMatch = timeInfo.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관))/);
+      const roomMatch = timeInfo.match(/(\d{3,4})/);
+      
+      if (dayMatch && timeMatch) {
+        const day = dayMatch[1];
+        const startTime = timeMatch[1];
+        const endTime = timeMatch[2];
+        let building = buildingMatch ? buildingMatch[1] : '';
+        
+        // 건물명 매핑 함수 호출
+        building = this.mapBuildingName(building, room);
+        const room = roomMatch ? roomMatch[1] : '';
+        
+        // 건물명에서 층수 추출 시도
+        let floor = '';
+        if (room && room.length >= 3) {
+          floor = room.charAt(0); // 첫 번째 숫자를 층수로 가정
+        }
+        
+        schedules.push({
+          day,
+          startTime,
+          endTime,
+          building,
+          floor,
+          room
+        });
+      }
+    });
+  } catch (error) {
+    console.error('시간표 문자열 파싱 오류:', error, '원본:', timetableStr);
+  }
+  
+  return schedules;
+};
+
+// 건물명 매핑 함수
+exports.mapBuildingName = (originalBuilding, roomNumber) => {
+  // 매핑 규칙 확인
+  const mapping = buildingMappings[originalBuilding];
+  
+  if (!mapping) {
+    // 매핑 규칙이 없으면 원본 건물명 반환
+    console.log(`건물명 매핑 규칙 없음: ${originalBuilding}`);
+    return originalBuilding;
+  }
+
+  // 단순 매핑인 경우
+  if (typeof mapping === 'string') {
+    return mapping;
+  }
+
+  // 복합 매핑인 경우 (조건부)
+  if (mapping.type === 'conditional') {
+    for (const rule of mapping.rules) {
+      if (rule.condition(roomNumber)) {
+        return rule.result;
+      }
+    }
+  }
+
+  // 기본값 반환
+  return originalBuilding;
+};
+
+// 랜덤 색상 생성
+exports.getRandomColor = () => {
+  const colors = [
+    '#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8',
+    '#6f42c1', '#fd7e14', '#e83e8c', '#20c997', '#6c757d'
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
+// 엑셀 데이터를 DB에 일괄 저장
+exports.bulkInsertTimetable = async (userId, timetableData) => {
+  try {
+    const results = [];
+    
+    for (const data of timetableData) {
+      try {
+        const result = await this.add(
+          userId,
+          data.title,
+          data.day_of_week,
+          data.start_time,
+          data.end_time,
+          data.building_name,
+          data.floor_number,
+          data.room_name,
+          data.professor,
+          data.color,
+          data.memo
+        );
+        results.push({ success: true, data });
+      } catch (error) {
+        console.error('개별 시간표 저장 실패:', error);
+        results.push({ success: false, data, error: error.message });
+      }
+    }
+    
+    return results;
+  } catch (error) {
+    console.error('일괄 저장 오류:', error);
+    throw error;
+  }
+};
