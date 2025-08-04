@@ -38,7 +38,7 @@ exports.add = (id, title, day_of_week, start_time, end_time, building_name, floo
   });
 }
 
-
+// 시간표 수정
 exports.update = (id, origin_title, origin_day_of_week, new_title, new_day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo) => {
     // 쿼리 완성
     const query = `
@@ -96,8 +96,11 @@ exports.parseExcelFile = async (buffer) => {
       if (row.length > 0 && row.some(cell => cell !== null && cell !== undefined)) {
         // 우송대 수강내역 엑셀 구조에 맞게 매핑
         const courseName = row[4] || ''; // 과목명 (5번째 컬럼)
-        const professor = row[7] || ''; // 강의교수 (8번째 컬럼)
+        const professorRaw = row[7] || ''; // 강의교수 (8번째 컬럼)
         const timetableInfo = row[8] || ''; // 시간표 (9번째 컬럼)
+        
+        // 강의교수 중복 제거 및 정리
+        const professor = this.cleanProfessorName(professorRaw);
         
         // 시간표 정보 파싱
         const parsedSchedules = this.parseTimetableString(timetableInfo);
@@ -210,6 +213,31 @@ exports.mapBuildingName = (originalBuilding, roomNumber) => {
 
   // 기본값 반환
   return originalBuilding;
+};
+
+// 강의교수 이름 정리 (중복 제거, 쉼표 구분)
+exports.cleanProfessorName = (professorRaw) => {
+  if (!professorRaw || typeof professorRaw !== 'string') {
+    return '';
+  }
+  
+  try {
+    // 쉼표로 분리하고 각 이름을 trim
+    const professors = professorRaw
+      .split(',')
+      .map(name => name.trim())
+      .filter(name => name.length > 0); // 빈 문자열 제거
+    
+    // 중복 제거 (Set 사용)
+    const uniqueProfessors = [...new Set(professors)];
+    
+    // 다시 쉼표로 연결
+    return uniqueProfessors.join(', ');
+    
+  } catch (error) {
+    console.error('강의교수 이름 정리 중 오류:', error);
+    return professorRaw; // 오류 시 원본 반환
+  }
 };
 
 // 랜덤 색상 생성

@@ -3,7 +3,7 @@
 const Service = require("./service")
 const multer = require('multer');
 const upload = multer();
-const { getBuildingMappings } = require('../../config/building-mappings');
+
 
 // 내 시간표 불러오기
 exports.getAll = async (req, res) => {
@@ -179,22 +179,5 @@ exports.delete = async (req, res) => {
   } catch (err) {
     console.error("DB 오류:", err);
     res.status(500).send("DB 오류");
-  }
-};
-
-// 건물명 매핑 조회
-exports.getBuildingMappings = async (req, res) => {
-  try {
-    const mappings = getBuildingMappings();
-    res.status(200).json({
-      success: true,
-      mappings
-    });
-  } catch (err) {
-    console.error("건물명 매핑 조회 오류:", err);
-    res.status(500).json({ 
-      success: false, 
-      message: "건물명 매핑 조회 중 오류가 발생했습니다." 
-    });
   }
 };

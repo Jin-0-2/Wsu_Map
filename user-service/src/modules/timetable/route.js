@@ -11,7 +11,7 @@ router.get("/:id", controller.getAll)
 router.post("/:id", controller.add)
 
 // 시간표 추가 at Excel
-router.post("/:id/excel", controller.addExcel)
+router.post("/:id/upload", controller.addExcel)
 
 // 시간표 수정
 router.put("/:id", controller.update)
@@ -20,6 +20,5 @@ router.put("/:id", controller.update)
 router.delete("/:id", controller.delete);
 
 // 건물명 매핑 조회
-router.get("/building-mappings", controller.getBuildingMappings)
 
 module.exports = router
