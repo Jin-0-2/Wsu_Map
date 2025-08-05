@@ -105,7 +105,7 @@ exports.parseExcelFile = async (buffer) => {
         let count = 1;
 
         console.log('--------------------------------');
-        console.log('row:', row++);
+        console.log('row:', count++);
         console.log('courseName:', courseName);
         console.log('professorRaw:', professorRaw);
         console.log('timetableInfo:', timetableInfo);
@@ -113,6 +113,8 @@ exports.parseExcelFile = async (buffer) => {
         
         // 강의교수 중복 제거 및 정리
         const professor = this.cleanProfessorName(professorRaw);
+
+        console.log('professor:', professor);
         
         // 시간표 정보 파싱
         const parsedSchedules = this.parseTimetableString(timetableInfo);
@@ -152,15 +154,19 @@ exports.parseTimetableString = (timetableStr) => {
   }
   
   try {
-    // 여러 시간표가 있을 수 있으므로 분리 (예: "목 13:00~15:00 우송교양관 205, 금 16:00~18:00 식품건축관 105")
-    const timeBlocks = timetableStr.split(',').map(block => block.trim());
+    // 날짜 범위 제거 (예: "(2025.0304~2025.0620)" 부분)
+    const cleanTimetableStr = timetableStr.replace(/\(\d{4}\.\d{4}~\d{4}\.\d{4}\)/g, '').trim();
+    console.log('날짜제거 후 테이블 스트링:', cleanTimetableStr);
+    
+    // 요일별로 시간 블록 분리 (예: "화 09:00~12:00(최창민, 미디어융합관-전산관 201), 13:00~15:00(최창민, 미디어융합관-전산관 201)")
+    const timeBlocks = cleanTimetableStr.split(',').map(block => block.trim());
     
     timeBlocks.forEach(block => {
       console.log('파싱할 블록:', block);
       
-      // 날짜 범위 제거 (예: "(2025.0304~2025.0620)" 부분)
-      const timeInfo = block.replace(/\(\d{4}\.\d{4}~\d{4}\.\d{4}\)/g, '').trim();
-      console.log('날짜 제거 후:', timeInfo);
+      // 이미 날짜 범위가 제거된 상태이므로 바로 사용
+      const timeInfo = block.trim();
+      console.log('처리할 시간 정보:', timeInfo);
       
       // 요일, 시간, 건물명, 강의실 추출
       const dayMatch = timeInfo.match(/(월|화|수|목|금|토|일)/);
