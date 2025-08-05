@@ -88,6 +88,10 @@ exports.parseExcelFile = async (buffer) => {
     
     // 5번째 행부터 실제 데이터 시작 (0-based index로 4)
     const dataRows = jsonData.slice(4);
+
+    // 데이터 확인
+    console.log('dataRows:', dataRows);
+  
     
     // 시간표 데이터 추출 및 정제
     const timetableData = [];
@@ -95,9 +99,17 @@ exports.parseExcelFile = async (buffer) => {
     dataRows.forEach(row => {
       if (row.length > 0 && row.some(cell => cell !== null && cell !== undefined)) {
         // 우송대 수강내역 엑셀 구조에 맞게 매핑
-        const courseName = row[4] || ''; // 과목명 (5번째 컬럼)
-        const professorRaw = row[7] || ''; // 강의교수 (8번째 컬럼)
-        const timetableInfo = row[8] || ''; // 시간표 (9번째 컬럼)
+        const courseName = row[8] || ''; // 과목명 (5번째 컬럼)
+        const professorRaw = row[10] || ''; // 강의교수 (8번째 컬럼)
+        const timetableInfo = row[15] || ''; // 시간표 (9번째 컬럼)
+        let count = 1;
+
+        console.log('--------------------------------');
+        console.log('row:', row++);
+        console.log('courseName:', courseName);
+        console.log('professorRaw:', professorRaw);
+        console.log('timetableInfo:', timetableInfo);
+
         
         // 강의교수 중복 제거 및 정리
         const professor = this.cleanProfessorName(professorRaw);
@@ -144,14 +156,20 @@ exports.parseTimetableString = (timetableStr) => {
     const timeBlocks = timetableStr.split(',').map(block => block.trim());
     
     timeBlocks.forEach(block => {
-      // 날짜 범위 제거 (예: "2024,0902~2024,1222" 부분)
-      const timeInfo = block.replace(/\d{4},\d{4}~\d{4},\d{4}/g, '').trim();
+      console.log('파싱할 블록:', block);
+      
+      // 날짜 범위 제거 (예: "(2025.0304~2025.0620)" 부분)
+      const timeInfo = block.replace(/\(\d{4}\.\d{4}~\d{4}\.\d{4}\)/g, '').trim();
+      console.log('날짜 제거 후:', timeInfo);
       
       // 요일, 시간, 건물명, 강의실 추출
       const dayMatch = timeInfo.match(/(월|화|수|목|금|토|일)/);
       const timeMatch = timeInfo.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})/);
-      const buildingMatch = timeInfo.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관))/);
+      // 건물명 패턴 수정: "미디어융합관-전산관" 형태도 포함
+      const buildingMatch = timeInfo.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관)(?:-[가-힣]+(?:관|관|대|학관|교양관|건축관|관))?)/);
       const roomMatch = timeInfo.match(/(\d{3,4})/);
+      
+      console.log('매칭 결과:', { dayMatch, timeMatch, buildingMatch, roomMatch });
       
       if (dayMatch && timeMatch) {
         const day = dayMatch[1];
@@ -159,8 +177,15 @@ exports.parseTimetableString = (timetableStr) => {
         const endTime = timeMatch[2];
         let building = buildingMatch ? buildingMatch[1] : '';
         
-        // 건물명 매핑 함수 호출
-        building = this.mapBuildingName(building, room);
+        // 건물명 매핑 함수 호출 (복합 건물명 처리)
+        let finalBuilding = building;
+        if (building && building.includes('-')) {
+          // "미디어융합관-전산관" 형태인 경우 첫 번째 건물명 사용
+          const firstBuilding = building.split('-')[0];
+          finalBuilding = this.mapBuildingName(firstBuilding, room);
+        } else {
+          finalBuilding = this.mapBuildingName(building, room);
+        }
         const room = roomMatch ? roomMatch[1] : '';
         
         // 건물명에서 층수 추출 시도
@@ -173,7 +198,7 @@ exports.parseTimetableString = (timetableStr) => {
           day,
           startTime,
           endTime,
-          building,
+          building: finalBuilding,
           floor,
           room
         });
