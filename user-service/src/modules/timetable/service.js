@@ -99,7 +99,7 @@ exports.parseExcelFile = async (buffer) => {
     dataRows.forEach(row => {
       if (row.length > 0 && row.some(cell => cell !== null && cell !== undefined)) {
         // 우송대 수강내역 엑셀 구조에 맞게 매핑
-        const courseName = row[8] || ''; // 과목명 (5번째 컬럼)
+        const courseName = row[7] || ''; // 과목명 (5번째 컬럼)
         const professorRaw = row[10] || ''; // 강의교수 (8번째 컬럼)
         const timetableInfo = row[15] || ''; // 시간표 (9번째 컬럼)
         let count = 1;
