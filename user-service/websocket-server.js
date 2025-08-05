@@ -164,7 +164,7 @@ function isUserConnected(userId) {
   return connectedUsers.has(userId);
 }
 
-// 친구 알림 함수 예시 (REST API에서 호출될 함수임)
+// 친구 알림 함수 
 function notifyFriendRequest(fromUserId, fromUserName, toUserId) {
   sendToUser(toUserId, {
     type: 'new_friend_request',

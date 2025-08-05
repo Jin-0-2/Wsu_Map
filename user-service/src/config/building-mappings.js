@@ -20,25 +20,9 @@ const buildingMappings = {
   'Culinary Center': 'W14',
   '식품건축관' : 'W15',
   '학생회관': 'W16',
-  '미디어융합관': {
-    type: 'conditional',
-    rules: [
-      // 동관 조건들
-      { condition: (room) => room && room.startsWith('1') && room.length >= 3 && parseInt(room.charAt(2)) >= 5, result: 'W17-동관' },
-      { condition: (room) => room && room.startsWith('2') && room.length >= 3 && parseInt(room.charAt(2)) >= 4, result: 'W17-동관' },
-      { condition: (room) => room && room.startsWith('3') && room.length >= 3 && parseInt(room.charAt(2)) >= 4, result: 'W17-동관' },
-      { condition: (room) => room && room.startsWith('4') && room.length >= 3 && parseInt(room.charAt(2)) >= 3, result: 'W17-동관' },
-      { condition: (room) => room && room.startsWith('5') && room.length >= 3 && parseInt(room.charAt(2)) >= 2, result: 'W17-동관' },
-      // 서관 조건들 (동관 조건이 아닌 모든 경우)
-      { condition: (room) => room && room.startsWith('1') && room.length >= 3 && parseInt(room.charAt(2))  < 5, result: 'W17-서관' },
-      { condition: (room) => room && room.startsWith('2') && room.length >= 3 && parseInt(room.charAt(2))  < 4, result: 'W17-서관' },
-      { condition: (room) => room && room.startsWith('3') && room.length >= 3 && parseInt(room.charAt(2))  < 4, result: 'W17-서관' },
-      { condition: (room) => room && room.startsWith('4') && room.length >= 3 && parseInt(room.charAt(2))  < 3, result: 'W17-서관' },
-      { condition: (room) => room && room.startsWith('5') && room.length >= 3 && parseInt(room.charAt(2))  < 2, result: 'W17-서관' },
-      // 기본값 (강의실 번호가 없거나 다른 경우)
-      { condition: () => true, result: 'W17-서관' }
-    ]
-  },
+  // 나중에 확인해보고 전산관 > W17-서관, 나머지 한개 > W17-동관
+  '미디어융합관-전산관': 'W17-서관',
+  '미디어융합관':  'W17-동관',
   '우송예술회관': 'W18',
   'Endicott Building': 'W19',
 };

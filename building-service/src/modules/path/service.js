@@ -363,9 +363,33 @@ exports.handleRoomToRoom = async (from_building, from_floor, from_room, to_build
 }
 
 // 내부
-// ✅ 두 좌표 간의 유클리드 거리 계산 함수
-const euclideanDistance = (a, b) =>
-  Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+/**
+ * 유클리드 거리 계산 함수 (Euclidean Distance)
+ * 
+ * 평면상의 두 점 간 직선 거리를 피타고라스 정리를 이용하여 계산합니다.
+ * 건물 내부와 같은 평면 공간에서 두 지점 간의 최단 거리를 구할 때 사용됩니다.
+ * 
+ * 수학 공식: √[(x₂-x₁)² + (y₂-y₁)²]
+ * 
+ * @param {Object} a - 첫 번째 지점의 좌표 {x: x좌표, y: y좌표}
+ * @param {Object} b - 두 번째 지점의 좌표 {x: x좌표, y: y좌표}
+ * @returns {number} 두 지점 간의 직선 거리 (동일한 단위)
+ * 
+ * @example
+ * const pointA = { x: 0, y: 0 };
+ * const pointB = { x: 3, y: 4 };
+ * const distance = euclideanDistance(pointA, pointB); // 5
+ */
+const euclideanDistance = (a, b) => {
+  // x좌표 차이의 제곱
+  const dx = (a.x - b.x) ** 2;
+  
+  // y좌표 차이의 제곱  
+  const dy = (a.y - b.y) ** 2;
+  
+  // 피타고라스 정리: √(dx² + dy²)
+  return Math.sqrt(dx + dy);
+};
 
 // ✅ DB에서 그래프 구성
 async function buildIndoorGraph() {
@@ -438,21 +462,68 @@ async function initIndoorGraph() {
   console.log('실내 그래프 캐싱 완료!');
 }
 
-// 외부
-// ✅ 위도 경도 거리계산 하버사인 함수
+/**
+ * 하버사인 공식 (Haversine Formula) - 지구 표면 거리 계산
+ * 
+ * 지구의 곡률을 고려하여 위도/경도 좌표 간의 정확한 거리를 계산합니다.
+ * 평면 거리 계산과 달리 지구의 구면적 특성을 반영하여 더 정확한 결과를 제공합니다.
+ * 
+ * @param {Object} a - 첫 번째 지점의 좌표 {lat: 위도, lng: 경도}
+ * @param {Object} b - 두 번째 지점의 좌표 {lat: 위도, lng: 경도}
+ * @returns {number} 두 지점 간의 거리 (미터 단위)
+ */
 function haversineDistance(a, b) {
+
+  // 각도를 라디안으로 변환하는 헬퍼 함수
+  // 위도/경도는 도(degree) 단위이므로 라디안으로 변환 필요
   const toRad = x => (x * Math.PI) / 180;
+
+  // 지구의 평균 반지름 (미터 단위)
+  // 정확한 계산을 위해 WGS84 기준 사용
   const R = 6371000; // 지구 반지름 (미터)
-  const lat1 = a.lat, lon1 = a.lng;
-  const lat2 = b.lat, lon2 = b.lng;
 
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
+  // 입력받은 두 지점의 위도/경도 추출
+  const lat1 = a.lat, lon1 = a.lng; // 첫 번째 지점의 위도/경도
+  const lat2 = b.lat, lon2 = b.lng; // 두 번째 지점의 위도/경도
 
-  const aa =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  // 두 지점의 위도/경도 차이를 라디안으로 변환
+  const dLat = toRad(lat2 - lat1); // 위도 차이
+  const dLon = toRad(lon2 - lon1); // 경도 차이
+
+  /**
+   * 하버사인 공식 적용
+   * 
+   * 공식: a = sin²(Δφ/2) + cos(φ₁) × cos(φ₂) × sin²(Δλ/2)
+   * 
+   * 여기서:
+   * - φ₁, φ₂: 두 지점의 위도
+   * - Δφ: 위도 차이
+   * - Δλ: 경도 차이
+   */
+  const aa = Math.sin(dLat / 2) ** 2 +          // sin²(Δφ/2)
+  Math.cos(toRad(lat1)) *                       // cos(φ₁)
+  Math.cos(toRad(lat2)) *                       // cos(φ₂)
+  Math.sin(dLon / 2) ** 2;                      // sin²(Δλ/2)
+
+  /**
+   * 대원 거리 (Great Circle Distance) 계산
+   * 
+   * 공식: c = 2 × atan2(√a, √(1-a))
+   * 
+   * atan2 함수는 두 인수의 비율로부터 각도를 계산하며,
+   * 사분면을 고려하여 정확한 각도를 반환합니다.
+   */
   const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
+
+  /**
+   * 최종 거리 계산
+   * 
+   * 공식: distance = R × c
+   * 
+   * R: 지구 반지름
+   * c: 라디안 단위의 중심각
+   * 결과: 미터 단위의 실제 거리
+   */
   return R * c;
 }
 

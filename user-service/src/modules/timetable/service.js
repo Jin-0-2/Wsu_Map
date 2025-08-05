@@ -177,13 +177,13 @@ exports.parseTimetableString = (timetableStr) => {
         const endTime = timeMatch[2];
         let building = buildingMatch ? buildingMatch[1] : '';
         
-        // 건물명 매핑 함수 호출 (복합 건물명 처리)
-        let finalBuilding = building;
-        finalBuilding = this.mapBuildingName(building, roomMatch);
-        
         // 건물명에서 층수 추출 시도
         let floor = '';
         const room = roomMatch ? roomMatch[1] : '';
+        
+        // 건물명 매핑 함수 호출 (복합 건물명 처리)
+        let finalBuilding = building;
+        finalBuilding = this.mapBuildingName(building, room);
 
         if (room && room.length >= 3) {
           floor = room.charAt(0); // 첫 번째 숫자를 층수로 가정
@@ -220,6 +220,9 @@ exports.parseTimetableString = (timetableStr) => {
           const endTime = timeMatch[2];
           let building = buildingMatch ? buildingMatch[1] : '';
           
+          // 건물명에서 층수 추출 시도
+          const room = roomMatch ? roomMatch[1] : '';
+          
           // 건물명 매핑 함수 호출 (복합 건물명 처리)
           let finalBuilding = building;
           if (building && building.includes('-')) {
@@ -229,7 +232,6 @@ exports.parseTimetableString = (timetableStr) => {
           } else {
             finalBuilding = this.mapBuildingName(building, room);
           }
-          const room = roomMatch ? roomMatch[1] : '';
           
           // 건물명에서 층수 추출 시도
           let floor = '';
@@ -262,6 +264,9 @@ exports.parseTimetableString = (timetableStr) => {
 
 // 건물명 매핑 함수
 exports.mapBuildingName = (originalBuilding, roomNumber) => {
+  // roomNumber가 문자열이 아닌 경우 문자열로 변환
+  const roomStr = roomNumber && typeof roomNumber === 'string' ? roomNumber : String(roomNumber || '');
+  
   // 매핑 규칙 확인
   const mapping = buildingMappings[originalBuilding];
   
@@ -279,7 +284,7 @@ exports.mapBuildingName = (originalBuilding, roomNumber) => {
   // 복합 매핑인 경우 (조건부)
   if (mapping.type === 'conditional') {
     for (const rule of mapping.rules) {
-      if (rule.condition(roomNumber)) {
+      if (rule.condition(roomStr)) {
         return rule.result;
       }
     }

@@ -211,7 +211,7 @@ exports.parseNavigationNodes = (svgBuffer) => {
   }
 
   let svgString;
-  // svgBuffer가 Buffer 타입인지 ArrayBuffer 타입인지 확인하여 적절하게 변환합니다.
+  // Buffer 타입에 따른 문자열 변환
   if (svgBuffer instanceof Buffer) {
     svgString = svgBuffer.toString('utf-8');
   } else if (svgBuffer instanceof ArrayBuffer) {
@@ -223,40 +223,42 @@ exports.parseNavigationNodes = (svgBuffer) => {
     return [];
   }
 
+  // Cheerio로 XML 파싱
   const $ = cheerio.load(svgString, { xmlMode: true });
 
   const nodes = [];
   const categories = [];
 
-  // 1. id가 'navigationNode'인 그룹(g 태그)을 찾습니다.
-  const navigationLayer = $('[id="Navigation_Nodes"]');
-  const categoryLayer = $('[id="Category"]');
+  // SVG 레이어 찾기
+  const navigationLayer = $('[id="Navigation_Nodes"]'); // 강의실 노드 레이어
+  const categoryLayer = $('[id="Category"]');           // 편의시설 레이어
 
-
+  // 레이어 존재 확인
   if (navigationLayer.length === 0) {
     console.log("'Navigation_Nodes' ID를 가진 레이어(그룹)를 찾을 수 없습니다.");
     return [];
   }
 
-  // 2. 해당 그룹 내부에 있는 모든 circle과 rect 태그를 찾습니다.
+  // 강의실 노드 추출 (circle, ellipse 태그)
   navigationLayer.find('circle, ellipse').each((index, element) => {
     const elem = $(element);
-    const nodeId = elem.attr('id');
+    const nodeId = elem.attr('id'); // 강의실 번호
     let x, y;
 
-    // 3. 태그 종류에 따라 좌표를 추출합니다.
+    // circle/ellipse의 중심 좌표 추출
     if (element.tagName.toLowerCase() === 'circle' || element.tagName.toLowerCase() === 'ellipse') {
       // circle 태그의 경우 cx, cy 속성이 중심 좌표입니다.
       x = parseFloat(elem.attr('cx'));
       y = parseFloat(elem.attr('cy'));
     }
 
-    // 4. ID와 좌표가 유효한 경우에만 배열에 추가합니다.
+    // 유효한 데이터만 저장
     if (nodeId && !isNaN(x) && !isNaN(y)) {
       nodes.push({ nodeId, x, y });
     }
   });
 
+  // 편의시설 카테고리 매핑 (DB 참조)
   const categoryNameMap = {
     cafe: "카페",
     restaurant: "식당",
@@ -272,7 +274,7 @@ exports.parseNavigationNodes = (svgBuffer) => {
     post: "우체국",
   };
 
-  // 3. 해당 그룹 내부에 있는 모든 circle과 reat 태그를 찾기
+  // 편의시설 노드 추출 (rect 태그)
    categoryLayer.find('rect').each((index, element) => {
      const elem = $(element);
      const nodeId = elem.attr('id');
@@ -280,7 +282,7 @@ exports.parseNavigationNodes = (svgBuffer) => {
      const y = parseFloat(elem.attr('y'));
 
      if(nodeId) {
-      const categoryKey = nodeId.replace(/-\d+$/, '');
+      const categoryKey = nodeId.replace(/-\d+$/, ''); // 숫자 제거 (예: cafe-1 → cafe), 동일한 편의시설은 여러개 있을 수 있으나, Id는 유일하기 때문
       const categoryName = categoryNameMap[categoryKey] || categoryKey;
       categories.push({nodeId: categoryName, x, y});
    }
