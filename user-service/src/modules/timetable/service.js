@@ -73,6 +73,20 @@ exports.delete = (id, title, day_of_week) => {
     });
 }
 
+// 시간표 전체 삭제
+exports.deleteAll = (id) => {
+    const query = `
+    DELETE FROM "timetable" WHERE "user_id" = $1;
+    `
+    const values = [id]
+
+    return new Promise((resolve, reject) => {
+        con.query(query, values, (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+        });
+    });
+}
 // 엑셀 파일 파싱 (우송대학교 수강내역 형식)
 exports.parseExcelFile = async (buffer) => {
   try {

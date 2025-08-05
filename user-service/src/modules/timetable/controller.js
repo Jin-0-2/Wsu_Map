@@ -110,6 +110,9 @@ exports.addExcel = [
         });
       }
 
+      // 일괄 저장 전 데이터 전부 삭제 씨빠끄~
+      await Service.deleteAll(id);
+
       // DB에 일괄 저장
       const insertResults = await Service.bulkInsertTimetable(id, parsedData);
       
