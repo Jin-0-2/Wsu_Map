@@ -25,6 +25,8 @@ exports.getAll = async (req, res) => {
             memo: row.memo,
         }))
 
+        console.log('response:', response);
+
         res.status(200).json(response);
     } catch (err) {
         console.error("DB 오류:", err);
