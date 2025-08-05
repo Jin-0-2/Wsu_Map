@@ -159,24 +159,18 @@ exports.parseTimetableString = (timetableStr) => {
     console.log('날짜제거 후 테이블 스트링:', cleanTimetableStr);
     
     // 요일별로 시간 블록 분리 (예: "화 09:00~12:00(최창민, 미디어융합관-전산관 201), 13:00~15:00(최창민, 미디어융합관-전산관 201)")
-    const timeBlocks = cleanTimetableStr.split(',').map(block => block.trim());
-    
-    timeBlocks.forEach(block => {
-      console.log('파싱할 블록:', block);
-      
-      // 이미 날짜 범위가 제거된 상태이므로 바로 사용
-      const timeInfo = block.trim();
-      console.log('처리할 시간 정보:', timeInfo);
-      
-      // 요일, 시간, 건물명, 강의실 추출
-      const dayMatch = timeInfo.match(/(월|화|수|목|금|토|일)/);
-      const timeMatch = timeInfo.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})/);
-      // 건물명 패턴 수정: "미디어융합관-전산관" 형태도 포함
-      const buildingMatch = timeInfo.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관)(?:-[가-힣]+(?:관|관|대|학관|교양관|건축관|관))?)/);
-      const roomMatch = timeInfo.match(/(\d{3,4})/);
-      
+    let timeBlocks = cleanTimetableStr.split(',').map(block => block.trim());
+    console.log('timeBlocks:', timeBlocks);
+
+    if(timeBlocks.length < 3) {
+      timeBlocks = cleanTimetableStr;
+      const dayMatch = timeBlocks.match(/(월|화|수|목|금|토|일)/);
+      const timeMatch = timeBlocks.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})/);
+      const buildingMatch = timeBlocks.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관))/);
+      const roomMatch = timeBlocks.match(/(\d{3,4})/);
+
       console.log('매칭 결과:', { dayMatch, timeMatch, buildingMatch, roomMatch });
-      
+
       if (dayMatch && timeMatch) {
         const day = dayMatch[1];
         const startTime = timeMatch[1];
@@ -185,21 +179,16 @@ exports.parseTimetableString = (timetableStr) => {
         
         // 건물명 매핑 함수 호출 (복합 건물명 처리)
         let finalBuilding = building;
-        if (building && building.includes('-')) {
-          // "미디어융합관-전산관" 형태인 경우 첫 번째 건물명 사용
-          const firstBuilding = building.split('-')[0];
-          finalBuilding = this.mapBuildingName(firstBuilding, room);
-        } else {
-          finalBuilding = this.mapBuildingName(building, room);
-        }
-        const room = roomMatch ? roomMatch[1] : '';
+        finalBuilding = this.mapBuildingName(building, roomMatch);
         
         // 건물명에서 층수 추출 시도
         let floor = '';
+        const room = roomMatch ? roomMatch[1] : '';
+
         if (room && room.length >= 3) {
           floor = room.charAt(0); // 첫 번째 숫자를 층수로 가정
         }
-        
+
         schedules.push({
           day,
           startTime,
@@ -209,12 +198,66 @@ exports.parseTimetableString = (timetableStr) => {
           room
         });
       }
-    });
+    } else {
+      timeBlocks.forEach(block => {
+        console.log('파싱할 블록:', block);
+        
+        // 이미 날짜 범위가 제거된 상태이므로 바로 사용
+        const timeInfo = block.trim();
+        console.log('처리할 시간 정보:', timeInfo);
+        
+        // 요일, 시간, 건물명, 강의실 추출
+        const dayMatch = timeInfo.match(/(월|화|수|목|금|토|일)/);
+        const timeMatch = timeInfo.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})/);
+        const buildingMatch = timeInfo.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관))/);
+        const roomMatch = timeInfo.match(/(\d{3,4})/);
+        
+        console.log('매칭 결과:', { dayMatch, timeMatch, buildingMatch, roomMatch });
+        
+        if (dayMatch && timeMatch) {
+          const day = dayMatch[1];
+          const startTime = timeMatch[1];
+          const endTime = timeMatch[2];
+          let building = buildingMatch ? buildingMatch[1] : '';
+          
+          // 건물명 매핑 함수 호출 (복합 건물명 처리)
+          let finalBuilding = building;
+          if (building && building.includes('-')) {
+            // "미디어융합관-전산관" 형태인 경우 첫 번째 건물명 사용
+            const firstBuilding = building.split('-')[0];
+            finalBuilding = this.mapBuildingName(firstBuilding, room);
+          } else {
+            finalBuilding = this.mapBuildingName(building, room);
+          }
+          const room = roomMatch ? roomMatch[1] : '';
+          
+          // 건물명에서 층수 추출 시도
+          let floor = '';
+          if (room && room.length >= 3) {
+            floor = room.charAt(0); // 첫 번째 숫자를 층수로 가정
+          }
+          
+          schedules.push({
+            day,
+            startTime,
+            endTime,
+            building: finalBuilding,
+            floor,
+            room
+          });
+        }
+      });
+
+    }
+
+    
+    
+
+  
+  return schedules;
   } catch (error) {
     console.error('시간표 문자열 파싱 오류:', error, '원본:', timetableStr);
   }
-  
-  return schedules;
 };
 
 // 건물명 매핑 함수
