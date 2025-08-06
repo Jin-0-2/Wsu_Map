@@ -350,8 +350,8 @@ exports.cleanProfessorName = (professorRaw) => {
 // 랜덤 색상 생성
 exports.getRandomColor = () => {
   const colors = [
-    '#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8',
-    '#6f42c1', '#fd7e14', '#e83e8c', '#20c997', '#6c757d'
+    'FF3B82F6', 'FF10B981', 'FFEF4444', 'FF8B5CF6', 
+    'FFF59E0B', 'FF06B6D4', 'FFEC4899', 'FF84CC16'
   ];
   return colors[Math.floor(Math.random() * colors.length)];
 };
