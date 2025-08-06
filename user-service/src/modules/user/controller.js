@@ -147,7 +147,8 @@ exports.admin_login = async (req, res) => {
 
     const result = await userService.check_admin(id);
 
-    if (result.rows[0].Id !== id) { 
+    // 관리자 확인 결과가 없는 경우
+    if (!result || !result.rows || !result.rows[0]) {
       console.log("관리자 아이디가 아닙니다.");
       return res.status(401).send("관리자 아이디가 아닙니다.");
     }
