@@ -78,7 +78,7 @@ exports.register = async (req, res) => {
     }
 
     // 관리자 테이블에 Id 추가
-    await userService.add_admin(result.Id);
+    await userService.add_admin(result.rows[0].Id);
 
     res.status(201).json({
       message: "회원가입이 완료되었습니다",
@@ -103,10 +103,11 @@ exports.admin_register = async (req, res) => {
     }
 
     // 관리자 테이블에 Id 추가
-    await userService.add_admin(result.Id);
+    await userService.add_admin(result.rows[0].Id);
+    console.log(`관리자 회원가입 완료: ${result.rows[0].Id}`);
 
     res.status(201).json({
-      message: "회원가입이 완료되었습니다",
+      message: "관리자 회원가입이 완료되었습니다",
     });
   } catch (err) {
     console.error("관리자 회원가입 처리 중 오류:", err);
