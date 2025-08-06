@@ -25,7 +25,7 @@ const buildingMappings = {
   '미디어융합관-관광관': 'W17-동관',
   '우송예술회관': 'W18',
   'Endicott Building': 'W19',
-  'IT 교육센터': 'S2',
+  '우송IT교육센터': 'S2',
 };
 
 module.exports = {
