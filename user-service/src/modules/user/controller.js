@@ -102,6 +102,9 @@ exports.admin_register = async (req, res) => {
       return res.status(409).send("이미 존재하는 아이디입니다.");
     }
 
+    // 관리자 테이블에 Id 추가
+    await userService.add_admin(result.Id);
+
     res.status(201).json({
       message: "회원가입이 완료되었습니다",
     });
