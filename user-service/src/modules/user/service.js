@@ -80,6 +80,50 @@ exports.register = (id, pw, name, stu_number, phone, email) => {
   });
 }
 
+// 관리자 회원가입
+exports.admin_register = (id, pw, name, stu_number, phone, email) => {
+  const insertQuery = `
+    INSERT INTO "User" ("Id", "Pw", "Name", "Stu_Num", "Phone", "Email")
+    VALUES ($1, $2, $3, $4, $5, $6) RETURNING "Id"
+  `
+  const values = [id, pw, name, stu_number, phone, email]
+
+  return new Promise((resolve, reject) => {
+    con.query(
+      insertQuery, values, (err, result) => {
+        if (err) {
+          // 중복(PK 제약 위반) 에러코드: 23505
+          if (err.code === '23505') {
+            // 어떤 제약조건 위반인지 구분
+            return resolve({ 
+              duplicate: true,
+              constraint: err.constraint, // 예: user_pkey, user_email_key 등
+              detail: err.detail // 예: Key (id)=(test) already exists.
+            });
+          }
+          return reject(err);
+        }
+        resolve(result);
+      }
+    );
+  });
+}
+
+exports.add_admin = (id) => {
+  const insertQuery = `
+    INSERT INTO "Admin" ("Id")
+    VALUES ($1)
+  `
+  const values = [id]
+
+  return new Promise((resolve, reject) => {
+    con.query(insertQuery, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 // 로그인
 exports.login = (id, pw) => {
   const selectQuery    = `SELECT * FROM "User" WHERE "Id" = $1 AND "Pw" = $2`
@@ -112,6 +156,20 @@ exports.login = (id, pw) => {
     });
   });
 };
+
+// 관리자 아이디 체크
+exports.check_admin = (id) => {
+  const selectQuery = `SELECT "Id" FROM "Admin" WHERE "Id" = $1`
+
+  const values = [id]
+
+  return new Promise((resolve, reject) => {
+    con.query(selectQuery, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+} 
 
 // 로그아웃
 exports.logout = (id) => {

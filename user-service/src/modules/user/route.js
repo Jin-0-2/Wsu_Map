@@ -22,9 +22,15 @@ router.get("/:id", controller.getUser)
 // 회원가입
 router.post("/register", controller.register)
 
+// 관리자 회원가입
+router.post("/admin_register", controller.admin_register)
+
 // 성공!
 // 로그인
 router.post("/login", controller.login)
+
+// 관리자 로그인
+router.post("/admin_login", controller.admin_login)
 
 // 성공!
 // 로그아웃

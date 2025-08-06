@@ -71,11 +71,14 @@ exports.register = async (req, res) => {
     if (!id || !pw || !name || !phone) {
       return res.status(400).send("모든 항목을 입력하세요.")
     }
-    const result = await userService.register(id, pw, name, stu_number, phone, email);
+    const result = await userService.admin_register(id, pw, name, stu_number, phone, email);
 
     if (result && result.duplicate) {
       return res.status(409).send("이미 존재하는 아이디입니다.");
     }
+
+    // 관리자 테이블에 Id 추가
+    await userService.add_admin(result.Id);
 
     res.status(201).json({
       message: "회원가입이 완료되었습니다",
@@ -86,6 +89,27 @@ exports.register = async (req, res) => {
     res.status(500).send("회원가입 처리 중 오류");
   }
 };
+
+// 관리자 회원가입
+exports.admin_register = async (req, res) => {
+  try {
+
+    const { id, pw, name, stu_number, phone, email } = req.body
+
+    const result = await userService.admin_register(id, pw, name, stu_number, phone, email);
+
+    if (result && result.duplicate) {
+      return res.status(409).send("이미 존재하는 아이디입니다.");
+    }
+
+    res.status(201).json({
+      message: "회원가입이 완료되었습니다",
+    });
+  } catch (err) {
+    console.error("관리자 회원가입 처리 중 오류:", err);
+    res.status(500).send("관리자 회원가입 처리 중 오류");
+  }
+}
 
 // 로그인
 exports.login = async (req, res) => {
@@ -111,6 +135,34 @@ exports.login = async (req, res) => {
     res.status(500).send("로그인 처리 중 오류");
   }
 };
+
+// 관리자 로그인
+exports.admin_login = async (req, res) => {
+  try {
+
+    const { id, pw } = req.body
+    if (!id || !pw) {
+      return res.status(400).send("아이디와 비밀번호를 입력하세요.")
+    }
+
+    const result = await userService.check_admin(id);
+
+    if (result.Id === id) {
+      return res.status(401).send("관리자 아이디가 아닙니다.");
+    }
+
+    const result2 = await userService.login(id, pw);
+
+    if (result2 && result2.notfound) {
+      return res.status(401).send("아이디 또는 비밀번호가 일치하지 않습니다.");
+    }
+
+    res.status(200).json(result2);
+  } catch (err) {
+    console.error("관리자 로그인 처리 중 오류:", err);
+    res.status(500).send("관리자 로그인 처리 중 오류");
+  }
+}
 
 // 로그아웃
 exports.logout = async (req, res) => {
