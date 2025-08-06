@@ -180,7 +180,7 @@ exports.parseTimetableString = (timetableStr) => {
       timeBlocks = cleanTimetableStr;
       const dayMatch = timeBlocks.match(/(월|화|수|목|금|토|일)/);
       const timeMatch = timeBlocks.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})/);
-      const buildingMatch = timeBlocks.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관))/);
+      const buildingMatch = timeBlocks.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관)(?:-[가-힣]+(?:관|관|대|학관|교양관|건축관|관))?)/);
       const roomMatch = timeBlocks.match(/(\d{3,4})/);
 
       console.log('매칭 결과:', { dayMatch, timeMatch, buildingMatch, roomMatch });
@@ -232,7 +232,7 @@ exports.parseTimetableString = (timetableStr) => {
           // 요일, 시간, 건물명, 강의실 추출
           const dayMatch = combinedBlock.match(/(월|화|수|목|금|토|일)/);
           const timeMatch = combinedBlock.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})/);
-          const buildingMatch = combinedBlock.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관))/);
+          const buildingMatch = combinedBlock.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관)(?:-[가-힣]+(?:관|관|대|학관|교양관|건축관|관))?)/);
           const roomMatch = combinedBlock.match(/(\d{3,4})/);
           
           console.log('매칭 결과:', { dayMatch, timeMatch, buildingMatch, roomMatch });
@@ -256,15 +256,8 @@ exports.parseTimetableString = (timetableStr) => {
             // 건물명에서 층수 추출 시도
             const room = roomMatch ? roomMatch[1] : '';
             
-            // 건물명 매핑 함수 호출 (복합 건물명 처리)
-            let finalBuilding = building;
-            if (building && building.includes('-')) {
-              // "미디어융합관-전산관" 형태인 경우 첫 번째 건물명 사용
-              const firstBuilding = building.split('-')[0];
-              finalBuilding = this.mapBuildingName(firstBuilding, room);
-            } else {
-              finalBuilding = this.mapBuildingName(building, room);
-            }
+            // 건물명 매핑 함수 호출
+            let finalBuilding = this.mapBuildingName(building, room);
             
             // 건물명에서 층수 추출 시도
             let floor = '';
