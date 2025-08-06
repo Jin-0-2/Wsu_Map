@@ -129,6 +129,12 @@ exports.getByInquiryCode = (inquiry_code) => {
 
 // S3에서 문의 사진 삭제
 exports.deleteImageFromS3 = (imageUrl) => {
+  // imageUrl이 null이거나 undefined인 경우 처리
+  if (!imageUrl) {
+    console.log('이미지 URL이 없습니다. S3 삭제를 건너뜁니다.');
+    return Promise.resolve();
+  }
+
   const bucketName = "wsu-svg";
   const key = imageUrl.split('.com/')[1];
 
