@@ -150,7 +150,8 @@ exports.login = (id, pw) => {
           id: Id,
           pw: Pw,
           name: Name,
-          islogin: result.rows[0].Is_Login
+          islogin: result.rows[0].Is_Login,
+          is_tutorial: result.rows[0].Is_Tutorial
         })
       });
     });
