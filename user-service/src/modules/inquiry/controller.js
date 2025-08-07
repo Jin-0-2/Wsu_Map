@@ -54,6 +54,8 @@ exports.createInquiry = [
     try {
       const { id } = req.params;
       const { category, title, content } = req.body;
+
+      console.log(req.body);
       
       if (!id || !title || !content) {
         return res.status(400).send("필수 정보가 누락되었습니다.");
