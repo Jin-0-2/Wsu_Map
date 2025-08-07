@@ -344,3 +344,17 @@ try {
     res.status(500).send("회원 삭제 처리 중 오류");
   }
 }
+
+// 튜토리얼 다시 보지 않기
+exports.update_tutorial = async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    const result = await userService.update_tutorial(id);
+
+    res.status(200).send("튜토리얼 다시 보지 않기로 전환");
+  } catch (err) {
+    console.error("튜토리얼 다시 보지 않기 처리 중 오류:", err);
+    res.status(500).send("튜토리얼 다시 보지 않기 처리 중 오류");
+  }
+}

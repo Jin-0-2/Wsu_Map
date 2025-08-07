@@ -275,3 +275,17 @@ exports.find_id = async (email) => {
     });
   });
 }
+
+// 튜토리얼 다시 보지 않기
+exports.update_tutorial = async (id) => {
+  const update_tutorial_Qurey = `UPDATE "User" SET "Is_Tutorial" = false WHERE "Id" = $1`
+
+  const values = [id];
+
+  return new Promise((resolve, reject) => {
+    con.query(update_tutorial_Qurey, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}

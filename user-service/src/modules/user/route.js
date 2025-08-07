@@ -53,4 +53,7 @@ router.delete("/delete", controller.delete)
 // 아이디 찾기
 router.post("/find_id", controller.find_id)
 
+// 튜토리얼 다시 보지 않기
+router.put("/update_tutorial", controller.update_tutorial)
+
 module.exports = router
