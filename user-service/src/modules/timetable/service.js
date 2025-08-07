@@ -176,6 +176,10 @@ exports.parseTimetableString = (timetableStr) => {
     let timeBlocks = cleanTimetableStr.split(',').map(block => block.trim());
     console.log('timeBlocks:', timeBlocks);
 
+    // 요일 기억용 변수
+    let lastDay = null;
+
+    // 3개 이상일 때 2개씩 짝수로 합쳐서 파싱 (기존 로직 유지)
     if(timeBlocks.length < 3) {
       timeBlocks = cleanTimetableStr;
       const dayMatch = timeBlocks.match(/(월|화|수|목|금|토|일)/);
@@ -197,6 +201,7 @@ exports.parseTimetableString = (timetableStr) => {
           '일': 'sun'
         };
         const day = dayMapping[dayMatch[1]] || dayMatch[1];
+        lastDay = day;
         const startTime = timeMatch[1];
         const endTime = timeMatch[2];
         let building = buildingMatch ? buildingMatch[1] : '';
@@ -222,62 +227,54 @@ exports.parseTimetableString = (timetableStr) => {
           room
         });
       }
+    } else {
+      // 2개씩 합치지 않고, 각 블록별로 처리 (요일 기억)
+      let dayMapping = {
+        '월': 'mon',
+        '화': 'tue', 
+        '수': 'wed',
+        '목': 'thu',
+        '금': 'fri',
+        '토': 'sat',
+        '일': 'sun'
+      };
+      for (let i = 0; i < timeBlocks.length; i++) {
+        const block = timeBlocks[i];
+        const dayMatch = block.match(/(월|화|수|목|금|토|일)/);
+        const timeMatch = block.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})/);
+        const buildingMatch = block.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관)(?:-[가-힣]+(?:관|관|대|학관|교양관|건축관|관))?)/);
+        const roomMatch = block.match(/(\d{3,4})/);
+
+        let day;
+        if (dayMatch) {
+          day = dayMapping[dayMatch[1]] || dayMatch[1];
+          lastDay = day;
         } else {
-      // 3개 이상일 때 2개씩 짝수로 합쳐서 파싱
-      for (let i = 0; i < timeBlocks.length; i += 2) {
-        if (i + 1 < timeBlocks.length) {
-          const combinedBlock = timeBlocks[i] + ', ' + timeBlocks[i + 1];
-          console.log('합쳐진 블록:', combinedBlock);
-          
-          // 요일, 시간, 건물명, 강의실 추출
-          const dayMatch = combinedBlock.match(/(월|화|수|목|금|토|일)/);
-          const timeMatch = combinedBlock.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})/);
-          const buildingMatch = combinedBlock.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관)(?:-[가-힣]+(?:관|관|대|학관|교양관|건축관|관))?)/);
-          const roomMatch = combinedBlock.match(/(\d{3,4})/);
-          
-          console.log('매칭 결과:', { dayMatch, timeMatch, buildingMatch, roomMatch });
-          
-          if (dayMatch && timeMatch) {
-            // 한글 요일을 영어로 변환
-            const dayMapping = {
-              '월': 'mon',
-              '화': 'tue', 
-              '수': 'wed',
-              '목': 'thu',
-              '금': 'fri',
-              '토': 'sat',
-              '일': 'sun'
-            };
-            const day = dayMapping[dayMatch[1]] || dayMatch[1];
-            const startTime = timeMatch[1];
-            const endTime = timeMatch[2];
-            let building = buildingMatch ? buildingMatch[1] : '';
-            
-            // 건물명에서 층수 추출 시도
-            const room = roomMatch ? roomMatch[1] : '';
-            
-            // 건물명 매핑 함수 호출
-            let finalBuilding = this.mapBuildingName(building, room);
-            
-            // 건물명에서 층수 추출 시도
-            let floor = '';
-            if (room && room.length >= 3) {
-              floor = room.charAt(0); // 첫 번째 숫자를 층수로 가정
-            }
-            
-            schedules.push({
-              day,
-              startTime,
-              endTime,
-              building: finalBuilding,
-              floor,
-              room
-            });
+          day = lastDay;
+        }
+
+        if (timeMatch) {
+          const startTime = timeMatch[1];
+          const endTime = timeMatch[2];
+          let building = buildingMatch ? buildingMatch[1] : '';
+          let floor = '';
+          const room = roomMatch ? roomMatch[1] : '';
+          let finalBuilding = this.mapBuildingName(building, room);
+          if (room && room.length >= 3) {
+            floor = room.charAt(0);
           }
+          schedules.push({
+            day,
+            startTime,
+            endTime,
+            building: finalBuilding,
+            floor,
+            room
+          });
         }
       }
     }
-  return schedules;
+    return schedules;
   } catch (error) {
     console.error('시간표 문자열 파싱 오류:', error, '원본:', timetableStr);
   }
