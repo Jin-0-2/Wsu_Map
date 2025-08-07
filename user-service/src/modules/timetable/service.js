@@ -176,11 +176,19 @@ exports.parseTimetableString = (timetableStr) => {
     let timeBlocks = cleanTimetableStr.split(',').map(block => block.trim());
     console.log('timeBlocks:', timeBlocks);
 
-    // 요일 기억용 변수
     let lastDay = null;
+    let dayMapping = {
+      '월': 'mon',
+      '화': 'tue', 
+      '수': 'wed',
+      '목': 'thu',
+      '금': 'fri',
+      '토': 'sat',
+      '일': 'sun'
+    };
 
-    // 3개 이상일 때 2개씩 짝수로 합쳐서 파싱 (기존 로직 유지)
     if(timeBlocks.length < 3) {
+      // 기존 단일 블록 처리 (변경 없음)
       timeBlocks = cleanTimetableStr;
       const dayMatch = timeBlocks.match(/(월|화|수|목|금|토|일)/);
       const timeMatch = timeBlocks.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})/);
@@ -190,34 +198,17 @@ exports.parseTimetableString = (timetableStr) => {
       console.log('매칭 결과:', { dayMatch, timeMatch, buildingMatch, roomMatch });
 
       if (dayMatch && timeMatch) {
-        // 한글 요일을 영어로 변환
-        const dayMapping = {
-          '월': 'mon',
-          '화': 'tue', 
-          '수': 'wed',
-          '목': 'thu',
-          '금': 'fri',
-          '토': 'sat',
-          '일': 'sun'
-        };
         const day = dayMapping[dayMatch[1]] || dayMatch[1];
         lastDay = day;
         const startTime = timeMatch[1];
         const endTime = timeMatch[2];
         let building = buildingMatch ? buildingMatch[1] : '';
-        
-        // 건물명에서 층수 추출 시도
         let floor = '';
         const room = roomMatch ? roomMatch[1] : '';
-        
-        // 건물명 매핑 함수 호출 (복합 건물명 처리)
-        let finalBuilding = building;
-        finalBuilding = this.mapBuildingName(building, room);
-
+        let finalBuilding = this.mapBuildingName(building, room);
         if (room && room.length >= 3) {
-          floor = room.charAt(0); // 첫 번째 숫자를 층수로 가정
+          floor = room.charAt(0);
         }
-
         schedules.push({
           day,
           startTime,
@@ -228,22 +219,14 @@ exports.parseTimetableString = (timetableStr) => {
         });
       }
     } else {
-      // 2개씩 합치지 않고, 각 블록별로 처리 (요일 기억)
-      let dayMapping = {
-        '월': 'mon',
-        '화': 'tue', 
-        '수': 'wed',
-        '목': 'thu',
-        '금': 'fri',
-        '토': 'sat',
-        '일': 'sun'
-      };
-      for (let i = 0; i < timeBlocks.length; i++) {
-        const block = timeBlocks[i];
-        const dayMatch = block.match(/(월|화|수|목|금|토|일)/);
-        const timeMatch = block.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})/);
-        const buildingMatch = block.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관)(?:-[가-힣]+(?:관|관|대|학관|교양관|건축관|관))?)/);
-        const roomMatch = block.match(/(\d{3,4})/);
+      // 2개씩 합쳐서 처리 + 요일 기억
+      for (let i = 0; i < timeBlocks.length; i += 2) {
+        const combinedBlock = (timeBlocks[i] || '') + ', ' + (timeBlocks[i + 1] || '');
+        console.log('합쳐진 블록:', combinedBlock);
+        const dayMatch = combinedBlock.match(/(월|화|수|목|금|토|일)/);
+        const timeMatch = combinedBlock.match(/(\d{1,2}:\d{2})~(\d{1,2}:\d{2})/);
+        const buildingMatch = combinedBlock.match(/([가-힣]+(?:관|관|대|학관|교양관|건축관|관)(?:-[가-힣]+(?:관|관|대|학관|교양관|건축관|관))?)/);
+        const roomMatch = combinedBlock.match(/(\d{3,4})/);
 
         let day;
         if (dayMatch) {
@@ -253,7 +236,9 @@ exports.parseTimetableString = (timetableStr) => {
           day = lastDay;
         }
 
-        if (timeMatch) {
+        console.log('매칭 결과:', { dayMatch, timeMatch, buildingMatch, roomMatch });
+
+        if (day && timeMatch) {
           const startTime = timeMatch[1];
           const endTime = timeMatch[2];
           let building = buildingMatch ? buildingMatch[1] : '';
