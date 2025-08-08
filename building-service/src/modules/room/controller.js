@@ -202,7 +202,7 @@ exports.stairs = async (req, res) => {
 
     let result = await pathService.getStairs(building);
 
-    console.log(result);
+    console.log(`getStairs----------`,result);
 
     result = result.sort((a, b) => {
       const [buildingA, floorA] = a.split('@');
@@ -216,6 +216,8 @@ exports.stairs = async (req, res) => {
 
       return parseInt(floorA) - parseInt(floorB);
     });
+
+    console.log(`sort-----------`, result);
 
     const currentFloor = parseInt(floor);
     const isToId = id && id.startsWith('to');
@@ -240,7 +242,7 @@ exports.stairs = async (req, res) => {
       }
     });
 
-    console.log(filtered);
+    console.log(`filtered----------`, filtered);
 
     res.status(200).json({
       stairs: filtered,
