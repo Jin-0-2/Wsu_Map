@@ -200,12 +200,12 @@ exports.stairs = async (req, res) => {
     const floor = req.params.floor;
     const id = req.params.id;
 
-    console.log(`id----------`, id);
+    console.log('id----------', id);
 
     // 건물 별 계단 조회
     let result = await pathService.getStairs(building);
 
-    console.log(`getStairs----------`,result);
+    console.log('getStairs----------', result);
 
     // 건물 이름 순으로 정렬
     result = result.sort((a, b) => {
@@ -218,43 +218,62 @@ exports.stairs = async (req, res) => {
       if (!isSameA && isSameB) return 1;
       if (buildingA !== buildingB) return buildingA.localeCompare(buildingB);
 
-      return parseInt(floorA) - parseInt(floorB);
+      return parseInt(floorA, 10) - parseInt(floorB, 10);
     });
 
-    console.log(`sort-----------`, result);
+    console.log('sort-----------', result);
 
-    const currentFloor = parseInt(floor);
-    const sprit_to = id.split('@')[2];
-    const isToId = sprit_to && sprit_to.startsWith('to');
+    const currentFloor = parseInt(floor, 10);
+
+    // 이름 오타 보정용 유틸: 'staris' -> 'stairs'
+    const normalizeName = (s = '') => s.replace('staris', 'stairs');
+
+    // 현재 id의 세 번째 파트(노드명)
+    const currentNameRaw = (id.split('@')[2] || '');
+    const currentName = normalizeName(currentNameRaw);
+
+    // 현재 id 유형 판별
+    const isToId = currentName.startsWith('to');
+    const isStairsLikeId = !isToId && currentName.includes('stairs');
 
     const filtered = result.filter(item => {
       const parts = item.split('@');
+      if (parts.length < 3) return false;
 
-      if (parts[0] === building) {
-        // 같은 building: floor ±1만 포함
-        const fl = parseInt(parts[1]);
-        if (Math.abs(fl - currentFloor) === 1) {
-          // 세 번째 파트가 to로 시작하면 제외
-          return !(parts[2] && parts[2].startsWith('to'));
-        }
-        return false;
-      } else if (isToId) {
-        // 다른 building: id가 to로 시작하면만, parts[2]가 to로 시작하면 포함
-        return parts[2] && parts[2].startsWith('to');
-      } else {
-        // 나머지는 포함하지 않음
-        return false;
+      const [b, fStr, rawName] = parts;
+      const f = parseInt(fStr, 10);
+      const name = normalizeName(rawName);
+
+      const isTo = name.startsWith('to');              // to-xxx
+      const isStairsLike = !isTo && name.includes('stairs'); // stairs, left-stairs, right-stairs 등
+
+      if (isToId) {
+        // 현재 id가 to-xxx인 경우: 다른 건물의 to-만 포함
+        return b !== building && isTo;
+
+        // (옵션) 다른 건물 + 같은 층만 포함하려면 아래처럼 변경하세요.
+        // return b !== building && isTo && Number.isFinite(f) && f === currentFloor;
       }
+
+      if (isStairsLikeId) {
+        // 현재 id가 stairs 계열인 경우: 같은 건물의 stairs 계열만 포함
+        return b === building && isStairsLike;
+
+        // (옵션) 같은 건물 + ±1층만 포함하려면 아래처럼 변경하세요.
+        // return b === building && isStairsLike && Math.abs(f - currentFloor) === 1;
+      }
+
+      // 현재 id가 위 두 유형이 아니면 일단 포함하지 않음(명확성 유지)
+      return false;
     });
 
-    console.log(`filtered----------`, filtered);
+    console.log('filtered----------', filtered);
 
     res.status(200).json({
       stairs: filtered,
     });
   } catch (err) {
     console.error(err);
-
-    res.status(500).send("계단 검색 중 오류");
+    res.status(500).send('계단 검색 중 오류');
   }
 };
