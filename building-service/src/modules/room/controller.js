@@ -238,6 +238,8 @@ exports.stairs = async (req, res) => {
       }
     });
 
+    console.log(filtered);
+
     res.status(200).json({
       stairs: filtered,
     });
