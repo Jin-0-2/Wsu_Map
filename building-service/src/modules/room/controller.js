@@ -200,10 +200,14 @@ exports.stairs = async (req, res) => {
     const floor = req.params.floor;
     const id = req.params.id;
 
+    console.log(`id----------`, id);
+
+    // 건물 별 계단 조회
     let result = await pathService.getStairs(building);
 
     console.log(`getStairs----------`,result);
 
+    // 건물 이름 순으로 정렬
     result = result.sort((a, b) => {
       const [buildingA, floorA] = a.split('@');
       const [buildingB, floorB] = b.split('@');
