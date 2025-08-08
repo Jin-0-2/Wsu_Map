@@ -7,6 +7,14 @@ const s3Client = new S3Client({
   region: "ap-southeast-2",
 });
 
+const CATEGORY_MAP = {
+  other: '기타 문의',
+  bug: '버그 신고',
+  route_error: '경로 안내 오류',
+  place_error: '장소/정보 오류',
+  feature: '기능 제안',
+};
+
 // 문의하기 전체 목록 조회
 exports.getAll = () => {
   const query = `
@@ -56,6 +64,10 @@ exports.create = (userId, title, content, category, inquiry_code, fileUrl = null
     });
   });
 };
+
+exports.mapCategory = (category) => {
+  return CATEGORY_MAP[category] || '기타 문의';
+}
 
 // 사진 업로드
 exports.uploadFile = async (inquiry_code, file) => {

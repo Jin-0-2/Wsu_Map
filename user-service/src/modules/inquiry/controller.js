@@ -70,8 +70,12 @@ exports.createInquiry = [
         fileUrl = await inquiryService.uploadFile(inquiry_code, req.file);
       }
       
-      const result = await inquiryService.create(id, title, content, category, inquiry_code, fileUrl);
+      const mapped_category = inquiryService.mapCategory(category);
+
+      const result = await inquiryService.create(id, title, content, mapped_category, inquiry_code, fileUrl);
       
+      console.log(result);
+
       res.status(201).json(result);
     } catch (err) {
       console.error("문의하기 작성 오류:", err);
