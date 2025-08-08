@@ -224,7 +224,8 @@ exports.stairs = async (req, res) => {
     console.log(`sort-----------`, result);
 
     const currentFloor = parseInt(floor);
-    const isToId = id && id.startsWith('to');
+    const sprit_to = id.split('@')[2];
+    const isToId = sprit_to && sprit_to.startsWith('to');
 
     const filtered = result.filter(item => {
       const parts = item.split('@');
