@@ -202,6 +202,8 @@ exports.stairs = async (req, res) => {
 
     let result = await pathService.getStairs(building);
 
+    console.log(result);
+
     result = result.sort((a, b) => {
       const [buildingA, floorA] = a.split('@');
       const [buildingB, floorB] = b.split('@');
