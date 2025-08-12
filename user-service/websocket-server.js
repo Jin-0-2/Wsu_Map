@@ -27,6 +27,8 @@ wss.on('connection', (ws, req) => {
   let userId = null;
 
   ws.on('message', async (message) => {
+    //원본 메시지 출력
+    console.log(`[WS MESSAGE] from ${userId || 'unknown'}:`, message.toString());
     try {
       const data = JSON.parse(message);
       switch (data.type) {
