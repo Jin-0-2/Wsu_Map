@@ -26,6 +26,9 @@ exports.getMyFriend = async (req, res) => {
 
     const result = await Service.getMyFriend(id);
 
+    console.log(result.rows);
+
+    res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
     res.status(500).json(err);
