@@ -190,7 +190,6 @@ function notifyFriendsLocationUpdate(friendIds, userId, x, y) {
   };
   friendIds.forEach(friendId => {
     sendToUser(friendId, locationMessage);
-    console.log("친구에게 내 위치 전송 완료", friendId)
   });
 }
 
