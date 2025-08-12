@@ -80,8 +80,8 @@ wss.on('connection', (ws, req) => {
     }
   });
 
-  ws.on('close', async () => {
-    console.log(`[WS CLOSE] userId=${userId}, IP=${ip}, code=${code}, reason=${reason.toString()}, 시간=${new Date().toISOString()}`);
+  ws.on('close', async (code, reason) => {
+    console.log(`[WS CLOSE] userId=${userId}, code=${code}, reason=${reason.toString()}, 시간=${new Date().toISOString()}`);
     if (userId) {
       connectedUsers.delete(userId);
       console.log(`❌ 웹소켓 해제: userId=${userId}`);
