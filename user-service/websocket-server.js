@@ -137,7 +137,6 @@ async function notifyLogoutToFriends(userId) {
   console.log(myFriends.rows);
 
   const friendIds = myFriends.rows.map(f => f.Id);
-  console.log(friendIds);
 
   friendIds.forEach(friendId => {
     sendToUser(friendId, {
@@ -147,8 +146,6 @@ async function notifyLogoutToFriends(userId) {
       timestamp: new Date().toISOString()
     });
   });
-
-  console.log("친구들에게 전송 완려!")
 }
 
 // 연결 끊기.
