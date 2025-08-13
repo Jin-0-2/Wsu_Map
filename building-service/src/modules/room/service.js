@@ -6,60 +6,70 @@ const cheerio = require('cheerio');
 // 전체 조회
 exports.getAll = () => {
   const query = `
-  SELECT
-  f."Building_Name",
-  f."Floor_Number",
-  r."Room_Name",
-  r."Room_Description",
-  r."Room_User",
-  r."User_Phone",
-  r."User_Email"
-  FROM
-  "Floor_R" r
-  JOIN
-  "Floor" f ON r."Floor_Id" = f."Floor_Id"
-  WHERE
-  r."Room_Name" NOT LIKE 'b%'           -- b로 시작하는 방 제외
-  AND r."Room_Name" NOT LIKE '%stairs'   -- stairs로 끝나는 방 제외
-  AND r."Room_Name" NOT LIKE 'enterence' -- entrance 제외
-  AND r."Room_Name" NOT LIKE 'to%'       -- to로 시작하는 방 제외
-  ORDER BY
-  -- W 건물을 앞에
-  CASE
-    WHEN f."Building_Name" LIKE 'W%' THEN 1
-    ELSE 2
-  END,
-  -- W 뒤 숫자 추출
-  CASE
-    WHEN f."Building_Name" LIKE 'W%' THEN CAST(substring(f."Building_Name" from 'W([0-9]+)') AS INTEGER)
-    ELSE NULL
-  END,
-  -- 동관/서관 등 (-동관 < -서관 < 그 외)
-  CASE
-    WHEN f."Building_Name" LIKE '%동관%' THEN 1
-    WHEN f."Building_Name" LIKE '%서관%' THEN 2
-    ELSE 0
-  END,
-  -- 층 오름차순
-  CAST(f."Floor_Number" AS INTEGER),
-  -- 방번호/호실 오름차순 (숫자 호실을 앞에 씀)
-  CASE
-    WHEN r."Room_Name" ~ '^[0-9]+(-[0-9]+)?$' THEN
-      LPAD(split_part(r."Room_Name", '-', 1), 4, '0') ||
-      COALESCE(LPAD(split_part(r."Room_Name", '-', 2), 4, '0'), '')
-    ELSE
-      r."Room_Name"
-  END
-;
-`
+    SELECT
+      f."Building_Name",
+      f."Floor_Number",
+      r."Room_Name",
+      r."Room_Description",
+      r."Room_User",
+      r."User_Phone",
+      r."User_Email"
+    FROM
+      "Floor_R" r
+      JOIN "Floor" f ON r."Floor_Id" = f."Floor_Id"
+    WHERE
+      r."Room_Name" NOT LIKE 'b%'          -- b로 시작하는 방 제외
+      AND r."Room_Name" NOT LIKE '%stairs' -- stairs로 끝나는 방 제외
+      AND r."Room_Name" NOT LIKE 'enterence' -- entrance 제외
+      AND r."Room_Name" NOT LIKE 'to%'     -- to로 시작하는 방 제외
+    ORDER BY
+      -- 1. W 건물을 먼저
+      CASE
+        WHEN f."Building_Name" LIKE 'W%' THEN 1
+        ELSE 2
+      END,
+      
+      -- 2. W 뒤 숫자 추출
+      CASE
+        WHEN f."Building_Name" LIKE 'W%' 
+          THEN CAST(substring(f."Building_Name" from 'W([0-9]+)') AS INTEGER)
+        ELSE NULL
+      END,
+      
+      -- 3. 동관/서관 등
+      CASE
+        WHEN f."Building_Name" LIKE '%동관%' THEN 1
+        WHEN f."Building_Name" LIKE '%서관%' THEN 2
+        ELSE 0
+      END,
+      
+      -- 4. 층 (B1 → -1로 변환)
+      CAST(
+        CASE
+          WHEN f."Floor_Number" ~ '^B[0-9]+$' 
+            THEN '-' || REGEXP_REPLACE(f."Floor_Number", '[^0-9]', '', 'g')
+          ELSE REGEXP_REPLACE(f."Floor_Number", '[^0-9]', '', 'g')
+        END
+      AS INTEGER),
+      
+      -- 5. 호실 번호: 숫자 우선, 사전식 보조
+      CASE
+        WHEN r."Room_Name" ~ '^[0-9]+(-[0-9]+)?$' THEN
+          LPAD(split_part(r."Room_Name", '-', 1), 4, '0') ||
+          COALESCE(LPAD(split_part(r."Room_Name", '-', 2), 4, '0'), '')
+        ELSE
+          r."Room_Name"
+      END
+  ;`;
 
   return new Promise((resolve, reject) => {
     con.query(query, (err, result) => {
       if (err) return reject(err);
-      resolve(result);
+      resolve(result.rows);
     });
   });
-}
+};
+
 
 exports.getRoombyBuilding = (building_name) => {
   const query = `SELECT
