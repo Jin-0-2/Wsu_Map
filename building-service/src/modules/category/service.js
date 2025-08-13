@@ -174,7 +174,7 @@ exports.delete = (building_name, floor_number, category_name, x, y) => {
 exports.create_tran = (building_name, floor_number, category_name, x, y, { client }) => {
   const f_idQuery = `SELECT "Floor_Id" FROM "Floor" WHERE "Building_Name" = $1 AND "Floor_Number" = $2;`;
   // 카테고리 이름 중복 방지 되어있음.
-  const insert_Categories_Query = `INSERT INTO "Categories" ("Category_Name", "Building_Name") VALUES ($1, $2) ON CONFLICT DO NOTHING;`;
+  const insert_Categories_Query = `INSERT INTO "Categories" ("Category_Name", "Building_Name") VALUES ($1, $2) ON CONFLICT ("Building_Name", "Category_Name") DO NOTHING;`;
   const insert_Floor_C_Query = `INSERT INTO "Floor_C" ("Floor_Id", "Category_Name", "Category_Location") VALUES ($1, $2, point($3, $4));`;
   
   const values1 = [building_name, floor_number];
