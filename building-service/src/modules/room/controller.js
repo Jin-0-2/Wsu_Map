@@ -8,9 +8,9 @@ exports.getAll = async (req, res) => {
   try {
     const result = await Service.getAll();
 
-    console.log('result----------', result.rows);
+    console.log('result----------', result);
     
-    res.status(200).json(result.rows);
+    res.status(200).json(result);
   } catch (err) {
     console.error("DB 오류:", err);
     
