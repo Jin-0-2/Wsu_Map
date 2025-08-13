@@ -127,7 +127,7 @@ exports.add_admin = (id) => {
 // 로그인
 exports.login = (id, pw) => {
   const selectQuery    = `SELECT * FROM "User" WHERE "Id" = $1 AND "Pw" = $2`
-  const updateQuery    = 'UPDATE "User" SET "Is_Login" = true WHERE "Id" = $1 RETURNING "Is_Login", "Is_Tutorial";'
+  const updateQuery    = 'UPDATE "User" SET "Is_Login" = true WHERE "Id" = $1 RETURNING "Is_Login", "Is_Tutorial", "Is_location_public";'
 
   const values = [id, pw]
   const values2 = [id]
