@@ -7,6 +7,8 @@ const pathService = require("../path/service")
 exports.getAll = async (req, res) => {
   try {
     const result = await Service.getAll();
+
+    console.log('result----------', result.rows);
     
     res.status(200).json(result.rows);
   } catch (err) {
