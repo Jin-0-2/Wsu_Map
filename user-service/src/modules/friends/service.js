@@ -170,7 +170,7 @@ exports.accept = async (my_id, add_id) => {
       VALUES ($1, $2, 'accepted', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       ON CONFLICT ("user_id", "friend_id") DO NOTHING;
     `;
-    await con.query(insertQuery, [my_id, add_id]);
+    await con.query(insertQuery, [add_id, my_id]);
 
     await con.query('COMMIT');
     return { message: '친구 요청이 수락되었습니다.' };
