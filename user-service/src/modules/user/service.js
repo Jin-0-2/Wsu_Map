@@ -151,6 +151,7 @@ exports.login = (id, pw) => {
           pw: Pw,
           name: Name,
           islogin: result.rows[0].Is_Login,
+          is_location_public: result.rows[0].Is_location_public,
           is_tutorial: result.rows[0].Is_Tutorial
         })
       });
