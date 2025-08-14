@@ -40,8 +40,6 @@ exports.getRoombyBuildingFloor = async (req, res) => {
 
     const result = await Service.getRoombyBuildingFloor(building_name, floor_number);
 
-    console.log('result----------', result.rows);
-    
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("DB 오류:", err);
