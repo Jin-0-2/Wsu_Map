@@ -1,5 +1,5 @@
 {
-  "name": "arserver",
+  "name": "user-service",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
