@@ -281,7 +281,7 @@ exports.mapBuildingName = (originalBuilding, roomNumber) => {
 
   // 단순 매핑인 경우
   if (typeof mapping === 'string') {
-    return mapping;
+    return mapping;    
   }
 
   // 복합 매핑인 경우 (조건부)
