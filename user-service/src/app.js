@@ -5,6 +5,8 @@ const app = express();
 const userRouter = require('./routes/index');
 const con = require('./core/db')
 const { requestLogger } = require('./core/logger');
+require('dotenv').config();
+
 
 const AWS_IP = `http://54.252.215.95:`
 
