@@ -2,6 +2,8 @@
 
 const con = require("../../core/db")
 
+const bcrypt = require('bcrypt');
+
 // 회원 전체 조회
 exports.getAll = () => {
   const query = 'SELECT * FROM "User" ORDER BY "Created_At"'
@@ -52,12 +54,17 @@ exports.getUser = (id) => {
 }
 
 // 회원가입
-exports.register = (id, pw, name, stu_number, phone, email) => {
+exports.register = async (id, pw, name, stu_number, phone, email) => {
   const insertQuery = `
     INSERT INTO "User" ("Id", "Pw", "Name", "Stu_Num", "Phone", "Email")
     VALUES ($1, $2, $3, $4, $5, $6)
   `
-  const values = [id, pw, name, stu_number, phone, email]
+
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(pw, saltRounds);
+
+
+  const values = [id, hashedPassword, name, stu_number, phone, email]
 
   return new Promise((resolve, reject) => {
     con.query(
@@ -81,12 +88,16 @@ exports.register = (id, pw, name, stu_number, phone, email) => {
 }
 
 // 관리자 회원가입
-exports.admin_register = (id, pw, name, stu_number, phone, email) => {
+exports.admin_register = async (id, pw, name, stu_number, phone, email) => {
   const insertQuery = `
     INSERT INTO "User" ("Id", "Pw", "Name", "Stu_Num", "Phone", "Email")
     VALUES ($1, $2, $3, $4, $5, $6) RETURNING "Id"
   `
-  const values = [id, pw, name, stu_number, phone, email]
+
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(pw, saltRounds);
+
+  const values = [id, hashedPassword, name, stu_number, phone, email]
 
   return new Promise((resolve, reject) => {
     con.query(
@@ -125,38 +136,41 @@ exports.add_admin = (id) => {
 }
 
 // 로그인
-exports.login = (id, pw) => {
-  const selectQuery    = `SELECT * FROM "User" WHERE "Id" = $1 AND "Pw" = $2`
-  const updateQuery    = 'UPDATE "User" SET "Is_Login" = true WHERE "Id" = $1 RETURNING "Is_Login", "Is_Tutorial", "Is_location_public";'
+exports.login = async (id, pw) => {
+  // 1. 아이디로 사용자 정보 조회
+  const findUserQuery = `SELECT * FROM "User" WHERE "Id" = $1`
+  const userResult    = await con.query(findUserQuery, [id])
 
-  const values = [id, pw]
-  const values2 = [id]
+  // 사용자가 없는 경우
+  if (userResult.rows.length === 0) {
+    return { notfound: true };
+  }
 
-  return new Promise((resolve, reject) => {
-    // 1. 사용자 조회
-    con.query(selectQuery, values, (err, result) => {
-      if (err) return reject(err);
-      if (result.rows.length === 0) return resolve({ notfound: true });
+  const user = userResult.rows[0];
+  const hashedPasswordInDB = user.Pw;
 
-      console.log(result.rows[0]); // 실제 반환되는 키 확인!
+  // 2. 비밀번호 일치 여부 확인
+  const isMatch = await bcrypt.compare(pw, hashedPasswordInDB);
 
-      const { Id, Pw, Name } = result.rows[0];
+  // 3. 결과에 따라 처리
+  if (isMatch) {
+    // 비밀번호 일치
+    const updateQuery    = 'UPDATE "User" SET "Is_Login" = true WHERE "Id" = $1 RETURNING "Is_Login", "Is_Tutorial", "Is_location_public";'
+    const updateResult   = await con.query(updateQuery, [id])
 
-      // 2. 로그인 상태 업데이트 (비동기, 실패해도 로그인은 진행)
-      con.query(updateQuery, values2, (err, result) => {
-        if (err) console.error("IsLogin 업데이트 실패:", err);
-
-        return resolve({
-          id: Id,
-          pw: Pw,
-          name: Name,
-          islogin: result.rows[0].Is_Login,
-          is_location_public: result.rows[0].Is_location_public,
-          is_tutorial: result.rows[0].Is_Tutorial
-        })
-      });
-    });
-  });
+    console.log(`로그인 성공: ${id}`);
+    returnuser = {
+      id: updateResult.rows[0].Id,
+      name: updateResult.rows[0].Name,
+      islogin: updateResult.rows[0].Is_Login,
+      is_location_public: updateResult.rows[0].Is_location_public,
+      is_tutorial: updateResult.rows[0].Is_Tutorial
+    }
+    return returnuser;
+  } else {
+    // 비밀번호 불일치
+    return { notmatch: true };
+  }
 };
 
 // 관리자 아이디 체크
@@ -190,14 +204,18 @@ exports.logout = (id) => {
 };
 
 // 회원정보 수정
-exports.update = (id, pw, phone, email) => {
+exports.update = async (id, pw, phone, email) => {
   let fields = []
   let values = []
   let idx = 1
 
   if (pw) {
     fields.push(`"Pw" = $${idx++}`)
-    values.push(pw)
+
+    // 암호화
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(pw, saltRounds);
+    values.push(hashedPassword)
   }
   if (phone) {
     fields.push(`"Phone" = $${idx++}`)
