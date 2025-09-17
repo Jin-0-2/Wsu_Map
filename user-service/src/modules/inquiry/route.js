@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const inquiryController = require('./controller');
+const authMiddleware = require('../../middleware/auth');
 
 
 // 문의하기 목록 조회 (관리자용)

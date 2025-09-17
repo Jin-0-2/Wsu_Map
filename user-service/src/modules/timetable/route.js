@@ -3,6 +3,9 @@
 const express = require("express")
 const router = express.Router()
 const controller = require("./controller")
+const authMiddleware = require("../../middleware/auth")
+
+// 시간표 전체 조회
 
 // 내 시간표 불러오기
 router.get("/:id", controller.getAll)

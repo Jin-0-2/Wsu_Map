@@ -8,7 +8,7 @@ const upload = multer();
 // 내 시간표 불러오기
 exports.getAll = async (req, res) => {
     try {
-        const id = req.params.id;
+        const id = req.user.id;
 
         const result = await Service.getAll(id);
 
@@ -38,7 +38,8 @@ exports.getAll = async (req, res) => {
 // 시간표 추가
 exports.add = async (req, res) => {
   try {
-    const id  = req.params.id;
+    const id  = req.user.id;
+
     const {
       title,
       day_of_week,
@@ -73,7 +74,8 @@ exports.addExcel = [
   upload.single('excelFile'),
   async (req, res) => {
     try {
-      const id = req.params.id;
+      const id = req.user.id;
+
       const file = req.file;
 
       if (!file) {
@@ -142,7 +144,7 @@ exports.addExcel = [
 // 시간표 수정
 exports.update = async (req, res) => {
   try {
-    const id  = req.params.id;
+    const id  = req.user.id;
 
     const {
       origin_title,
@@ -172,7 +174,8 @@ exports.update = async (req, res) => {
 // 시간표 삭제
 exports.delete = async (req, res) => {
   try {   
-    const id  = req.params.id;
+    const id  = req.user.id;
+    
     const title = req.body.title;
     const day_of_week = req.body.day_of_week;
 
