@@ -311,7 +311,7 @@ exports.update_share_location = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
 
-    const id = req.user.id;
+    const id = req.params.id;
 
     const result = await userService.delete(id);
     if (result.rowCount === 0) {
