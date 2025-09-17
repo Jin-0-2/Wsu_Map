@@ -195,8 +195,8 @@ exports.admin_login = async (req, res) => {
 // 로그아웃
 exports.logout = async (req, res) => {
   try {
-
-    const { id } = req.user.id;
+    // 버그 수정: req.user.id는 문자열이므로 구조 분해 할당을 사용하지 않습니다.
+    const id = req.user.id;
 
     if (isUserConnected(id)) {
       disconnectUserSocket(id);
@@ -223,15 +223,8 @@ exports.update = async (req, res) => {
 
     const id = req.user.id;
 
-    const {
-      pw = null,
-      phone = null,
-      email = null
-    } = req.body;
+    const { pw, phone, email } = req.body;
 
-    if (!id) {
-      return res.status(400).json({ success: false, message: "id는 필수입니다." });
-    }
     if (!pw && !phone && !email) {
       return res.status(400).json({ success: false, message: "수정할 항목이 없습니다." });
     }
@@ -239,7 +232,10 @@ exports.update = async (req, res) => {
     const result = await userService.update(id, pw, phone, email);
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ success: false, message: "해당 id의 사용자가 없습니다." });
+      // 토큰이 유효하다면 사용자는 존재해야 하므로 이 경우는 거의 발생하지 않습니다.
+      return res.status(404).json({
+        success: false, message: "사용자 정보를 찾을 수 없습니다."
+      });
     }
 
     res.status(200).json({ success: true, message: "회원정보가 수정되었습니다." });
@@ -259,7 +255,7 @@ try {
     const y = req.body.y;
     const timestamp = req.body.timestamp;
 
-    if (!id && !x && !y) {
+    if (!x || !y) { // id는 토큰에서 오므로 검사할 필요 없음
       return res.status(400).json({ success: false, message: "필수 항목이 누락되었습니다." });
     }
 

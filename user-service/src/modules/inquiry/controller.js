@@ -12,7 +12,7 @@ exports.getInquiries = async (req, res) => {
     res.status(200).json(inquiries);
   } catch (err) {
     console.error("문의하기 목록 조회 오류:", err);
-    res.status(500).send("문의하기 목록 조회 실패");
+    res.status(500).json({ success: false, message: "문의 목록 조회 중 오류가 발생했습니다." });
   }
 };
 
@@ -26,24 +26,24 @@ exports.answerInquiry = async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     console.error("답글 달기 오류:", err);
-    res.status(500).send("답글 달기 실패");
+    res.status(500).json({ success: false, message: "답글 처리 중 오류가 발생했습니다." });
   }
 };
 
 // 내 문의 조회(클라이언트용)
 exports.getInquiry = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.user.id;
     const inquiry = await inquiryService.getById(id);
 
-    if (!inquiry) {
-      return res.status(404).send("문의를 찾을 수 없습니다.");
+    if (!inquiry || inquiry.length === 0) {
+      return res.status(404).json({ success: false, message: "작성한 문의를 찾을 수 없습니다." });
     }
     
     res.status(200).json(inquiry);
   } catch (err) {
     console.error("문의하기 상세 조회 오류:", err);
-    res.status(500).send("문의하기 상세 조회 실패");
+    res.status(500).json({ success: false, message: "문의 조회 중 오류가 발생했습니다." });
   }
 };
 
@@ -52,13 +52,11 @@ exports.createInquiry = [
   upload.single('image'),
   async (req, res) => {
     try {
-      const { id } = req.params;
+      const id = req.user.id;
       const { category, title, content } = req.body;
-
-      console.log(req.body);
       
-      if (!id || !title || !content) {
-        return res.status(400).send("필수 정보가 누락되었습니다.");
+      if (!title || !content || !category) {
+        return res.status(400).json({ success: false, message: "필수 정보(카테고리, 제목, 내용)가 누락되었습니다." });
       }
 
       // 문의 코드 생성
@@ -79,7 +77,7 @@ exports.createInquiry = [
       res.status(201).json(result);
     } catch (err) {
       console.error("문의하기 작성 오류:", err);
-      res.status(500).send("문의하기 작성 실패");
+      res.status(500).json({ success: false, message: "문의 작성 중 오류가 발생했습니다." });
     }
   }
 ];
@@ -88,13 +86,11 @@ exports.createInquiry = [
 // 내 문의 삭제(클라이언트용)
 exports.deleteInquiry = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.user.id;
     const { inquiry_code } = req.body;
 
-    if (!id) {
-      return res.status(400).send("ID가 누락되었습니다.");
-    } else if (!inquiry_code) {
-      return res.status(400).send("문의 코드가 누락되었습니다.");
+    if (!inquiry_code) {
+      return res.status(400).json({ success: false, message: "문의 코드가 누락되었습니다." });
     }
 
     // S3에서 문의 사진 삭제
@@ -110,12 +106,12 @@ exports.deleteInquiry = async (req, res) => {
     const result = await inquiryService.delete(id, inquiry_code);
     
     if (!result) {
-      return res.status(404).send("문의를 찾을 수 없습니다.");
+      return res.status(404).json({ success: false, message: "삭제할 문의를 찾을 수 없습니다." });
     }
     
-    res.status(200).send("문의가 삭제되었습니다.");
+    res.status(200).json({ success: true, message: "문의가 삭제되었습니다." });
   } catch (err) {
     console.error("문의하기 삭제 오류:", err);
-    res.status(500).send("문의하기 삭제 실패");
+    res.status(500).json({ success: false, message: "문의 삭제 중 오류가 발생했습니다." });
   }
 };
