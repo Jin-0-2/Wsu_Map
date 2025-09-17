@@ -18,9 +18,9 @@ const authMiddleware = (req, res, next) => {
     // 검증에 성공하면, 토큰 생성 시 넣었던 payload가 반환됩니다.
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // 4. 검증 성공 시, 요청 객체(req)에 사용자 정보 추가
-    // 이제 이 미들웨어를 거치는 모든 API 컨트롤러에서 req.user.id 로 사용자 ID를 참조할 수 있습니다.
-    req.user = { id: decoded.id };
+    // 4. 검증 성공 시, 디코딩된 payload 전체를 요청 객체(req)에 추가합니다.
+    // 이제 다른 미들웨어나 컨트롤러에서 req.user.id, req.user.isAdmin 등을 참조할 수 있습니다.
+    req.user = decoded;
     next(); // 다음 미들웨어 또는 컨트롤러로 제어를 넘깁니다.
   } catch (error) {
     // 5. 검증 실패 시 (만료, 위조 등)

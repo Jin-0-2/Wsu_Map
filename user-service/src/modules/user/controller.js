@@ -311,8 +311,6 @@ exports.update_share_location = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
 
-    const id = req.params.id;
-
     const result = await userService.delete(id);
     if (result.rowCount === 0) {
       // 삭제된 행이 없음 → 잘못된 id
