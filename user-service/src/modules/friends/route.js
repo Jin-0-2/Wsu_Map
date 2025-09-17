@@ -3,6 +3,8 @@
 const express = require("express")
 const router = express.Router()
 const controller = require("./controller")
+const authMiddleware = require("../../middleware/auth")
+
 
 // 친구 목록 전체 조회
 router.get("/", controller.getAll)

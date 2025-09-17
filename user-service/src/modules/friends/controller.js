@@ -22,11 +22,9 @@ exports.getAll = async (req, res) => {
 exports.getMyFriend = async (req, res) => {
   try {
 
-    const id = req.params.id;
+    const id = req.user.id;
 
     const result = await Service.getMyFriend(id);
-
-    console.log(result.rows);
 
     res.status(200).json(result.rows);
   } catch (err) {
@@ -39,7 +37,7 @@ exports.getMyFriend = async (req, res) => {
 exports.add = async (req, res) => {
   try {
 
-    const my_id = req.body.my_id;
+    const my_id = req.user.my_id;
     const add_id = req.body.add_id;
 
     if (my_id === add_id) {
@@ -71,7 +69,7 @@ exports.add = async (req, res) => {
 exports.my_req_list = async (req, res) => {
   try {
 
-    const id = req.params.id;
+    const id = req.user.id;
 
     const result = await Service.my_req_list(id);
 
@@ -85,7 +83,7 @@ exports.my_req_list = async (req, res) => {
 // 친구추가 받은 요청 목록 조회
 exports.request_list = async (req, res) => {
   try {
-    const id = req.params.id;
+    const id = req.user.id;
 
     const result = await Service.request_list(id);
 
@@ -99,10 +97,10 @@ exports.request_list = async (req, res) => {
 // 오 마이 미스테이크
 exports.mistake = async (req, res) => {
   try {
-    const id = req.params.id;
+    const my_id = req.user.id;
     const friend_id = req.body.friend_id;
 
-    const result = await Service.mistake(id, friend_id);
+    const result = await Service.mistake(my_id, friend_id);
 
     res.status(200).json({ message: "실수 인정" })
   } catch (err) {
@@ -115,7 +113,7 @@ exports.mistake = async (req, res) => {
 exports.accept = async (req, res) => {
   try {
 
-    const my_id = req.body.my_id;
+    const my_id = req.user.id;
     const add_id = req.body.add_id;
 
     await Service.accept(my_id, add_id);
@@ -132,7 +130,7 @@ exports.accept = async (req, res) => {
 exports.reject = async (req, res) => {
   try {
 
-    const my_id = req.body.my_id;
+    const my_id = req.user.id;
     const add_id = req.body.add_id;
 
     await Service.reject(my_id, add_id);
@@ -147,7 +145,7 @@ exports.reject = async (req, res) => {
 // 친구 삭제
 exports.delete = async (req, res) => {
   try {
-    const my_id = req.body.my_id;
+    const my_id = req.user.id;
     const add_id = req.body.add_id;
 
     const result = await Service.delete(my_id, add_id);
