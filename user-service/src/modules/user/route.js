@@ -3,6 +3,7 @@
 const express = require("express")
 const router = express.Router()
 const controller = require("./controller")
+const authMiddleware = require("../../middleware/auth")
 
 // 성공!
 // 회원 전체 조회

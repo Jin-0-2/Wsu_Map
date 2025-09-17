@@ -37,7 +37,7 @@ exports.getMyFriend = async (req, res) => {
 exports.add = async (req, res) => {
   try {
 
-    const my_id = req.user.my_id;
+    const my_id = req.user.id;
     const add_id = req.body.add_id;
 
     if (my_id === add_id) {

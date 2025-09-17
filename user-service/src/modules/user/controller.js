@@ -196,7 +196,7 @@ exports.admin_login = async (req, res) => {
 exports.logout = async (req, res) => {
   try {
 
-    const { id } = req.body;
+    const { id } = req.user.id;
 
     if (isUserConnected(id)) {
       disconnectUserSocket(id);
@@ -221,8 +221,9 @@ exports.logout = async (req, res) => {
 exports.update = async (req, res) => {
   try {
 
+    const id = req.user.id;
+
     const {
-      id = null,
       pw = null,
       phone = null,
       email = null
@@ -252,7 +253,8 @@ exports.update = async (req, res) => {
 // 현재 위치 전송
 exports.update_location = async (req, res) => {
 try {
-    const id = req.body.id;
+    const id = req.user.id;
+
     const x = req.body.x;
     const y = req.body.y;
     const timestamp = req.body.timestamp;
@@ -287,7 +289,7 @@ try {
 // 내 위치 공유 함 안함 할래 말래 할래 말래 할래 말래 애매하긴 해
 exports.update_share_location = async (req, res) => {
   try {
-    const id = req.body.id;
+    const id = req.user.id;
 
     const result = await userService.update_share_location(id);
     
@@ -313,7 +315,7 @@ exports.update_share_location = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
 
-    const { id } = req.body;
+    const id = req.user.id;
 
     const result = await userService.delete(id);
     if (result.rowCount === 0) {
@@ -369,7 +371,7 @@ try {
 // 튜토리얼 다시 보지 않기
 exports.update_tutorial = async (req, res) => {
   try {
-    const { id } = req.body;
+    const id = req.user.id;
 
     const result = await userService.update_tutorial(id);
 
