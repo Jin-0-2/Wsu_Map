@@ -159,12 +159,12 @@ exports.login = async (id, pw) => {
     const updateResult   = await con.query(updateQuery, [id])
 
     console.log(`로그인 성공: ${id}`);
-    returnuser = {
-      id: updateResult.rows[0].Id,
-      name: updateResult.rows[0].Name,
+    const returnuser = {
+      id: user.Id, // 버그 수정: updateResult가 아닌, 이전에 조회한 user 객체에서 Id를 가져옵니다.
+      name: user.Name, // 버그 수정: user 객체에서 Name을 가져옵니다.
       islogin: updateResult.rows[0].Is_Login,
       is_location_public: updateResult.rows[0].Is_location_public,
-      is_tutorial: updateResult.rows[0].Is_Tutorial
+      is_tutorial: updateResult.rows[0].Is_Tutorial,
     }
     return returnuser;
   } else {
