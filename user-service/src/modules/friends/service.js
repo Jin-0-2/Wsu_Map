@@ -3,22 +3,23 @@
 const con = require("../../core/db")
 
 // 회원 전체 조회
-exports.getAll = () => {
+exports.getAll = async () => {
   const query = 'SELECT * FROM "User" ORDER BY "Created_At"'
 
-  return new Promise((resolve, reject) => {
-    con.query(query, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  try {
+    const result = await con.query(query);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 }
 
 // 친구 추가
-exports.add = (my_id, add_id) => {
+exports.add = async (my_id, add_id) => {
   const checkQuery = `
     SELECT "status" FROM "friendship"
     WHERE "user_id" = $1 AND "friend_id" = $2
+    FOR UPDATE;
   `;
   const insertQuery = `
     INSERT INTO "friendship" ("user_id", "friend_id", "status")
@@ -32,49 +33,43 @@ exports.add = (my_id, add_id) => {
     RETURNING "user_id"
   `;
 
-  return new Promise((resolve, reject) => {
-    con.query(checkQuery, [my_id, add_id], (err, result) => {
-      if (err) return reject(err);
+  const nameQuery = `
+    SELECT "Name" AS user_name FROM "User" WHERE "Id" = $1
+  `;
 
-      if (result.rows.length === 0) {
-        // 친구 신청한 적 없음 → 새로 추가!
-        con.query(insertQuery, [my_id, add_id], (err2, result2) => {
-          if (err2) return reject(err2);
+  try {
+    await con.query('BEGIN');
 
-          // 유저 이름도 같이 가져옴
-          if (result2.rows.length > 0) {
-            const nameQuery = `SELECT "Name" AS user_name FROM "User" WHERE "Id" = $1`;
-            con.query(nameQuery, [my_id], (err3, result3) => {
-              if (err3) return reject(err3);
-              result2.rows[0].user_name = result3.rows[0]?.user_name || my_id;
-              resolve(result2);
-            });
-          } else {
-            resolve(result2);
-          }
-        });
-      } else if (result.rows[0].status === 'rejected') {
-        // 거절 상태 → 다시 신청(=pending으로)!
-        con.query(updateQuery, [my_id, add_id], (err2, result2) => {
-          if (err2) return reject(err2);
+    // 기존 관계 상태 확인(잠금)
+    const checkRes = await con.query(checkQuery, [my_id, add_id]);
 
-          if (result2.rows.length > 0) {
-            const nameQuery = `SELECT "Name" AS user_name FROM "User" WHERE "Id" = $1`;
-            con.query(nameQuery, [my_id], (err3, result3) => {
-              if (err3) return reject(err3);
-              result2.rows[0].user_name = result3.rows[0]?.user_name || my_id;
-              resolve(result2);
-            });
-          } else {
-            resolve(result2);
-          }
-        });
-      } else {
-        // 이미 pending/accepted 등 → 아무것도 안 함
-        resolve({ rows: [] });
-      }
-    });
-  });
+    let result;
+    if (checkRes.rows.length === 0) {
+      // 친구 신청한 적 없음 -> 새로 추가!
+      result = await con.query(insertQuery, [my_id, add_id]);
+
+    } else if (checkRes.rows[0].status === 'rejected') {
+      // 거절 상태 → 다시 신청(=pending으로)!
+      result = await con.query(updateQuery, [my_id, add_id]);
+
+    } else {
+      // 이미 pending/accepted 등 → 아무것도 안 함
+      await con.query('ROLLBACK');
+      result = { rows: [] };
+  }
+
+  if (result.rows.length > 0) {
+    // 유저 이름도 같이 가져옴
+    const nameRes = await con.query(nameQuery, [my_id]);
+    result.rows[0].user_name = nameRes.rows[0]?.user_name || my_id;
+  }
+  
+  await con.query('COMMIT');
+  return result;
+  } catch (err) {
+    await con.query('ROLLBACK');
+    throw err;
+  }
 };
 
 // 내 친구 목록 조회
@@ -87,14 +82,12 @@ exports.getMyFriend = async (id) => {
   AND f."status" = 'accepted';
   `;
 
-  const values = [id];
-
-  return new Promise((resolve, reject) => {
-    con.query(select_query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  try {
+    const result = await con.query(select_query, [id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 }
 
 // 내가 보낸 친구 조회 리스트
@@ -106,15 +99,14 @@ exports.my_req_list = async (id) => {
     WHERE f."user_id" = $1
       AND f."status" = 'pending'
   `
-  const values = [id];
-
-  return new Promise((resolve, reject) => {
-    con.query(select_query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  try {
+    const result = await con.query(select_query, [id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 }
+
 
 // 친구 요청 받은 리스트 조회
 exports.request_list = async (id) => {
@@ -125,15 +117,15 @@ exports.request_list = async (id) => {
     WHERE f."friend_id" = $1
       AND f."status" = 'pending'
   `;
-  const values = [id];
-
-  return new Promise((resolve, reject) => {
-    con.query(select_query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  try {
+    const result = await con.query(select_query, [id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 }
+
+
 
 // 내가 보낸 친구 요청 취소 mistake;;
 exports.mistake = async (id, friend_id) => {
@@ -141,14 +133,12 @@ exports.mistake = async (id, friend_id) => {
   DELETE FROM "friendship" WHERE "user_id" = $1 AND "friend_id" = $2
   `;
 
-  const values = [id, friend_id];
-
-  return new Promise((resolve, reject) => {
-    con.query(delete_qurey, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  try {
+    const result = await con.query(delete_qurey, [id, friend_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 }
 
 // 친구 요청 받기
@@ -188,30 +178,29 @@ exports.reject = async (my_id, add_id) => {
     WHERE "user_id" = $2 AND "friend_id" = $1 AND "status" = 'pending';
   `;
 
-  const values = [my_id, add_id]; // my_id = 거절한 사람, add_id = 요청 보낸 사람
+  // my_id = 거절한 사람, add_id = 요청 보낸 사람
 
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
-};
+  try {
+    const result = await con.query(query, [my_id, add_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+}
 
-// 회원정보 삭제
-exports.delete = (my_id, add_id) => {
+
+// 친구 삭제
+exports.delete = async (my_id, add_id) => {
   const deleteQuery = `
   DELETE FROM friendship
   WHERE (user_id = $1 AND friend_id = $2)
   OR (user_id = $2 AND friend_id = $1);
   `;
 
-  const values = [my_id, add_id]
-
-  return new Promise((resolve, reject) => {
-    con.query(deleteQuery, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
-};
+  try {
+    const result = await con.query(deleteQuery, [my_id, add_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+}
