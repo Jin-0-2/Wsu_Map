@@ -16,53 +16,51 @@ const CATEGORY_MAP = {
 };
 
 // 문의하기 전체 목록 조회
-exports.getAll = () => {
+exports.getAll = async () => {
   const query = `
-    SELECT i.*
-    FROM "Inquiry" i 
-    ORDER BY i."Created_At" DESC
+    SELECT *
+    FROM "Inquiry"
+    ORDER BY "Created_At" DESC
   `;
 
-  return new Promise((resolve, reject) => {
-    con.query(query, (err, result) => {
-      if (err) return reject(err);
-      resolve(result.rows);
-    });
-  });
+  try {
+    const result = await con.query(query);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };
 
 // 내 문의 조회
-exports.getById = (id) => {
+exports.getById = async (id) => {
   const query = `
-    SELECT i.*
-    FROM "Inquiry" i 
-    WHERE i."User_Id" = $1
+    SELECT *
+    FROM "Inquiry" 
+    WHERE "User_Id" = $1
   `;
-  const values = [id];
 
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result.rows);
-    });
-  });
+  try {
+    const result = await con.query(query, [id]);
+    return result.rows;
+  } catch (err) {
+    throw err;
+  }
 };
 
 // 문의하기 작성
-exports.create = (userId, title, content, category, inquiry_code, fileUrl = null) => {
+exports.create = async (userId, title, content, category, inquiry_code, fileUrl = null) => {
   const query = `
     INSERT INTO "Inquiry" ("User_Id", "Category", "Inquiry_Code", "Title", "Content", "Image_Path", "Created_At", "Status") 
     VALUES ($1, $2, $3, $4, $5, $6, (NOW() AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Seoul'), 'pending') 
     RETURNING *
   `;
-  const values = [userId, category, inquiry_code, title, content, fileUrl];
 
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result.rows[0]);
-    });
-  });
+  try {
+    const result = await con.query(query, values);
+    return result.rows[0];
+  } catch (err) {
+    throw err;
+  }
 };
 
 exports.mapCategory = (category) => {
@@ -125,18 +123,17 @@ exports.createInquiryCode = (category) => {
 }
 
 // 문의 코드로 문의 사진 조회
-exports.getByInquiryCode = (inquiry_code) => {
+exports.getByInquiryCode = async (inquiry_code) => {
   const query = `
     SELECT "Image_Path" FROM "Inquiry" WHERE "Inquiry_Code" = $1
   `;
-  const values = [inquiry_code];
 
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result.rows[0]);
-    });
-  });
+  try {
+    const result = await con.query(query, [inquiry_code]);
+    return result.rows[0];
+  } catch (err) {
+    throw err;
+  }
 }
 
 // S3에서 문의 사진 삭제
@@ -161,33 +158,30 @@ exports.deleteImageFromS3 = (imageUrl) => {
 }
 
 // 문의하기 삭제
-exports.delete = (id, inquiry_code) => {
+exports.delete = async (id, inquiry_code) => {
   const query = 'DELETE FROM "Inquiry" WHERE "User_Id" = $1 AND "Inquiry_Code" = $2 RETURNING *';
-  const values = [id, inquiry_code];
 
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result.rows[0]);
-    });
-  });
+  try {
+    const result = await con.query(query, [id, inquiry_code]);
+    return result.rows[0];
+  } catch (err) {
+    throw err;
+  }
 };
 
-
 // 답글 달기
-exports.answer = (inquiry_code, answer) => {
+exports.answer = async (inquiry_code, answer) => {
   const query = `
     UPDATE "Inquiry" 
     SET "Status" = 'answered', "Answer" = $1, "Answered_At" = (NOW() AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Seoul') 
     WHERE "Inquiry_Code" = $2 
     RETURNING *
   `;
-  const values = [answer, inquiry_code];
 
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result.rows[0]);
-    });
-  });
+  try {
+    const result = await con.query(query, [answer, inquiry_code]);
+    return result.rows[0];
+  } catch (err) {
+    throw err;
+  }
 };
