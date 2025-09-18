@@ -69,26 +69,36 @@ exports.getUser = async (req, res) => {
 exports.register = async (req, res) => {
   try {
 
-    const { id, pw, name, stu_number, phone, email } = req.body
+    const { id, pw, name, stu_number, phone, email } = req.body;
+
     if (!id || !pw || !name || !phone) {
-      return res.status(400).send("모든 항목을 입력하세요.")
+      return res.status(400).json({
+        success: false,
+        message: "모든 항목을 입력하세요."
+      });
     }
-    const result = await userService.admin_register(id, pw, name, stu_number, phone, email);
+
+    const result = await userService.register(id, pw, name, stu_number, phone, email);
 
     if (result && result.duplicate) {
-      return res.status(409).send("이미 존재하는 아이디입니다.");
+      return res.status(409).json({
+        success: false,
+        message: "이미 존재하는 아이디입니다."
+      });
     }
 
-    // 관리자 테이블에 Id 추가
-    await userService.add_admin(result.rows[0].Id);
-
     res.status(201).json({
-      message: "회원가입이 완료되었습니다",
+      success: true,
+      message: "회원가입이 완료되었습니다"
     });
+
   } catch (err) {
     console.error("회원가입 처리 중 오류:", err);
-    // saveLog("", req.path, 500);
-    res.status(500).send("회원가입 처리 중 오류");
+  
+    res.status(500).json({
+      success: false,
+      message: "회원가입 처리 중 오류"
+    });
   }
 };
 
@@ -109,6 +119,7 @@ exports.admin_register = async (req, res) => {
     console.log(`관리자 회원가입 완료: ${result.rows[0].Id}`);
 
     res.status(201).json({
+      success: true,
       message: "관리자 회원가입이 완료되었습니다",
     });
   } catch (err) {
