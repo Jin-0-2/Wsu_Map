@@ -7,31 +7,36 @@ const upload = multer();
 
 // 내 시간표 불러오기
 exports.getAll = async (req, res) => {
-    try {
-        const id = req.user.id;
+  try {
+    const id = req.user.id;
 
-        const result = await Service.getAll(id);
+    const result = await Service.getAll(id);
 
-        const response = result.rows.map(row => ({
-            title: row.title,
-            day_of_week: row.day_of_week,
-            start_time: row.start_time,
-            end_time: row.end_time,
-            building_name: row.building_name,
-            floor_number: row.floor_number,
-            room_name: row.room_name,
-            professor: row.professor,
-            color: row.color,
-            memo: row.memo,
-        }))
+    const response = result.rows.map(row => ({
+      title: row.title,
+      day_of_week: row.day_of_week,
+      start_time: row.start_time,
+      end_time: row.end_time,
+      building_name: row.building_name,
+      floor_number: row.floor_number,
+      room_name: row.room_name,
+      professor: row.professor,
+      color: row.color,
+      memo: row.memo,
+    }))   
 
-        console.log('response:', response);
+    res.status(200).json({
+      success: true,
+      response: response,
+    });
 
-        res.status(200).json(response);
     } catch (err) {
-        console.error("DB 오류:", err);
+      console.error("DB 오류:", err);
 
-        res.status(500).send("DB 오류");
+      res.status(500).json({
+        success: false,
+        message: "DB 오류"
+      });
     }
 };
 
@@ -61,7 +66,7 @@ exports.add = async (req, res) => {
         color, memo
     );
 
-    res.status(201).json({ success: true, result });
+    res.status(201).json({ success: true, data: result });
   } catch (err) {
     console.error("DB 오류:", err);
     
@@ -186,6 +191,6 @@ exports.delete = async (req, res) => {
     });
   } catch (err) {
     console.error("DB 오류:", err);
-    res.status(500).send("DB 오류");
+    res.status(500).json({ success: "DB 오류"});
   }
 };
