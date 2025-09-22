@@ -17,7 +17,7 @@ exports.getAll = async (req, res) => {
   } catch (err) {
     console.error("DB 오류:", err);
     
-    res.status(500).send("DB 오류");
+    res.status(500).json({ success: false, message: "DB 오류" });
   }
 };
 
@@ -31,7 +31,7 @@ exports.friend_request_list = async (req, res) => {
   } catch (err) {
     console.error("DB 오류:", err);
     
-    res.status(500).send("DB 오류");
+    res.status(500).json({ success: false, message: "DB 오류" });
   }
 };
 
@@ -45,7 +45,7 @@ exports.getislogin = async (req, res) => {
   } catch (err) {
     console.error("DB 오류:", err);
     
-    res.status(500).send("DB 오류");
+    res.status(500).json({ success: false, message: "DB 오류" });
   }
 }
 
@@ -61,7 +61,7 @@ exports.getUser = async (req, res) => {
   } catch (err) {
     console.error("DB 오류:", err);
     
-    res.status(500).send("DB 오류");
+    res.status(500).json({ success: false, message: "DB 오류" });
   }
 }
 
@@ -124,7 +124,7 @@ exports.admin_register = async (req, res) => {
     });
   } catch (err) {
     console.error("관리자 회원가입 처리 중 오류:", err);
-    res.status(500).send("관리자 회원가입 처리 중 오류");
+    res.status(500).json({ success: false, message: "관리자 회원가입 처리 중 오류" });
   }
 }
 
@@ -160,7 +160,7 @@ exports.login = async (req, res) => {
   } catch (err) {
     console.error("로그인 처리 중 오류:", err);
     // saveLog("", req.path, 500);
-    res.status(500).json({ success: false, message: "로그인 처리 중 오류가 발생했습니다." });
+      res.status(500).json({ success: false, message: "로그인 처리 중 오류가 발생했습니다." });
   }
 };
 
