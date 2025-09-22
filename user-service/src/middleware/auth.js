@@ -16,6 +16,9 @@ const authMiddleware = (req, res, next) => {
   try {
     // 3. 토큰 검증 (비밀 키 사용)
     // 검증에 성공하면, 토큰 생성 시 넣었던 payload가 반환됩니다.
+    if(!process.env.JWT_SECRET) {
+      return res.status(500).json({ success: false, message: 'JWT_SECRET 환경 변수가 설정되지 않았습니다.' });
+    }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // 4. 검증 성공 시, 디코딩된 payload 전체를 요청 객체(req)에 추가합니다.

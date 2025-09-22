@@ -8,7 +8,6 @@ const { requestLogger } = require('./core/logger');
 require('dotenv').config();
 
 
-const AWS_IP = `http://54.252.215.95:`
 
 app.use(express.json());
 app.use(requestLogger);
@@ -21,5 +20,5 @@ app.use("/", userRouter);
 const PORT = 3001;
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on ${AWS_IP}${PORT}`);
+  console.log(`Server running on ${PORT}`);
 });

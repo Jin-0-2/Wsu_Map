@@ -3,6 +3,8 @@
 const express = require("express")
 const router = express.Router()
 const controller = require("./controller")
+const auth = require("../../middleware/auth")
+const admin = require("../../middleware/admin")
 
 // 카테고리 이름을 반환(그거.. 그거 뭐지? 그거 ㅇㅇ 뭐였더라..) 카테고리 추가할 때 선택할 콤보박스 
 // 나중에 함. 아또네;
@@ -25,10 +27,10 @@ router.get("/manager/:building/:floor", controller.getCategoryForManager)
 
 // 성공!
 // 카테고리 추가(2d도면에서 좌표 지정, 이름 지정을 하면, categories, floor_c에 들거가게끔)
-router.post("/:building/:floor", controller.create)
+router.post("/:building/:floor", auth, admin, controller.create)
 
 // 아직.
 // 카테고리 삭제: 이건 관리 페이지에서.. 목록을 보고 삭제를..
-router.delete("/:building/:floor", controller.delete)
+router.delete("/:building/:floor", auth, admin, controller.delete)
 
 module.exports = router

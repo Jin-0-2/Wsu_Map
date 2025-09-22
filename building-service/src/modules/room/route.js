@@ -3,6 +3,8 @@
 const express = require("express")
 const router = express.Router()
 const controller = require("./controller")
+const auth = require("../../middleware/auth")
+const admin = require("../../middleware/admin")
 
 // 방 목록 전부다 : 관리자
 router.get("/", controller.getAll)
@@ -23,20 +25,20 @@ router.get("/desc/:building/:floor/:room", controller.getRoomDescByName)
 router.get("/point/:building/:floor", controller.getRoomPointByName)
 
 // 강의실 수정
-router.put("/:building/:floor", controller.update)
+router.put("/:building/:floor", auth, admin, controller.update)
 
 // 실내 패스 도면 연결
-router.post("/connect", controller.connect);
+router.post("/connect", auth, admin, controller.connect);
 
 // 실내 패스 도면 연결 해제
-router.delete("/disconnect", controller.disconnect);
+router.delete("/disconnect", auth, admin, controller.disconnect);
 
 
 
 // 필ㅇ없ㅇㅁ.
 // 방 추가
-router.post("/:building/:floor", controller.create)
+router.post("/:building/:floor", auth, admin, controller.create)
 
 // 방 삭제
-router.delete("/:building/:floor", controller.delete)
+router.delete("/:building/:floor", auth, admin, controller.delete)
 module.exports = router

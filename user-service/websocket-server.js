@@ -5,7 +5,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const cors = require('cors');
 const userService = require('./src/modules/user/service')
-const firendService = require('./src/modules/friends/service')
+const friendService = require('./src/modules/friends/service')
 
 const app = express();
 const server = http.createServer(app);
@@ -46,7 +46,7 @@ wss.on('connection', (ws, req) => {
           
           // 웹소켓 연결 성공 시 친구들에게 로그인 알림 전송
           try {
-            const myFriends = await firendService.getMyFriend(userId);
+            const myFriends = await friendService.getMyFriend(userId);
             const friendIds = myFriends.rows.map(f => f.Id);
             
             friendIds.forEach(friendId => {
@@ -131,7 +131,7 @@ async function notifyLogoutToFriends(userId) {
   // userService.getFriends(userId)로 친구 목록 조회 (Id만 필요)
   let myFriends = [];
   try {
-    myFriends = await firendService.getMyFriend(userId);
+    myFriends = await friendService.getMyFriend(userId);
   } catch (err) {
     console.error('친구목록 조회 실패:', err);
   }
@@ -198,7 +198,7 @@ function notifyFriendsLocationUpdate(friendIds, userId, x, y) {
 async function notifyLocationShareStatusChange(userId, isLocationPublic) {
   try {
     // 사용자의 친구 목록 조회
-    const myFriends = await firendService.getMyFriend(userId);
+    const myFriends = await friendService.getMyFriend(userId);
     const friendIds = myFriends.rows.map(f => f.Id);
     
     const statusMessage = {

@@ -3,6 +3,8 @@
 const express = require("express")
 const router = express.Router()
 const controller = require("./controller")
+const auth = require("../../middleware/auth")
+const admin = require("../../middleware/admin")
 
 // 아직
 // 전체 검색
@@ -21,14 +23,14 @@ router.get("/:floor/:building", controller.getFloorNumber)
 
 // 성공!
 // 층 추가
-router.post("/", controller.create)
+router.post("/", auth, admin, controller.create)
 
 // 아직
 // 층 수정
-router.put("/:floor/:building", controller.update)
+router.put("/:floor/:building", auth, admin, controller.update)
 
 // 아직(안쓸듯)?
 // 층 삭제
-router.delete("/:floor/:building", controller.delete)
+router.delete("/:floor/:building", auth, admin, controller.delete)
 
 module.exports = router

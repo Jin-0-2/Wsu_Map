@@ -321,6 +321,7 @@ exports.update_share_location = async (req, res) => {
 // 회원 삭제
 exports.delete = async (req, res) => {
   try {
+    const id = req.params.id;
 
     const result = await userService.delete(id);
     if (result.rowCount === 0) {
@@ -340,7 +341,7 @@ exports.delete = async (req, res) => {
 exports.find_id = async (req, res) => {
 try { 
     // 버그 수정: req.body.email.email이 아닌 req.body.email을 사용해야 합니다.
-    const { email } = req.body;
+    const { email } = req.body; 
 
     const result = await userService.find_id(email);
     if (result.rows.length === 0) {
