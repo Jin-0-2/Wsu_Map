@@ -129,12 +129,12 @@ exports.request_list = async (id) => {
 
 // 내가 보낸 친구 요청 취소 mistake;;
 exports.mistake = async (id, friend_id) => {
-  const delete_qurey =`
+  const delete_query =`
   DELETE FROM "friendship" WHERE "user_id" = $1 AND "friend_id" = $2
   `;
 
   try {
-    const result = await con.query(delete_qurey, [id, friend_id]);
+    const result = await con.query(delete_query, [id, friend_id]);
     return result;
   } catch (err) {
     throw err;

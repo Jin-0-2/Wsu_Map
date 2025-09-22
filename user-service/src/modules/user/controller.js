@@ -27,7 +27,7 @@ exports.friend_request_list = async (req, res) => {
 
     const result = await userService.friend_request_list(); 
 
-    res.status(200).json(result.rows);
+    res.status(200).json({ success: true, data: result.rows });
   } catch (err) {
     console.error("DB 오류:", err);
     
@@ -41,7 +41,7 @@ exports.getislogin = async (req, res) => {
     
     const result = await userService.getislogin();
 
-    res.status(200).json(result.rows);
+    res.status(200).json({ success: true, data: result.rows });
   } catch (err) {
     console.error("DB 오류:", err);
     
@@ -57,7 +57,7 @@ exports.getUser = async (req, res) => {
 
     const result = await userService.getUser(id);
 
-    res.status(200).json(result.rows);
+    res.status(200).json({ success: true, data: result.rows });
   } catch (err) {
     console.error("DB 오류:", err);
     

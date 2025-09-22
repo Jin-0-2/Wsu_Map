@@ -4,7 +4,6 @@ const express = require("express")
 const router = express.Router()
 const controller = require("./controller")
 const authMiddleware = require("../../middleware/auth")
-const adminMiddleware = require("../../middleware/admin")
 
 // 성공!
 // 회원 전체 조회

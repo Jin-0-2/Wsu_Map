@@ -1,4 +1,4 @@
-// src/modules/table/service.js
+// src/modules/timetable/service.js
 
 const con = require("../../core/db")
 const XLSX = require('xlsx');

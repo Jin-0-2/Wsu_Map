@@ -55,6 +55,8 @@ exports.create = async (userId, title, content, category, inquiry_code, fileUrl 
     RETURNING *
   `;
 
+  const values = [userId, category, inquiry_code, title, content, fileUrl];
+
   try {
     const result = await con.query(query, values);
     return result.rows[0];
