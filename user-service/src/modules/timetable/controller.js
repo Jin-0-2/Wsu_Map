@@ -70,7 +70,7 @@ exports.add = async (req, res) => {
   } catch (err) {
     console.error("DB 오류:", err);
     
-    res.status(500).send("DB 오류");
+    res.status(500).json({ success: false, message: "DB 오류" });
   }
 };
 
@@ -172,7 +172,7 @@ exports.update = async (req, res) => {
   } catch (err) {
     console.error("DB 오류:", err);
     
-    res.status(500).send("DB 오류");
+    res.status(500).json({ success: false, message: "DB 오류" });
   }
 };
 
@@ -191,6 +191,6 @@ exports.delete = async (req, res) => {
     });
   } catch (err) {
     console.error("DB 오류:", err);
-    res.status(500).json({ success: "DB 오류"});
+    res.status(500).json({ success: false, message: "DB 오류" });
   }
 };
