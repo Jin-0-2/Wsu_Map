@@ -1,4 +1,4 @@
-// src/modules/user/controller.js
+// src/modules/timetable/controller.js
 
 const Service = require("./service")
 const multer = require('multer');

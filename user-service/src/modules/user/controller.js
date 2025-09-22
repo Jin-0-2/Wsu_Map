@@ -13,7 +13,7 @@ exports.getAll = async (req, res) => {
 
     const result = await userService.getAll();
     
-    res.status(200).json(result.rows);
+    res.status(200).json({ success: true, data: result.rows });
   } catch (err) {
     console.error("DB 오류:", err);
     
