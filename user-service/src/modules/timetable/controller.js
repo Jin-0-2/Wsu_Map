@@ -84,6 +84,7 @@ exports.addExcel = [
       const file = req.file;
 
       if (!file) {
+        console.log("엑셀 파일이 업로드되지 않았습니다.");
         return res.status(400).json({ 
           success: false, 
           message: "엑셀 파일이 업로드되지 않았습니다." 
@@ -95,6 +96,7 @@ exports.addExcel = [
       const fileExtension = file.originalname.toLowerCase().substring(file.originalname.lastIndexOf('.'));
       
       if (!allowedExtensions.includes(fileExtension)) {
+        console.log("엑셀 파일(.xlsx, .xls)만 업로드 가능합니다.");
         return res.status(400).json({ 
           success: false, 
           message: "엑셀 파일(.xlsx, .xls)만 업로드 가능합니다." 
@@ -111,6 +113,7 @@ exports.addExcel = [
       const parsedData = await Service.parseExcelFile(file.buffer);
       
       if (!parsedData || parsedData.length === 0) {
+        console.log("엑셀 파일에서 시간표 데이터를 찾을 수 없습니다.");
         return res.status(400).json({ 
           success: false, 
           message: "엑셀 파일에서 시간표 데이터를 찾을 수 없습니다." 
@@ -125,6 +128,8 @@ exports.addExcel = [
       
       const successCount = insertResults.filter(result => result.success).length;
       const failCount = insertResults.filter(result => !result.success).length;
+
+      console.log("insertResults:", "엑셀 파일이 성공적으로 처리되었습니다");
       
       res.status(200).json({ 
         success: true, 
@@ -168,7 +173,7 @@ exports.update = async (req, res) => {
 
     const result = await Service.update(id, origin_title, origin_day_of_week, new_title, new_day_of_week, start_time, end_time, building_name, floor_number, room_name, professor, color, memo);
     
-    res.status(200).json({ success: true, updated: result.rows });
+    res.status(200).json({ success: true, updated: result.rows });  
   } catch (err) {
     console.error("DB 오류:", err);
     
