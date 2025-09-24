@@ -7,6 +7,7 @@ const authMiddleware = (req, res, next) => {
 
   // 2. 헤더 및 토큰 형식 검사
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.warn(`[AUTH FAIL] ${req.method} ${req.originalUrl} - Missing or malformed Authorization header`);
     return res.status(401).json({ success: false, message: '인증 토큰이 필요하거나 형식이 올바르지 않습니다.' });
   }
 
@@ -17,6 +18,7 @@ const authMiddleware = (req, res, next) => {
     // 3. 토큰 검증 (비밀 키 사용)
     // 검증에 성공하면, 토큰 생성 시 넣었던 payload가 반환됩니다.
     if(!process.env.JWT_SECRET) {
+      console.error(`[AUTH ERROR] ${req.method} ${req.originalUrl} - JWT_SECRET not configured`);
       return res.status(500).json({ success: false, message: 'JWT_SECRET 환경 변수가 설정되지 않았습니다.' });
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -24,12 +26,15 @@ const authMiddleware = (req, res, next) => {
     // 4. 검증 성공 시, 디코딩된 payload 전체를 요청 객체(req)에 추가합니다.
     // 이제 다른 미들웨어나 컨트롤러에서 req.user.id, req.user.isAdmin 등을 참조할 수 있습니다.
     req.user = decoded;
+    console.info(`[AUTH OK] ${req.method} ${req.originalUrl} - userId=${decoded?.id ?? 'unknown'} admin=${decoded?.isAdmin ? 'Y' : 'N'}`);
     next(); // 다음 미들웨어 또는 컨트롤러로 제어를 넘깁니다.
   } catch (error) {
     // 5. 검증 실패 시 (만료, 위조 등)
     if (error.name === 'TokenExpiredError') {
+      console.warn(`[AUTH FAIL] ${req.method} ${req.originalUrl} - TokenExpiredError`);
       return res.status(419).json({ success: false, message: '토큰이 만료되었습니다. 다시 로그인해주세요.' });
     }
+    console.warn(`[AUTH FAIL] ${req.method} ${req.originalUrl} - Invalid token (${error.name || 'UnknownError'})`);
     return res.status(401).json({ success: false, message: '유효하지 않은 토큰입니다.' });
   }
 };
