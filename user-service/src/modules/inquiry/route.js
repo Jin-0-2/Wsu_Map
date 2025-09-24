@@ -10,7 +10,7 @@ const adminMiddleware = require('../../middleware/admin');
 
 // 관리자
 // 문의하기 목록 조회 
-router.get('/all', [authMiddleware, adminMiddleware], inquiryController.getInquiries);
+router.get('/', [authMiddleware, adminMiddleware], inquiryController.getInquiries);
 
 // 답글 달기
 router.put('/answer', [authMiddleware, adminMiddleware], inquiryController.answerInquiry); 
