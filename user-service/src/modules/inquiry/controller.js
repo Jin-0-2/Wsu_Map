@@ -9,6 +9,8 @@ exports.getInquiries = async (req, res) => {
   try {
     const inquiries = await inquiryService.getAll();
 
+    console.log("inquiries:", inquiries);
+
     res.status(200).json({ success: true, data: inquiries });
   } catch (err) {
     console.error("문의하기 목록 조회 오류:", err);
