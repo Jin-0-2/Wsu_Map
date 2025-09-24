@@ -25,7 +25,7 @@ exports.getAll = async () => {
 
   try {
     const result = await con.query(query);
-    return result;
+    return result.rows;
   } catch (err) {
     throw err;
   }
