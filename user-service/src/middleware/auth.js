@@ -4,6 +4,7 @@ const authMiddleware = (req, res, next) => {
   // 1. 요청 헤더에서 토큰 가져오기
   // 클라이언트는 요청 헤더의 Authorization 필드에 'Bearer <JWT_TOKEN>' 형식으로 토큰을 보내야 합니다.
   const authHeader = req.headers.authorization;
+  console.log("authHeader:", authHeader);
 
   // 2. 헤더 및 토큰 형식 검사
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
