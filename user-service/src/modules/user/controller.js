@@ -108,7 +108,7 @@ exports.admin_register = async (req, res) => {
 
     const { id, pw, name, stu_number, phone, email } = req.body
 
-    const result = await userService.admin_register(id, pw, name, stu_number, phone, email);
+    const result = await userService.register(id, pw, name, stu_number, phone, email);
 
     if (result && result.duplicate) {
       return res.status(409).send("이미 존재하는 아이디입니다.");
