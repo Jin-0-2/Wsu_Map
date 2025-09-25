@@ -57,6 +57,8 @@ exports.getUser = async (req, res) => {
 
     const result = await userService.getUser(id);
 
+    console.log({ success: true, data: result.rows })
+
     res.status(200).json({ success: true, data: result.rows });
   } catch (err) {
     console.error("DB 오류:", err);
