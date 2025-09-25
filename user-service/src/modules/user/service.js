@@ -164,9 +164,9 @@ exports.update = async (id, pw, phone, email) => {
   let idx = 1
 
   const allowedFields = {
-    pw: "Pw",
-    phone: "Phone",
-    email: "Email"
+    pw: '"Pw"',
+    phone: '"Phone"',
+    email: '"Email"'
   }
 
   if (pw) {
