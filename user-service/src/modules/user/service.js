@@ -195,6 +195,8 @@ exports.update = async (id, pw, phone, email) => {
   
   const sql = `UPDATE "User" SET ${fields.join(", ")} WHERE "Id" = $${idx}`
 
+  console.log("sql:", sql);
+
   try { 
     const result = await con.query(sql, values);
     return result;
