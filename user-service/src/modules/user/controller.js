@@ -321,7 +321,7 @@ exports.update_share_location = async (req, res) => {
 // 회원 삭제
 exports.delete = async (req, res) => {
   try {
-    const id = req.params.id;
+    const id = req.body.id;
 
     const result = await userService.delete(id);
     if (result.rowCount === 0) {
