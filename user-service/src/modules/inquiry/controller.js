@@ -39,6 +39,8 @@ exports.getInquiry = async (req, res) => {
     if (!inquiry || inquiry.length === 0) {
       return res.status(404).json({ success: false, message: "작성한 문의를 찾을 수 없습니다." });
     }
+
+    console.log("inquiry:", inquiry);
     
     res.status(200).json({ success: true, data: inquiry });
   } catch (err) {
