@@ -240,19 +240,31 @@ async function notifyLocationShareStatusChange(userId, isLocationPublic) {
   }
 }
 
-// 친구 상태 변경 알림 (온라인/오프라인)
-function notifyFriendStatusChange(userId, isOnline) {
-  const statusMessage = {
-    type: 'friend_status_change',
-    userId: userId,
-    isOnline: isOnline,
-    message: `${userId}님이 ${isOnline ? '온라인' : '오프라인'}이 되었습니다.`,
-    timestamp: new Date().toISOString()
-  };
-  
-  // 모든 연결된 사용자에게 브로드캐스트
-  broadcast(statusMessage);
-  console.log(`[FRIEND STATUS] ${userId} is now ${isOnline ? 'online' : 'offline'}`);
+// 친구 상태 변경 알림 (온라인/오프라인) - 친구들에게만 전송
+async function notifyFriendStatusChange(userId, isOnline) {
+  try {
+    // 해당 사용자의 친구 목록 조회
+    const myFriends = await friendService.getMyFriend(userId);
+    const friendIds = myFriends.rows.map(f => f.Id);
+    
+    const statusMessage = {
+      type: 'friend_status_change',
+      userId: userId,
+      isOnline: isOnline,
+      message: `${userId}님이 ${isOnline ? '온라인' : '오프라인'}이 되었습니다.`,
+      timestamp: new Date().toISOString()
+    };
+    
+    // 친구들에게만 전송
+    friendIds.forEach(friendId => {
+      sendToUser(friendId, statusMessage);
+      console.log(`친구 ${friendId}에게 상태 변경 알림 전송 완료`);
+    });
+    
+    console.log(`[FRIEND STATUS] ${userId} is now ${isOnline ? 'online' : 'offline'} - 친구 ${friendIds.length}명에게 알림 전송`);
+  } catch (err) {
+    console.error('친구 상태 변경 알림 전송 실패:', err);
+  }
 }
 
 // 친구 목록과 상태 정보 전송
