@@ -57,6 +57,7 @@ wss.on('connection', (ws, req) => {
                 message: `${userId}님이 로그인하셨습니다.`,
                 timestamp: new Date().toISOString()
               });
+              console.log(`친구 ${friendId}에게 로그인 알림 전송 완료`);
             });
             
             console.log(`친구 ${friendIds.length}명에게 로그인 알림 전송 완료`);
@@ -146,6 +147,7 @@ async function notifyLogoutToFriends(userId) {
       message: `${userId}님이 로그아웃하셨습니다.`,
       timestamp: new Date().toISOString()
     });
+    console.log(`친구 ${friendId}에게 로그아웃 알림 전송 완료`);
   });
 }
 
