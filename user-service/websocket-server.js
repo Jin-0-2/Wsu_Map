@@ -125,7 +125,7 @@ async function notifyUserLoggedIn(userId) {
   const myfriends = await friendService.getMyFriend(userId);
 
   // 2. rows에서 Id값만 추출하여 새로운 배열 생성
-  const myfriend_Ids = myfriend.rows.map(friend => friend.Id);
+  const myfriend_Ids = myfriends.rows.map(friend => friend.Id);
 
   const loginMessage = {
     type: 'Login_Status',
@@ -153,7 +153,7 @@ async function notifyUserLoggedOut(userId) {
   const myfriends = await friendService.getMyFriend(userId);
 
   // 2. rows에서 Id값만 추출하여 새로운 배열 생성
-  const myfriend_Ids = myfriend.rows.map(friend => friend.Id);
+  const myfriend_Ids = myfriends.rows.map(friend => friend.Id);
 
   const logOutMessage = {
     type: 'Login_Status',
