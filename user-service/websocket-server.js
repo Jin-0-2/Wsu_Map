@@ -26,12 +26,17 @@ const connectedUsers = new Map();
 wss.on('connection', (ws, req) => {
   let userId = null;
 
+  // 메시지를 보낼 때
   ws.on('message', async (message) => {
     //원본 메시지 출력
     console.log(`[WS MESSAGE] from ${userId || 'unknown'}:`, message.toString());
+
     try {
+      // JSON 파싱
       const data = JSON.parse(message);
       console.log(`[WS PARSED] type: ${data.type}, data:`, data);
+
+      // 데이터 타입에 따라 할 일을 제공.
       switch (data.type) {
         case 'register':
           userId = data.userId;
@@ -44,36 +49,14 @@ wss.on('connection', (ws, req) => {
             message: '웹소켓 연결 성공',
             timestamp: new Date().toISOString()
           }));
-          
-          // 웹소켓 연결 성공 시 친구들에게 로그인 알림 전송
-          try {
-            const myFriends = await friendService.getMyFriend(userId);
-            const friendIds = myFriends.rows.map(f => f.Id);
-            
-            friendIds.forEach(friendId => {
-              sendToUser(friendId, {
-                type: 'friend_logged_in',
-                userId: userId,
-                is_login: true,
-                message: `${userId}님이 로그인하셨습니다.`,
-                timestamp: new Date().toISOString()
-              });
-              console.log(`친구 ${friendId}에게 로그인 알림 전송 완료`);
-            });
-            
-            console.log(`친구 ${friendIds.length}명에게 로그인 알림 전송 완료`);
-          } catch (notifyErr) {
-            console.error('로그인 알림 전송 실패:', notifyErr);
-          }
-          
-          // 로그인한 사용자에게 친구 목록과 상태 정보 전송
-          await sendFriendListWithStatus(userId);
-          
-          // 친구 상태 변경 알림 (온라인)
-          notifyFriendStatusChange(userId, true);
-          
-          broadcastOnlineUsers();
+
+          console.log(`[WS SEND] To ${userId}, type: registered`);
+
+          // 친구에게 내가 연결되었다는 것을 알려주는 함수.
+          notifyUserLoggedIn(userId);
+
           break;
+
         case 'heartbeat':
           ws.send(JSON.stringify({
             type: 'heartbeat_response',
@@ -88,8 +71,11 @@ wss.on('connection', (ws, req) => {
     }
   });
 
+
+  // 연결이 끊겼을 때
   ws.on('close', async (code, reason) => {
     console.log(`[WS CLOSE] userId=${userId}, code=${code}, reason=${reason.toString()}, 시간=${new Date().toISOString()}`);
+
     if (userId) {
       connectedUsers.delete(userId);
       console.log(`❌ 웹소켓 해제: userId=${userId}`);
@@ -97,12 +83,7 @@ wss.on('connection', (ws, req) => {
 
       userService.logout(userId);
 
-      await notifyLogoutToFriends(userId);
-      
-      // 친구 상태 변경 알림 (오프라인)
-      notifyFriendStatusChange(userId, false);
-
-      broadcastOnlineUsers();
+      notifyUserLoggedOut(userId);
     }
   });
 
@@ -112,9 +93,11 @@ wss.on('connection', (ws, req) => {
 });
 
 // 메시지 전송 함수들
+// 한명에게
 function sendToUser(userId, message) {
   const userWs = connectedUsers.get(userId);
   console.log(`[WS SEND CHECK] user ${userId} exists: ${!!userWs}, readyState: ${userWs?.readyState}`);
+
   if (userWs && userWs.readyState === WebSocket.OPEN) {
     const messageStr = JSON.stringify(message);
     console.log(`[WS SEND] to ${userId}:`, messageStr);
@@ -126,6 +109,7 @@ function sendToUser(userId, message) {
   return false;
 }
 
+// 브로드캐스트
 function broadcast(message) {
   connectedUsers.forEach((ws) => {
     if (ws.readyState === WebSocket.OPEN) {
@@ -134,37 +118,62 @@ function broadcast(message) {
   });
 }
 
-function broadcastOnlineUsers() {
-  const onlineUsers = Array.from(connectedUsers.keys());
-  broadcast({
-    type: 'online_users_update',
-    onlineUsers,
-    timestamp: new Date().toISOString()
-  });
-}
-
-async function notifyLogoutToFriends(userId) {
-  // userService.getFriends(userId)로 친구 목록 조회 (Id만 필요)
-  let myFriends = [];
+// 로그인 시 내 로그인 정보 친구에게 보냄냄
+async function notifyUserLoggedIn(userId) {
   try {
-    myFriends = await friendService.getMyFriend(userId);
-  } catch (err) {
-    console.error('친구목록 조회 실패:', err);
+  // 1. 친구 목록 조회
+  const myfriends = await friendService.getMyFriend(userId);
+
+  // 2. rows에서 Id값만 추출하여 새로운 배열 생성
+  const myfriend_Ids = myfriend.rows.map(friend => friend.Id);
+
+  const loginMessage = {
+    type: 'Login_Status',
+    userId: userId,
+    status: true,
+    message: '친구(Id: ' + userId + ')가 접속했습니다.',
+    timestamp: new Date().toISOString()
   }
-  console.log(myFriends.rows);
 
-  const friendIds = myFriends.rows.map(f => f.Id);
+  myfriend_Ids.forEach(friendId => {
+    sendToUser(friendId, loginMessage);
+  })
 
-  friendIds.forEach(friendId => {
-    sendToUser(friendId, {
-      type: 'friend_logged_out',
-      userId,
-      message: `${userId}님이 로그아웃하셨습니다.`,
-      timestamp: new Date().toISOString()
-    });
-    console.log(`친구 ${friendId}에게 로그아웃 알림 전송 완료`);
-  });
+  console.log(`[Notification] Sending login status to ${myfriend_Ids.length} friends...`);
+
+  } catch (error) {
+    console.error('Error in notifyUserLoggedIn:', error);
+  }
 }
+
+// 로그아웃 시 내 로그인 정보 친구에게 보냄냄
+async function notifyUserLoggedOut(userId) {
+  try {
+  // 1. 친구 목록 조회
+  const myfriends = await friendService.getMyFriend(userId);
+
+  // 2. rows에서 Id값만 추출하여 새로운 배열 생성
+  const myfriend_Ids = myfriend.rows.map(friend => friend.Id);
+
+  const logOutMessage = {
+    type: 'Login_Status',
+    userId: userId,
+    status: false,
+    message: '친구(Id: ' + userId + ')가 연결을 종료료했습니다.',
+    timestamp: new Date().toISOString()
+  }
+
+  myfriend_Ids.forEach(friendId => {
+    sendToUser(friendId, logOutMessage);
+  })
+
+  console.log(`[Notification] Sending logout status to ${myfriend_Ids.length} friends...`);
+
+  } catch (error) {
+    console.error('Error in notifyUserLoggedOut:', error);
+  }
+}
+
 
 // 연결 끊기.
 function disconnectUserSocket(userId) {
@@ -176,13 +185,14 @@ function disconnectUserSocket(userId) {
   console.log("로그아웃 버튼으로 소켓 종료", userId)
 }
 
-// 커넥트 되어있는지 확인
+// 커넥트 되어있는지 확인 (T/F)
 function isUserConnected(userId) {
   return connectedUsers.has(userId);
 }
 
-// 친구 알림 함수 
+// 친구 추가 알림 함수 
 function notifyFriendRequest(fromUserId, fromUserName, toUserId) {
+  // fromUserId가 toUserId에게 요청을 했다고 toUserId에게 알림
   sendToUser(toUserId, {
     type: 'new_friend_request',
     fromUserId,
@@ -190,6 +200,8 @@ function notifyFriendRequest(fromUserId, fromUserName, toUserId) {
     message: `${fromUserName}님이 친구 요청을 보냈습니다.`,
     timestamp: new Date().toISOString()
   });
+
+  // 나에게 확인
   sendToUser(fromUserId, {
     type: 'friend_request_sent',
     toUserId,
@@ -240,56 +252,6 @@ async function notifyLocationShareStatusChange(userId, isLocationPublic) {
   }
 }
 
-// 친구 상태 변경 알림 (온라인/오프라인) - 친구들에게만 전송
-async function notifyFriendStatusChange(userId, isOnline) {
-  try {
-    // 해당 사용자의 친구 목록 조회
-    const myFriends = await friendService.getMyFriend(userId);
-    const friendIds = myFriends.rows.map(f => f.Id);
-    
-    const statusMessage = {
-      type: 'friend_status_change',
-      userId: userId,
-      isOnline: isOnline,
-      message: `${userId}님이 ${isOnline ? '온라인' : '오프라인'}이 되었습니다.`,
-      timestamp: new Date().toISOString()
-    };
-    
-    // 친구들에게만 전송
-    friendIds.forEach(friendId => {
-      sendToUser(friendId, statusMessage);
-      console.log(`친구 ${friendId}에게 상태 변경 알림 전송 완료`);
-    });
-    
-    console.log(`[FRIEND STATUS] ${userId} is now ${isOnline ? 'online' : 'offline'} - 친구 ${friendIds.length}명에게 알림 전송`);
-  } catch (err) {
-    console.error('친구 상태 변경 알림 전송 실패:', err);
-  }
-}
-
-// 친구 목록과 상태 정보 전송
-async function sendFriendListWithStatus(userId) {
-  try {
-    const myFriends = await friendService.getMyFriend(userId);
-    const friendIds = myFriends.rows.map(f => f.Id);
-    const onlineUsers = Array.from(connectedUsers.keys());
-    
-    const friendListMessage = {
-      type: 'friend_list_with_status',
-      friends: friendIds.map(friendId => ({
-        userId: friendId,
-        isOnline: onlineUsers.includes(friendId),
-        lastSeen: new Date().toISOString()
-      })),
-      timestamp: new Date().toISOString()
-    };
-    
-    sendToUser(userId, friendListMessage);
-    console.log(`[FRIEND LIST] Sent friend list with status to ${userId}`);
-  } catch (err) {
-    console.error('친구 목록 전송 실패:', err);
-  }
-}
 
 // 테스트 및 REST 연동용 API 엔드포인트 등 필요한 부분만 남겨도 됨
 app.get('/friend/ws/status', (req, res) => {
@@ -309,12 +271,8 @@ server.listen(PORT, () => {
 
 module.exports = {
   notifyFriendRequest,
-  notifyLogoutToFriends,
   disconnectUserSocket,
   isUserConnected,
   notifyFriendsLocationUpdate,
   notifyLocationShareStatusChange, // 위치 공유 상태 변경 알림
-  sendToUser, // 개별 사용자에게 메시지 전송
-  notifyFriendStatusChange, // 친구 상태 변경 알림
-  sendFriendListWithStatus, // 친구 목록과 상태 정보 전송
 }
