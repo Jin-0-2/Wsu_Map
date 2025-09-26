@@ -31,6 +31,7 @@ wss.on('connection', (ws, req) => {
     console.log(`[WS MESSAGE] from ${userId || 'unknown'}:`, message.toString());
     try {
       const data = JSON.parse(message);
+      console.log(`[WS PARSED] type: ${data.type}, data:`, data);
       switch (data.type) {
         case 'register':
           userId = data.userId;
@@ -105,9 +106,12 @@ wss.on('connection', (ws, req) => {
 function sendToUser(userId, message) {
   const userWs = connectedUsers.get(userId);
   if (userWs && userWs.readyState === WebSocket.OPEN) {
-    userWs.send(JSON.stringify(message));
+    const messageStr = JSON.stringify(message);
+    console.log(`[WS SEND] to ${userId}:`, messageStr);
+    userWs.send(messageStr);
     return true;
   }
+  console.log(`[WS SEND FAIL] user ${userId} not connected or socket closed`);
   return false;
 }
 

@@ -8,7 +8,6 @@ const upload = multer();
 exports.getInquiries = async (req, res) => {
   try {
     const inquiries = await inquiryService.getAll();
-    console.log("inquiries:", inquiries);
 
     res.status(200).json({ success: true, data: inquiries });
   } catch (err) {
