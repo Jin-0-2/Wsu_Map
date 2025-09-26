@@ -66,6 +66,12 @@ wss.on('connection', (ws, req) => {
             console.error('로그인 알림 전송 실패:', notifyErr);
           }
           
+          // 로그인한 사용자에게 친구 목록과 상태 정보 전송
+          await sendFriendListWithStatus(userId);
+          
+          // 친구 상태 변경 알림 (온라인)
+          notifyFriendStatusChange(userId, true);
+          
           broadcastOnlineUsers();
           break;
         case 'heartbeat':
@@ -92,6 +98,9 @@ wss.on('connection', (ws, req) => {
       userService.logout(userId);
 
       await notifyLogoutToFriends(userId);
+      
+      // 친구 상태 변경 알림 (오프라인)
+      notifyFriendStatusChange(userId, false);
 
       broadcastOnlineUsers();
     }
@@ -105,10 +114,12 @@ wss.on('connection', (ws, req) => {
 // 메시지 전송 함수들
 function sendToUser(userId, message) {
   const userWs = connectedUsers.get(userId);
+  console.log(`[WS SEND CHECK] user ${userId} exists: ${!!userWs}, readyState: ${userWs?.readyState}`);
   if (userWs && userWs.readyState === WebSocket.OPEN) {
     const messageStr = JSON.stringify(message);
     console.log(`[WS SEND] to ${userId}:`, messageStr);
     userWs.send(messageStr);
+    console.log(`[WS SEND SUCCESS] message sent to ${userId}`);
     return true;
   }
   console.log(`[WS SEND FAIL] user ${userId} not connected or socket closed`);
@@ -229,6 +240,45 @@ async function notifyLocationShareStatusChange(userId, isLocationPublic) {
   }
 }
 
+// 친구 상태 변경 알림 (온라인/오프라인)
+function notifyFriendStatusChange(userId, isOnline) {
+  const statusMessage = {
+    type: 'friend_status_change',
+    userId: userId,
+    isOnline: isOnline,
+    message: `${userId}님이 ${isOnline ? '온라인' : '오프라인'}이 되었습니다.`,
+    timestamp: new Date().toISOString()
+  };
+  
+  // 모든 연결된 사용자에게 브로드캐스트
+  broadcast(statusMessage);
+  console.log(`[FRIEND STATUS] ${userId} is now ${isOnline ? 'online' : 'offline'}`);
+}
+
+// 친구 목록과 상태 정보 전송
+async function sendFriendListWithStatus(userId) {
+  try {
+    const myFriends = await friendService.getMyFriend(userId);
+    const friendIds = myFriends.rows.map(f => f.Id);
+    const onlineUsers = Array.from(connectedUsers.keys());
+    
+    const friendListMessage = {
+      type: 'friend_list_with_status',
+      friends: friendIds.map(friendId => ({
+        userId: friendId,
+        isOnline: onlineUsers.includes(friendId),
+        lastSeen: new Date().toISOString()
+      })),
+      timestamp: new Date().toISOString()
+    };
+    
+    sendToUser(userId, friendListMessage);
+    console.log(`[FRIEND LIST] Sent friend list with status to ${userId}`);
+  } catch (err) {
+    console.error('친구 목록 전송 실패:', err);
+  }
+}
+
 // 테스트 및 REST 연동용 API 엔드포인트 등 필요한 부분만 남겨도 됨
 app.get('/friend/ws/status', (req, res) => {
   res.json({
@@ -253,4 +303,6 @@ module.exports = {
   notifyFriendsLocationUpdate,
   notifyLocationShareStatusChange, // 위치 공유 상태 변경 알림
   sendToUser, // 개별 사용자에게 메시지 전송
+  notifyFriendStatusChange, // 친구 상태 변경 알림
+  sendFriendListWithStatus, // 친구 목록과 상태 정보 전송
 }
