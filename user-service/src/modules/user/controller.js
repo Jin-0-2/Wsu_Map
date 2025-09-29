@@ -208,15 +208,15 @@ exports.admin_login = async (req, res) => {
 // 로그아웃
 exports.logout = async (req, res) => {
   try {
-    // 버그 수정: req.user.id는 문자열이므로 구조 분해 할당을 사용하지 않습니다.
     const id = req.user.id;
 
     if (isUserConnected(id)) {
-      disconnectUserSocket(id);
+      // 웹소켓이 연결된 경우: 웹소켓 서버에서 처리 (DB 업데이트 + 친구 알림)
+      await disconnectUserSocket(id);
     } else {
+      // 웹소켓이 연결되지 않은 경우: DB만 업데이트
       const result = await userService.logout(id);
       if (result.rowCount === 0) {
-        // 업데이트된 행이 없음 → 잘못된 id
         return res.status(404).json({ success: false, message: "존재하지 않는 사용자입니다." });
       }
     }
@@ -225,7 +225,6 @@ exports.logout = async (req, res) => {
 
   } catch (err) {
     console.error("로그아웃 처리 중 오류:", err);
-
     res.status(500).json({ success: false, message: "로그아웃 처리 중 오류가 발생했습니다." });
   }
 };

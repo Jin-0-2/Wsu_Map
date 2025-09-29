@@ -22,6 +22,9 @@ const wss = new WebSocket.Server({
 // 연결된 클라이언트 관리
 const connectedUsers = new Map();
 
+// 중복 알림 방지를 위한 상태 관리
+const notificationStatus = new Map(); // userId -> { lastLoginNotify, lastLogoutNotify }
+
 // 웹소켓 연결 처리
 wss.on('connection', (ws, req) => {
   let userId = null;
@@ -77,13 +80,23 @@ wss.on('connection', (ws, req) => {
     console.log(`[WS CLOSE] userId=${userId}, code=${code}, reason=${reason.toString()}, 시간=${new Date().toISOString()}`);
 
     if (userId) {
-      connectedUsers.delete(userId);
-      console.log(`❌ 웹소켓 해제: userId=${userId}`);
-      console.log('현재 연결된 유저:', Array.from(connectedUsers.keys()));
-
-      userService.logout(userId);
-
-      notifyUserLoggedOut(userId);
+      try {
+        // 1. 먼저 친구들에게 로그아웃 알림 전송
+        await notifyUserLoggedOut(userId);
+        
+        // 2. DB에서 로그아웃 상태 업데이트
+        await userService.logout(userId);
+        
+        // 3. 마지막에 연결 목록에서 제거
+        connectedUsers.delete(userId);
+        console.log(`❌ 웹소켓 해제: userId=${userId}`);
+        console.log('현재 연결된 유저:', Array.from(connectedUsers.keys()));
+        
+      } catch (error) {
+        console.error('로그아웃 처리 중 오류:', error);
+        // 에러가 발생해도 연결은 정리
+        connectedUsers.delete(userId);
+      }
     }
   });
 
@@ -121,25 +134,45 @@ function broadcast(message) {
 // 로그인 시 내 로그인 정보 친구에게 보냄냄
 async function notifyUserLoggedIn(userId) {
   try {
-  // 1. 친구 목록 조회
-  const myfriends = await friendService.getMyFriend(userId);
+    const now = Date.now();
+    const userStatus = notificationStatus.get(userId) || { lastLoginNotify: 0, lastLogoutNotify: 0 };
+    
+    // 중복 알림 방지: 5초 이내 동일한 로그인 알림은 무시
+    if (now - userStatus.lastLoginNotify < 5000) {
+      console.log(`[Notification] Duplicate login notification ignored for user ${userId}`);
+      return;
+    }
 
-  // 2. rows에서 Id값만 추출하여 새로운 배열 생성
-  const myfriend_Ids = myfriends.rows.map(friend => friend.Id);
+    // 1. 친구 목록 조회
+    const myfriends = await friendService.getMyFriend(userId);
 
-  const loginMessage = {
-    type: 'Login_Status',
-    userId: userId,
-    status: true,
-    message: '친구(Id: ' + userId + ')가 접속했습니다.',
-    timestamp: new Date().toISOString()
-  }
+    // 2. rows에서 Id값만 추출하여 새로운 배열 생성
+    const myfriend_Ids = myfriends.rows.map(friend => friend.Id);
 
-  myfriend_Ids.forEach(friendId => {
-    sendToUser(friendId, loginMessage);
-  })
+    const loginMessage = {
+      type: 'Login_Status',
+      userId: userId,
+      status: true,
+      message: '친구(Id: ' + userId + ')가 접속했습니다.',
+      timestamp: new Date().toISOString()
+    }
 
-  console.log(`[Notification] Sending login status to ${myfriend_Ids.length} friends...`);
+    // 3. 모든 친구에게 동기적으로 알림 전송
+    const sendPromises = myfriend_Ids.map(friendId => {
+      return new Promise((resolve) => {
+        const success = sendToUser(friendId, loginMessage);
+        resolve({ friendId, success });
+      });
+    });
+
+    const results = await Promise.all(sendPromises);
+    const successCount = results.filter(r => r.success).length;
+    
+    // 4. 알림 시간 업데이트
+    userStatus.lastLoginNotify = now;
+    notificationStatus.set(userId, userStatus);
+    
+    console.log(`[Notification] Login status sent to ${successCount}/${myfriend_Ids.length} friends`);
 
   } catch (error) {
     console.error('Error in notifyUserLoggedIn:', error);
@@ -149,25 +182,45 @@ async function notifyUserLoggedIn(userId) {
 // 로그아웃 시 내 로그인 정보 친구에게 보냄냄
 async function notifyUserLoggedOut(userId) {
   try {
-  // 1. 친구 목록 조회
-  const myfriends = await friendService.getMyFriend(userId);
+    const now = Date.now();
+    const userStatus = notificationStatus.get(userId) || { lastLoginNotify: 0, lastLogoutNotify: 0 };
+    
+    // 중복 알림 방지: 5초 이내 동일한 로그아웃 알림은 무시
+    if (now - userStatus.lastLogoutNotify < 5000) {
+      console.log(`[Notification] Duplicate logout notification ignored for user ${userId}`);
+      return;
+    }
 
-  // 2. rows에서 Id값만 추출하여 새로운 배열 생성
-  const myfriend_Ids = myfriends.rows.map(friend => friend.Id);
+    // 1. 친구 목록 조회
+    const myfriends = await friendService.getMyFriend(userId);
 
-  const logOutMessage = {
-    type: 'Login_Status',
-    userId: userId,
-    status: false,
-    message: '친구(Id: ' + userId + ')가 연결을 종료료했습니다.',
-    timestamp: new Date().toISOString()
-  }
+    // 2. rows에서 Id값만 추출하여 새로운 배열 생성
+    const myfriend_Ids = myfriends.rows.map(friend => friend.Id);
 
-  myfriend_Ids.forEach(friendId => {
-    sendToUser(friendId, logOutMessage);
-  })
+    const logOutMessage = {
+      type: 'Login_Status',
+      userId: userId,
+      status: false,
+      message: '친구(Id: ' + userId + ')가 연결을 종료했습니다.',
+      timestamp: new Date().toISOString()
+    }
 
-  console.log(`[Notification] Sending logout status to ${myfriend_Ids.length} friends...`);
+    // 3. 모든 친구에게 동기적으로 알림 전송
+    const sendPromises = myfriend_Ids.map(friendId => {
+      return new Promise((resolve) => {
+        const success = sendToUser(friendId, logOutMessage);
+        resolve({ friendId, success });
+      });
+    });
+
+    const results = await Promise.all(sendPromises);
+    const successCount = results.filter(r => r.success).length;
+    
+    // 4. 알림 시간 업데이트
+    userStatus.lastLogoutNotify = now;
+    notificationStatus.set(userId, userStatus);
+    
+    console.log(`[Notification] Logout status sent to ${successCount}/${myfriend_Ids.length} friends`);
 
   } catch (error) {
     console.error('Error in notifyUserLoggedOut:', error);
@@ -176,13 +229,30 @@ async function notifyUserLoggedOut(userId) {
 
 
 // 연결 끊기.
-function disconnectUserSocket(userId) {
+async function disconnectUserSocket(userId) {
   const ws = connectedUsers.get(userId);
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.close(4001, '로그아웃 처리'); // 실제 네트워크 연결 종료 및 클라에 종료 이벤트 전달
-    connectedUsers.delete(userId);    // 관리목록에서도 제거
+    try {
+      // 1. 먼저 친구들에게 로그아웃 알림 전송
+      await notifyUserLoggedOut(userId);
+      
+      // 2. DB에서 로그아웃 상태 업데이트
+      await userService.logout(userId);
+      
+      // 3. 웹소켓 연결 종료
+      ws.close(4001, '로그아웃 처리');
+      connectedUsers.delete(userId);
+      
+      console.log("로그아웃 버튼으로 소켓 종료 완료", userId);
+    } catch (error) {
+      console.error('로그아웃 처리 중 오류:', error);
+      // 에러가 발생해도 연결은 정리
+      ws.close(4001, '로그아웃 처리');
+      connectedUsers.delete(userId);
+    }
+  } else {
+    console.log("웹소켓이 이미 연결되지 않음", userId);
   }
-  console.log("로그아웃 버튼으로 소켓 종료", userId)
 }
 
 // 커넥트 되어있는지 확인 (T/F)
