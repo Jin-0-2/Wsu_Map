@@ -47,6 +47,7 @@ wss.on('connection', (ws, req) => {
           console.log(`✅ 웹소켓 등록: userId=${userId}`);
           console.log('현재 연결된 유저:', Array.from(connectedUsers.keys()));
 
+          // 연결한 사람.
           ws.send(JSON.stringify({
             type: 'registered',
             message: '웹소켓 연결 성공',
@@ -55,7 +56,7 @@ wss.on('connection', (ws, req) => {
 
           console.log(`[WS SEND] To ${userId}, type: registered`);
 
-          // 친구에게 내가 연결되었다는 것을 알려주는 함수.
+          // 연결한 사람 X 친구에게 내가 연결되었다는 것을 알려주는 함수.
           notifyUserLoggedIn(userId);
 
           break;

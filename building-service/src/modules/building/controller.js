@@ -103,7 +103,8 @@ exports.update = [
     const building_name = req.params.name;
     const desc  = req.body.desc;
 
-    if (!desc) {
+    // desc와 파일 모두 없을 때만 "수정할 항목이 없습니다" 반환
+    if ((desc === undefined || desc === "") && (!req.files || req.files.length === 0)) {
       return res.status(400).send("수정할 항목이 없습니다.")
     }
 
