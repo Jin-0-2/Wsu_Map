@@ -30,6 +30,9 @@ router.post("/admin_register", controller.admin_register)
 // 로그인
 router.post("/login", controller.login)
 
+// 게스트 로그인
+router.post("/guest_login", controller.guest_login)
+
 // 관리자 로그인
 router.post("/admin_login", controller.admin_login)
 

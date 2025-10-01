@@ -162,9 +162,28 @@ exports.login = async (req, res) => {
   } catch (err) {
     console.error("로그인 처리 중 오류:", err);
     // saveLog("", req.path, 500);
-      res.status(500).json({ success: false, message: "로그인 처리 중 오류가 발생했습니다." });
+    res.status(500).json({ success: false, message: "로그인 처리 중 오류가 발생했습니다." });
   }
 };
+
+// 게스트 로그인
+exports.guest_login = async (req, res) => {
+  try {
+    const id = req.body.id;
+
+    const payload = { id: id };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.status(200).json({ 
+      success: true, 
+      message: "게스트 로그인 성공",
+      token: token,
+    });
+  } catch (err) {
+    console.error("게스트 로그인 처리 중 오류:", err);
+    res.status(500).json({ success: false, message: "게스트 로그인 처리 중 오류가 발생했습니다." });
+  }
+}
 
 // 관리자 로그인
 exports.admin_login = async (req, res) => {
