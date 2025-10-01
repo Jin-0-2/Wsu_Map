@@ -171,7 +171,7 @@ exports.guest_login = async (req, res) => {
   try {
     const id = req.body.id;
 
-    const payload = { id: id };
+    const payload = { id: id, isGuest: true };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.status(200).json({ 
