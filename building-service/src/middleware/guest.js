@@ -37,7 +37,6 @@ const flexibleAuthMiddleware = (req, res, next) => {
 };
 
 module.exports = {
-  guestAuthMiddleware,    // 게스트만 접근 가능
   flexibleAuthMiddleware  // 일반 사용자 + 게스트 모두 접근 가능
 };
 
