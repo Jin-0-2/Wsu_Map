@@ -14,11 +14,11 @@ router.get("/", auth, controller.getAll)
 
 // 아직.
 // 건물 별 층 조회(2D) 목록 볼 때 필터.
-// 사용 가능한 사용자: 일반, 관리자
-router.get("/:building", auth, controller.getFloors)
+// 사용 가능한 사용자: 일반, 관리자, 게스트트
+router.get("/:building", flexibleAuthMiddleware, controller.getFloors)
 
 // 건물 별 층 목록만! 조회
-// 사용 가능한 사용자: 일반, 관리자, 게스트
+// 사용 가능한 사용자: 일반, 관리자
 router.get("/names/:building", auth, controller.getFloorNames)
 
 // 성공!

@@ -9,8 +9,8 @@ const { flexibleAuthMiddleware } = require("../../middleware/guest")
 
 // 아직...
 // 빌딩 전체 조회(메인화면)
-// 사용 가능한 사용자: 일반, 관리자, 게스트트
-router.get("/", auth, controller.getAll)
+// 사용 가능한 사용자: 일반, 관리자, 게스트
+router.get("/", flexibleAuthMiddleware, controller.getAll)
 
 // 빌딩 이름만 조회
 // 사용 가능한 사용자: 일반, 관리자

@@ -11,11 +11,11 @@ const { flexibleAuthMiddleware } = require("../../middleware/guest")
 
 // 건물(W1~W19) 카테고리 목록 전부다. : 관리자에서.........
 // 사용 가능한 사용자: 일반, 관리자, 게스트
-router.get("/", auth, controller.getAll)
+router.get("/", flexibleAuthMiddleware, controller.getAll)
 
 // 카테고리 검색(카테고리 이름 > 건물 위치) 메인화면에서 상단부분 필터 클릭 시
 // 사용 가능한 사용자: 일반, 관리자, 게스트
-router.get("/:category", auth, controller.getBuildingLocationsByCategory)
+router.get("/:category", flexibleAuthMiddleware, controller.getBuildingLocationsByCategory)
 
 // 아직.
 // 건물_층 2d도면에 카테고리 필터 클릭시 띄우기

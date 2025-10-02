@@ -8,8 +8,8 @@ const adminMiddleware = require("../../middleware/admin")
 const { flexibleAuthMiddleware } = require("../../middleware/guest")
 
 // 경로 조회 및 반환
-// 사용 가능한 사용자: 일반, 관리자, 게스트
-router.post("/", authMiddleware, controller.getPath)
+// 사용 가능한 사용자: 일반, 게스트
+router.post("/", flexibleAuthMiddleware, controller.getPath)
 
 // 노드 목록 조회
 // 사용 가능한 사용자: 일반, 관리자

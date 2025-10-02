@@ -9,7 +9,7 @@ const { flexibleAuthMiddleware } = require("../../middleware/guest")
 
 // 방 목록 전부다 : 관리자
 // 사용 가능한 사용자: 관리자, 게스트
-router.get("/", auth, admin, controller.getAll)
+router.get("/", flexibleAuthMiddleware, controller.getAll)
 // 경로 연결 시 다른 층의 계단 검색
 // 사용 가능한 사용자: 관리자
 router.get("/stairs/:building/:floor/:id", auth, admin, controller.stairs);
