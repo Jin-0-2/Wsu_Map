@@ -5,40 +5,51 @@ const router = express.Router()
 const controller = require("./controller")
 const auth = require("../../middleware/auth")
 const admin = require("../../middleware/admin")
+const { flexibleAuthMiddleware } = require("../../middleware/guest")
 
 // 방 목록 전부다 : 관리자
+// 사용 가능한 사용자: 관리자, 게스트
 router.get("/", auth, admin, controller.getAll)
 // 경로 연결 시 다른 층의 계단 검색
+// 사용 가능한 사용자: 관리자
 router.get("/stairs/:building/:floor/:id", auth, admin, controller.stairs);
 
 
 // 건물만 해서 모든 층의 방 반환
-router.get("/:building", controller.getRoombyBuilding)
+// 사용 가능한 사용자: 일반, 관리자
+router.get("/:building", auth, controller.getRoombyBuilding)
 
 // 건물_층의 방 목록 조회 : 관리자
+// 사용 가능한 사용자: 관리자
 router.get("/:building/:floor", auth, admin, controller.getRoombyBuildingFloor)
 
 // 2D도면에서 방 클릭 시 보여줄 방 이름 및 설명 : 앱
-router.get("/desc/:building/:floor/:room", controller.getRoomDescByName)
+// 사용 가능한 사용자: 일반, 관리자
+router.get("/desc/:building/:floor/:room", auth, controller.getRoomDescByName)
 
 // 길찾기용 포인트 (수정 필요)
 // router.get("/point/:building/:floor", controller.getRoomPointByName)
 
 // 강의실 수정
+// 사용 가능한 사용자: 관리자
 router.put("/:building/:floor", auth, admin, controller.update)
 
 // 실내 패스 도면 연결
+// 사용 가능한 사용자: 관리자
 router.post("/connect", auth, admin, controller.connect);
 
 // 실내 패스 도면 연결 해제
+// 사용 가능한 사용자: 관리자
 router.delete("/disconnect", auth, admin, controller.disconnect);
 
 
 
 // 필ㅇ없ㅇㅁ.
 // 방 추가
+// 사용 가능한 사용자: 관리자
 router.post("/:building/:floor", auth, admin, controller.create)
 
 // 방 삭제
+// 사용 가능한 사용자: 관리자
 router.delete("/:building/:floor", auth, admin, controller.delete)
 module.exports = router
